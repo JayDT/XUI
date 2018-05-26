@@ -1,0 +1,17 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="Separator">
+            <Border BorderBrush="{x:TemplateBinding BorderBrush}"
+                BorderThickness="{x:TemplateBinding BorderThickness}"
+                Background="{x:TemplateBinding Background}"/>
+        </ControlTemplate>
+        <Style TargetType="Separator">
+            <Setter Property="Background" Value="{x:StaticResource ThemeControlMidBrush}"/>
+            <Setter Property="Margin" Value="29,1,0,1"/>
+            <Setter Property="Height" Value="1"/>
+        </Style>
+    </Application.Resources>
+</Application>

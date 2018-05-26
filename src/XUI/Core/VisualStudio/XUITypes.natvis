@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="XUI::Core::Dependency::BindProperty&lt;*&gt;">
+        <DisplayString>[{_id}] {_name}</DisplayString>
+        <Expand>
+            <Item Name="[OwnerType]">_ownerType</Item>
+            <Item Name="[ValueType]">_propertyType</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="XUI::Core::Media::Vector">
+        <DisplayString>{x} {y}</DisplayString>
+    </Type>
+
+    <Type Name="XUI::Core::Media::Point">
+        <DisplayString>{x} {y}</DisplayString>
+    </Type>
+
+</AutoVisualizer>

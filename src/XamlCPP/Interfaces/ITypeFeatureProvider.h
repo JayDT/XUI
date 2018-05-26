@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2017-2018 Tauri JayD <https://www.>
+ * Copyright (c) 2016 OmniGUI Platform
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include <System/System.h>
+#include "Reflection/Runtime/Type.h"
+
+namespace XamlCPP::Core
+{
+    struct Metadata;
+    class TypeConverterRegistration;
+}
+
+namespace XamlCPP::Interfaces
+{
+    struct ITypeConverter;
+
+    struct ITypeFeatureProvider
+    {
+        virtual ~ITypeFeatureProvider() {}
+        virtual std::vector<Core::TypeConverterRegistration> getTypeConverters() = 0;
+        virtual ITypeConverter* GetTypeConverter(std::size_t typehash) = 0;
+        virtual std::string GetContentPropertyName(const System::Reflection::Type* type) = 0;
+        virtual std::shared_ptr<Core::Metadata> GetMetadata(const System::Reflection::Type* type) = 0;
+        virtual void RegisterMetadata(const System::Reflection::Type* type, Core::Metadata* metadata) = 0;
+        virtual void AddTypeConverter(Core::TypeConverterRegistration const& typeConverterRegistration) = 0;
+    };
+}
+

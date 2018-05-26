@@ -1,0 +1,58 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{x:StaticResource ThemeBorderMidBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+
+                    <ControlTemplate>
+                        <Border Name="border"
+                                Background="{x:TemplateBinding Background}"
+                                BorderBrush="{x:TemplateBinding BorderBrush}"
+                                BorderThickness="{x:TemplateBinding BorderThickness}">
+
+                            <DockPanel LastChildFill="True" Margin="{x:TemplateBinding Padding}">
+                                <!-- <Canvas Name="error" DockPanel.Dock="Right" Width="14" Height="14" Margin="4 0 1 0">
+                                     <ToolTip.Tip>
+                                       <ItemsControl Items="{x:TemplateBinding DataValidationErrors}" MemberSelector="Message"/>
+                                     </ToolTip.Tip>
+                                     <Path Data="M14,7 A7,7 0 0,0 0,7 M0,7 A7,7 0 1,0 14,7 M7,3l0,5 M7,9l0,2" Stroke="{x:DynamicResource ErrorBrush}" StrokeThickness="2"/>
+                                   </Canvas> -->
+
+                                <ScrollViewer CanScrollHorizontally="{x:TemplateBinding CanScrollHorizontally}"
+                                              HorizontalScrollBarVisibility="{x:TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                              VerticalScrollBarVisibility="{x:TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+
+                                    <!-- <Panel>
+                                        <TextBlock Name="watermark"
+                           Opacity="0.5"
+                           Text="{x:TemplateBinding Watermark}"
+                           IsVisible="{x:TemplateBinding Path=Text, Converter={x:Static StringConverters.NullOrEmpty}}"/> -->
+
+                                        <TextPresenter GID="3003"
+                                                    Name="PART_TextPresenter"
+                                                    Text="{x:TemplateBinding Text, Mode=TwoWay}"
+                                                    Foreground="{x:TemplateBinding Foreground}"
+                                                    CaretIndex="{x:TemplateBinding CaretIndex}"
+                                                    SelectionStart="{x:TemplateBinding SelectionStart}"
+                                                    SelectionEnd="{x:TemplateBinding SelectionEnd}"
+                                                    TextAlignment="{x:TemplateBinding TextAlignment}"
+                                                    TextWrapping="{x:TemplateBinding TextWrapping}"/>
+                                    <!-- </Panel> -->
+                                </ScrollViewer>
+                            </DockPanel>
+
+                        </Border>
+                    </ControlTemplate>
+
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

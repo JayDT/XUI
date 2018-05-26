@@ -1,0 +1,151 @@
+/* ----------------------------------------------------------------------------
+** GENERATED SOURCE FILE
+** Do not modify the contents of this file.
+**
+** System::Reflection Meta Generator v{{version}}
+** --------------------------------------------------------------------------*/
+
+namespace basens = System::Reflection::Assembly;
+
+namespace System::Reflection::Assembly
+{
+    class AssemblyModul{{targetName}};
+}
+
+#define _ALLOW_KEYWORD_MACROS true
+// open back door
+#   define protected friend class basens::AssemblyModul{{targetName}}; protected
+#   define private friend class basens::AssemblyModul{{targetName}}; private
+
+{{#hasReflType}}
+{{#usingPrecompiledHeader}}#include "{{precompiledHeader}}"
+{{/usingPrecompiledHeader}}
+
+//#include "{{moduleFileHeader}}"
+
+{{#standardIncludes}}
+#include {{& header}}{{/standardIncludes}}
+
+#include "{{moduleFileSourceHeader}}"
+{{/hasReflType}}
+
+#include "{{moduleHeaderFile}}"
+
+namespace m = System::Reflection::meta;
+extern std::shared_ptr<m::Object> AssemblyModul{{targetName}}__SharedContructor_{{moduleFileName}}_impl(size_t methodId, const m::ArgumentList&& arguments);
+
+void System::Reflection::Assembly::AssemblyModul{{targetName}}::DefineModuleFile{{moduleFileName}}(m::ReflectionDatabase &db)
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // Global Definitions
+    ///////////////////////////////////////////////////////////////////////////
+    {{#global}}
+    db.AddGlobal<{{& type}}>
+        ( "{{& qualifiedName}}",
+        {{#isGetterAccessible}}{{> getterBody}},{{/isGetterAccessible}}{{^isGetterAccessible}}
+        nullptr,{{/isGetterAccessible}}{{#isSetterAccessible}}
+        {{> setterBody}},{{/isSetterAccessible}}{{^isSetterAccessible}}
+        nullptr,{{/isSetterAccessible}} { {{> metaDataInitializerList}} }
+    );{{/global}}
+    ///////////////////////////////////////////////////////////////////////////
+    // Global Functions
+    ///////////////////////////////////////////////////////////////////////////
+    {{#globalFunction}}
+    db.AddGlobalFunction( "{{& qualifiedName}}", &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& internalID}}, {
+    {{> metaDataInitializerList}}}, m::CXVisibilityKind({{& LinkerVisibility}}) );{{/globalFunction}}
+    ///////////////////////////////////////////////////////////////////////////
+    // Enum Definitions
+    ///////////////////////////////////////////////////////////////////////////
+    {{#enum}}
+    {
+    auto typeID = typeidof( {{& qualifiedName}} );
+
+    if (typeID != m::InvalidTypeID && db.m_nextID.ModulID == typeID.ModulID && !db.types[ typeID ]->isDefined)
+    {
+        auto &type = db.types[ typeID ];
+        type->metaData = { {{> metaDataInitializerList}} };
+        type->SetEnum( "{{& displayName}}", &typeof( {{& qualifiedName}} ), &typeof( std::underlying_type<{{& qualifiedName}}>
+    ::type ),
+    { {{#member}}
+    { "{{key}}", unsigned long long({{value}}) }{{^isLast}},{{/isLast}}{{/member}}
+    } );
+    type->isDefined = true;
+    }
+    }{{/enum}}
+    ///////////////////////////////////////////////////////////////////////////
+    // Class Definitions
+    ///////////////////////////////////////////////////////////////////////////
+    {{#class}}
+    /**
+    * {{& qualifiedName}}
+    */
+    {
+    auto typeID = System::Reflection::typeid_of(typeid( {{& qualifiedName}} ));
+
+    if (typeID != m::InvalidTypeID && db.m_nextID.ModulID == typeID.ModulID && !db.types[ typeID ]->isDefined)
+    {
+    auto &type = db.types[ typeID ];
+    type->internalId = {{& internalID}};
+    type->linkerVisibility = m::CXVisibilityKind({{& LinkerVisibility}});
+    type->__class_object_adjuter_impl = &AssemblyModul{{targetName}}::offset_adjustment_{{moduleFileName}}_impl;
+    type->__class_shared_contructor_impl = AssemblyModul{{targetName}}__SharedContructor_{{moduleFileName}}_impl;
+    type->metaData = {
+    {{> metaDataInitializerList}}};
+    type->name = "{{& SpellingName}}";
+    {{#namespace}}type->nameSpace = "{{& namespace}}";{{/namespace}}
+    {{#baseClass}}
+    {
+    m::TypeData::AttachedClass aclass;
+    aclass.m_type = &typeof( {{& name}} );
+    aclass.m_nativeDescriptor = std::type_index( typeid( {{& name}} ) );
+    aclass.m_isVirtual = {{& virtual}};
+    aclass.m_accessLevel = m::CXXAccessSpecifier({{& accessLevel}});
+    type->AddBaseClasses(db, typeID, aclass);
+    }
+    {{/baseClass}}
+    {{#TemplateDefinationClass}}
+    {
+    type->InitializeTemplateTypes(db, typeID, { {{#templateClass}}
+    m::TypeData::AttachedClass(&typeof({{& name}}), std::type_index(typeid({{& name}})), 0, false, m::CXXAccessSpecifier(0)){{^isLast}},{{/isLast}}{{/templateClass}}
+    });
+    }{{/TemplateDefinationClass}}
+    {{#arrayTypeEnabled}}// Array Constructor
+    type->SetArrayConstructor( &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& arrayConstructorID}} );{{/arrayTypeEnabled}}
+    // Destructor
+    type->SetDestructor( &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& destructorID}} );
+    {{#HasDefaultConstructor}}// Constructors
+    type->AddConstructor( &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& ConstructorID}}, { } );{{/HasDefaultConstructor}}
+    // Dynamic Constructors
+    {{#dynamicConstructor}}
+    type->AddConstructor( &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& internalID}}, { {{> metaDataInitializerList}} }, m::CXXAccessSpecifier({{& AccessLevel}}));{{/dynamicConstructor}}
+    // Properties{{#property}}
+    type->AddProperty( "{{& displayName}}", typeid({{& type}}).hash_code(), {{& internalID}}, typeof({{& type}}), typeof({{& parentQualifiedName}}),
+    {{#isGetterAccessible}}AssemblyModul{{targetName}}::field_Getter_{{moduleFileName}}_impl,{{/isGetterAccessible}}{{^isGetterAccessible}}nullptr,{{/isGetterAccessible}}
+    {{#isSetterAccessible}}AssemblyModul{{targetName}}::field_Setter_{{moduleFileName}}_impl,{{/isSetterAccessible}}{{^isSetterAccessible}}nullptr,{{/isSetterAccessible}}
+    &AssemblyModul{{targetName}}::FieldDesc_{{moduleFileName}}_impl, { {{> metaDataInitializerList}} }, m::CXXAccessSpecifier({{& AccessLevel}}), {{& isStaticGetter}}, {{& isStaticSetter}}
+    );{{/property}}
+    // Fields{{#field}}
+    type->AddField( "{{& displayName}}", typeid({{& type}}).hash_code(), {{& internalID}}, typeof({{& type}}), typeof({{& parentQualifiedName}}),
+    {{#isGetterAccessible}}AssemblyModul{{targetName}}::field_Getter_{{moduleFileName}}_impl,{{/isGetterAccessible}}{{^isGetterAccessible}}nullptr,{{/isGetterAccessible}}
+    {{#isSetterAccessible}}AssemblyModul{{targetName}}::field_Setter_{{moduleFileName}}_impl,{{/isSetterAccessible}}{{^isSetterAccessible}}nullptr,{{/isSetterAccessible}}
+    &AssemblyModul{{targetName}}::FieldDesc_{{moduleFileName}}_impl, { {{> metaDataInitializerList}} }, m::CXXAccessSpecifier({{& AccessLevel}})
+    );{{/field}}
+    // Static Fields{{#staticField}}
+    type->AddStaticField( "{{& displayName}}", typeid({{& type}}).hash_code(), {{& internalID}}, typeof({{& type}}), typeof({{& parentQualifiedName}}),
+    {{#isGetterAccessible}}AssemblyModul{{targetName}}::field_Getter_{{moduleFileName}}_impl,{{/isGetterAccessible}}{{^isGetterAccessible}}nullptr,{{/isGetterAccessible}}
+    {{#isSetterAccessible}}AssemblyModul{{targetName}}::field_Setter_{{moduleFileName}}_impl,{{/isSetterAccessible}}{{^isSetterAccessible}}nullptr,{{/isSetterAccessible}}
+    &AssemblyModul{{targetName}}::FieldDesc_{{moduleFileName}}_impl, { {{> metaDataInitializerList}} }, m::CXXAccessSpecifier({{& AccessLevel}})
+    );{{/staticField}}
+    // Methods{{#method}}
+    type->AddMethod( "{{& name}}", &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& internalID}}, { {{> metaDataInitializerList}} }, m::CXXAccessSpecifier({{& AccessLevel}}) );{{/method}}
+    // Static Methods{{#staticMethod}}
+    type->AddStaticMethod( "{{& name}}", &AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl, &AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl, {{& internalID}}, { {{> metaDataInitializerList}} }, m::CXXAccessSpecifier({{& AccessLevel}})
+    );{{/staticMethod}}
+    type->isDefined = true;
+    }
+    }{{/class}}
+    }
+
+    #   undef private
+    #   undef protected
+    #undef _ALLOW_KEYWORD_MACROS

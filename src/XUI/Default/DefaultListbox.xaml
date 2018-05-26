@@ -1,0 +1,51 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="ListBox">
+            <Border BorderBrush="{x:TemplateBinding BorderBrush}" GID="6006"
+                    BorderThickness="{x:TemplateBinding BorderThickness}">
+                <ScrollViewer Name="PART_ScrollViewer" Background="{x:TemplateBinding Background}">
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                Items="{x:TemplateBinding Items}"
+                                ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                                ItemTemplate="{x:TemplateBinding ItemTemplate}"
+                                Margin="{x:TemplateBinding Padding}"
+                                MemberSelector="{x:TemplateBinding MemberSelector}"
+                                Foreground="{x:TemplateBinding Foreground}"
+                                VirtualizationMode="{x:TemplateBinding VirtualizationMode}"/>
+                </ScrollViewer>
+            </Border>
+        </ControlTemplate>
+        <ControlTemplate TargetType="ListBoxItem">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Background="{x:TemplateBinding Background}"
+                              BorderBrush="{x:TemplateBinding BorderBrush}"
+                              BorderThickness="{x:TemplateBinding BorderThickness}"
+                              Content="{x:TemplateBinding Content}"
+                              ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                              Foreground="{x:TemplateBinding Foreground}"
+                              Padding="{x:TemplateBinding Padding}"/>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="PART_ContentPresenter" Property="BorderBrush" Value="SteelBlue" />
+                    <Setter TargetName="PART_ContentPresenter" Property="BorderThickness" Value="1" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="true">
+                    <Setter TargetName="PART_ContentPresenter" Property="Background" Value="Blue" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="{x:StaticResource ThemeBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{x:StaticResource ThemeBorderMidBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="SteelBlue"/>
+        </Style>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,44 @@
+/* ----------------------------------------------------------------------------
+** GENERATED HEADER FILE
+** Do not modify the contents of this file.
+**
+** System::Reflection Meta Generator v{{version}}
+** --------------------------------------------------------------------------*/
+
+#pragma once
+
+#include "Reflection/Runtime/ReflectionDatabase.h"
+#include "Reflection/Runtime/ReflectionModule.h"
+
+namespace System::Reflection::Assembly 
+{
+    namespace meta
+    {
+        class ReflectionDatabase;
+        class Variant;
+    }
+
+    class AssemblyModul{{targetName}} : public System::Reflection::meta::ReflectionModule
+    {
+        ///////////////////////////////////////////////////////////////////////////
+        // Module Files
+        ///////////////////////////////////////////////////////////////////////////
+        {{#moduleFile}}
+        void AllocateModuleFile{{& name}}( System::Reflection::meta::ReflectionDatabase &db );{{/moduleFile}}
+        {{#moduleFile}}
+        void DefineModuleFile{{& name}}( System::Reflection::meta::ReflectionDatabase &db );
+        static intptr_t offset_adjustment_{{& name}}_impl(size_t classId, System::Reflection::meta::Variant& from);
+        static void field_Setter_{{& name}}_impl(size_t methodId, System::Reflection::meta::Variant&& obj, System::Reflection::meta::Variant&& value);
+        static System::Reflection::meta::Variant field_Getter_{{& name}}_impl(size_t methodId, System::Reflection::meta::Variant&& obj);
+        static System::Reflection::meta::FieldDesc const& FieldDesc_{{& name}}_impl(size_t fieldId);
+        static System::Reflection::meta::Variant invoker_{{& name}}_impl(size_t methodId, System::Reflection::meta::Variant&& obj, const System::Reflection::meta::ArgumentList&& arguments);
+        static System::Reflection::meta::MethodDesc const& MethodDesc_{{& name}}_impl(size_t methodId);{{/moduleFile}}
+
+    public:
+        AssemblyModul{{targetName}}();
+        ~AssemblyModul{{targetName}}(void);
+
+        void CreateTypes() override;
+        void Initialize() override;
+    };
+}

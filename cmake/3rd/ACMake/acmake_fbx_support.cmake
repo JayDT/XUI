@@ -1,0 +1,10 @@
+# usage: acmake_fbx_support([<target>])
+# requires: cache/environment variable FBX_HOME or FBX_ROOT
+macro(acmake_fbx_support)
+    find_package(FBX REQUIRED)
+    include_directories(${FBX_INCLUDE_DIRS})
+    add_definitions(${FBX_DEFINITIONS})
+    if(${ARGC} GREATER 0)
+        target_link_libraries(${ARGN} ${FBX_LIBRARIES})
+    endif()
+endmacro()

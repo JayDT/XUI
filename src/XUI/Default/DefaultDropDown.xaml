@@ -1,0 +1,82 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="DropDown">
+            <Border Name="border"
+                Background="{x:TemplateBinding Background}"
+                BorderBrush="{x:TemplateBinding BorderBrush}"
+                BorderThickness="{x:TemplateBinding BorderThickness}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter Content="{x:TemplateBinding SelectionBoxItem}"
+                            Margin="{x:TemplateBinding Padding}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"/>
+                    <ToggleButton Name="toggle"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          ClickMode="Press"
+                          Focusable="False"
+                          IsChecked="{x:TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                          Grid.Column="1">
+                        <Path Fill="{x:StaticResource ThemeForegroundBrush}"
+                            Width="8"
+                            Height="4"
+                            Stretch="Uniform"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z"/>
+                    </ToggleButton>
+                    <Popup Name="PART_Popup"
+                        IsOpen="{x:TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                        MinWidth="{x:TemplateBinding Bounds.Width}"
+                        MaxHeight="{x:TemplateBinding MaxDropDownHeight}"
+                        StaysOpen="False">
+                        <Border BorderBrush="{x:StaticResource ThemeBorderMidBrush}"
+                            BorderThickness="1">
+                            <ScrollViewer>
+                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                  Items="{x:TemplateBinding Items}"
+                                  ItemTemplate="{x:TemplateBinding ItemTemplate}"
+                                  MemberSelector="{x:TemplateBinding MemberSelector}"/>
+                            </ScrollViewer>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+        <ControlTemplate TargetType="DropDownItem">
+            <ContentPresenter Name="PART_ContentPresenter" GID="204"
+                          Background="{x:TemplateBinding Background}"
+                          BorderBrush="{x:TemplateBinding BorderBrush}"
+                          BorderThickness="{x:TemplateBinding BorderThickness}"
+                          Content="{x:TemplateBinding Content}"
+                          ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                          HorizontalContentAlignment="{x:TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{x:TemplateBinding VerticalContentAlignment}"
+                          Padding="{x:TemplateBinding Padding}"/>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="PART_ContentPresenter" Property="BorderBrush" Value="SteelBlue" />
+                    <Setter TargetName="PART_ContentPresenter" Property="BorderThickness" Value="1" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="true">
+                    <Setter TargetName="PART_ContentPresenter" Property="Background" Value="Blue" />
+                </Trigger>
+            </ControlTemplate.Triggers>            
+        </ControlTemplate>
+        <Style TargetType="DropDown">
+            <Setter Property="Background" Value="{x:StaticResource ThemeControlMidBrush}"/>
+            <Setter Property="Padding" Value="2, 2, 2, 2"/>
+        </Style>
+        <Style TargetType="DropDownItem">
+            <Setter Property="Background" Value="{x:StaticResource ThemeControlMidBrush}"/>
+            <Setter Property="Padding" Value="5, 2, 5, 2"/>
+        </Style>
+    </Application.Resources>
+</Application>

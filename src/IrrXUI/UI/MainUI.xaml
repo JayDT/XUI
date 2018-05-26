@@ -1,0 +1,62 @@
+<Window x:Class="WorldClient.MainWindow"
+            xmlns="http://git.tauri.hu/XUI"
+            xmlns:x="http://git.tauri.hu/Xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:WorldClient"
+            mc:Ignorable="d"
+            Title="MainWindow" Height="350" Width="525" Background="#E01E1E1E" WindowStyle="GUIWindow">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions> 
+        <Menu Grid.Row="0" Name="menu1">
+            <MenuItem Header=" File" GID="11">
+                <MenuItem Header="Open" IsCheckable="true" Click="OnShowDebugWindow" GID="21"/>
+                <MenuItem Header="Close" IsCheckable="true" GID="22"/>
+                <MenuItem Header="Save" IsCheckable="true" GID="23"/>
+                <TextBox TextWrapping="Wrap" Text="TextBox" GID="45"/>
+                <Separator GID="24"/>
+                <MenuItem Header="Sub Items">
+                    <MenuItem Header="Child1 SubItem" IsCheckable="true"/>
+                    <TextBox TextWrapping="Wrap" Text="TextBox" GID="46"/>
+                    <MenuItem Header="Child2 SubItem" IsCheckable="true">
+                        <MenuItem Header="GrandChild2 SubItem" IsCheckable="true"/>
+                    </MenuItem>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <DockingManager x:Name="MainLayoutManager" ActiveContentChanged="EditorMainManager_ActiveContentChanged" AllowMixedOrientation="True" Margin="1,0,-1,0" Grid.Row="1">
+            <LayoutRoot>
+                <LayoutRoot.RootPanel>
+                    <LayoutPanel>
+                        <LayoutAnchorablePane>
+                            <LayoutAnchorable Title="EditorMainLayoutPanel">
+                                <DataGrid Name="dataView" GID="110" ColumnWidth="*" />
+                            </LayoutAnchorable>
+                            <LayoutAnchorable Title="TextTest">
+                                <TextBox HorizontalAlignment="Left" Height="96" TextWrapping="NoWrap" Text="TextBox" VerticalAlignment="Top" Width="187" Margin="220,66,0,0" AcceptsReturn="True" AcceptsTab="True" Foreground="#FF4EC9B0"/>
+                            </LayoutAnchorable>
+                            <LayoutAnchorable Title="SliderTest">
+                                <Grid>
+                                    <Slider Height="20" Width="104" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="223,10,0,0" GID="60">
+                                        <Slider.ToolTip>
+                                            <ToolTip>
+                                                <StackPanel>
+                                                    <TextBlock FontWeight="Bold">Submit Request</TextBlock>
+                                                    <TextBlock>Submits the request to the server.</TextBlock>
+                                                </StackPanel>
+                                            </ToolTip>
+                                        </Slider.ToolTip>
+                                    </Slider>
+                                    <ProgressBar HorizontalAlignment="Left" Height="10" VerticalAlignment="Top" Width="100" Margin="216,60,0,0" Value="50"/>
+                                </Grid>
+                            </LayoutAnchorable>
+                        </LayoutAnchorablePane>
+                    </LayoutPanel>
+                </LayoutRoot.RootPanel>
+            </LayoutRoot>
+        </DockingManager>
+    </Grid>
+</Window>

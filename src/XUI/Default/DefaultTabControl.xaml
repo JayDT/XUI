@@ -1,0 +1,81 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="TabControl">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TabStrip Name="PART_TabStrip"
+                        Grid.Row="0"
+                        Items="{x:TemplateBinding Items}"
+                        SelectedIndex="{x:TemplateBinding Path=SelectedIndex, Mode=TwoWay}"/>
+                <Border Name="tcBorder"
+                  Margin="0,0,0,0"
+                  Grid.Row="1"
+                  BorderThickness="{x:TemplateBinding BorderThickness}"
+                  BorderBrush="{x:TemplateBinding BorderBrush}"
+                  Background="{x:TemplateBinding Background}">
+                    <ContentPresenter Name="PART_Content"
+                        Content="{x:TemplateBinding SelectedContent}"              
+                        Padding="{x:TemplateBinding Padding}"
+                        RecognizesAccessKey="True"/>
+                </Border>
+            </Grid>
+        </ControlTemplate>
+        <ControlTemplate TargetType="TabStripItem">
+            <Border Name="Border"
+                Padding="{x:TemplateBinding Padding}"
+                Background="{x:TemplateBinding Background}"
+                BorderBrush="{x:TemplateBinding BorderBrush}"
+                BorderThickness="{x:TemplateBinding BorderThickness}">
+                <ContentPresenter Name="PART_ContentPresenter"
+                                      Content="{x:TemplateBinding Content}"
+                                      ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                                      Foreground="{x:TemplateBinding Foreground}"
+                                      Padding="{x:TemplateBinding Padding}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="SteelBlue" />
+                    <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="SteelBlue" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style TargetType="TabStripItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="2, 2, 2, 2"/>
+            <Setter Property="Foreground" Value="{x:StaticResource ThemeForegroundLightBrush}"/>
+        </Style>
+        <Style TargetType="TabStrip">
+            <Setter Property="Background" Value="#30EEEEEE"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                   Items="{x:TemplateBinding Items}"
+                                   MemberSelector="{x:TemplateBinding MemberSelector}"
+                                   ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                                   ItemTemplate="{x:TemplateBinding ItemTemplate}"
+                   />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <!-- <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </Setter> -->
+        </Style>
+    </Application.Resources>
+</Application>

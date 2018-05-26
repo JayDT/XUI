@@ -1,0 +1,10 @@
+add_subdirectory(Reflection)
+add_subdirectory(CFramework)
+add_subdirectory(XamlCPP)
+add_subdirectory(ResourceCompiler)
+add_subdirectory(XUI)
+add_subdirectory(IrrLicht)
+IF (NOT SKIP_SAMPLE)
+    add_subdirectory(IrrXUI)
+ENDIF(NOT SKIP_SAMPLE)
+

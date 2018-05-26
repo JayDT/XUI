@@ -1,0 +1,92 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="TreeView">
+            <Border BorderBrush="{x:TemplateBinding BorderBrush}"
+                    BorderThickness="{x:TemplateBinding BorderThickness}">
+                <ScrollViewer Name="PART_ScrollViewer" CanScrollHorizontally="True" Background="{x:TemplateBinding Background}">
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                Items="{x:TemplateBinding Items}"
+                                ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                                ItemTemplate="{x:TemplateBinding ItemTemplate}"
+                                Margin="{x:TemplateBinding Padding}"
+                                MemberSelector="{x:TemplateBinding MemberSelector}"/>
+                </ScrollViewer>
+            </Border>
+        </ControlTemplate>
+        <ControlTemplate TargetType="TreeViewItem">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ToggleButton Name="expander"
+                              Focusable="False"
+                              Style="{x:StaticResource Base_TreeViewItem_ToggleButton_Expander}"
+                              IsChecked="{x:TemplateBinding Path=IsExpanded, Mode=TwoWay}"
+                              RenderTransformOrigin="0.5,0.5"/>
+                    <ContentPresenter Name="PART_HeaderPresenter"
+                                  Background="{x:TemplateBinding Background}"
+                                  BorderBrush="{x:TemplateBinding BorderBrush}"
+                                  BorderThickness="{x:TemplateBinding BorderThickness}"
+                                  Foreground="{x:TemplateBinding Foreground}"
+                                  Content="{x:TemplateBinding Header}"
+                                  Padding="{x:TemplateBinding Padding}"
+                                  Grid.Column="1" GID="203"/>
+                </Grid>
+                <ItemsPresenter Name="PART_ItemsPresenter"
+                              IsVisible="{x:TemplateBinding IsExpanded}"
+                              Items="{x:TemplateBinding Items}"
+                              ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                              Margin="12,1,0,0"
+                              MemberSelector="{x:TemplateBinding MemberSelector}"/>
+            </StackPanel>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="PART_HeaderPresenter" Property="BorderBrush" Value="SteelBlue" />
+                    <Setter TargetName="PART_HeaderPresenter" Property="BorderThickness" Value="1" />
+                </Trigger>
+                <Trigger SourceName="expander" Property="ToggleButton.IsChecked" Value="{x:Static ToggleButtonState.TBS_CHECKED}">
+                    <Setter TargetName="expander" Property="RenderTransform">
+                        <RotateTransform Angle="45"/>
+                    </Setter>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style TargetType="TreeView">
+            <Setter Property="Background" Value="{x:StaticResource ThemeBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{x:StaticResource ThemeBorderMidBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="SteelBlue"/>
+            <Setter Property="Padding" Value="2"/>
+        </Style>
+        <Style x:Key="Base_TreeViewItem_ToggleButton_Expander" TargetType="ToggleButton">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="Transparent"
+                      Width="14"
+                      Height="12"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+                        <Path Fill="{x:StaticResource ThemeForegroundBrush}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Data="M 0 2 L 4 6 L 0 10 Z"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Application.Resources>
+    <Application.DataTemplates>
+        <HierarchicalDataTemplate DataType="{x:Type TreeViewItem}" ItemsSource="{x:Binding Items}">
+            <TextBlock Text="{x:TemplateBinding Content}" Foreground="{x:TemplateBinding Foreground}"/>
+        </HierarchicalDataTemplate>
+    </Application.DataTemplates>
+</Application>

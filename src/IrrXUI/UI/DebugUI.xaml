@@ -1,0 +1,44 @@
+<Window x:Class="WorldClient.DebugWindow"
+            xmlns="http://git.tauri.hu/XUI"
+            xmlns:x="http://git.tauri.hu/Xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:WorldClient"
+            mc:Ignorable="d"
+            Title="DebugWindow" Height="350" Width="525" Background="#E01E1E1E" WindowStyle="None">
+    <TabControl Margin="0,0,0,0" Grid.ColumnSpan="2">
+        <TabItem Header="Logical Tree">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="185"/>
+                </Grid.ColumnDefinitions>
+                <TreeView Grid.Column="0" Name="tvItems" SelectedItemChanged="PART_TreeviewSelectedItemChanged">
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Visible" IsCheckable="True" Name="VisibleControl" GID="111" />
+                        </ContextMenu>
+                    </TreeView.ContextMenu>                    
+                </TreeView>
+                <TextBox Grid.Column="1" TextWrapping="Wrap" Text="TextBox" AcceptsReturn="True" AcceptsTab="True" Name="tbSelectedLogicalInfo">
+                </TextBox>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Visual Tree">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="185"/>
+                </Grid.ColumnDefinitions>
+                <TreeView Grid.Column="0" Name="tvVisualItems" SelectedItemChanged="PART_TreeviewSelectedItemChanged">
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Visible" IsCheckable="True" Name="VisibleControl2" />
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
+                </TreeView>
+                <TextBox Grid.Column="1" TextWrapping="Wrap" Text="TextBox" AcceptsReturn="True" AcceptsTab="True" Name="tbSelectedVisualInfo"/>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</Window>

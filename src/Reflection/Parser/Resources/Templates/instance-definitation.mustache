@@ -1,0 +1,1 @@
+{{#isDynamicCast}}dynamic_cast{{/isDynamicCast}}{{^isDynamicCast}}static_cast{{/isDynamicCast}}<std::remove_cv<{{& parentQualifiedName}}>::type*>(obj.{{#isReflObject}}ToObject{{/isReflObject}}{{^isReflObject}}toPointer{{/isReflObject}}())

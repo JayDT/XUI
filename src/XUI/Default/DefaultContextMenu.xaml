@@ -1,0 +1,26 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="ContextMenu">
+            <Border Background="{x:TemplateBinding Background}"
+              BorderBrush="{x:TemplateBinding BorderBrush}"
+              BorderThickness="{x:TemplateBinding BorderThickness}"
+              Padding="{x:TemplateBinding Padding}">
+                <ItemsPresenter Name="PART_ItemsPresenter"
+                        Items="{x:TemplateBinding Items}"
+                        ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                        ItemTemplate="{x:TemplateBinding ItemTemplate}"/>
+            </Border>
+        </ControlTemplate>
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="#E01E1E1E"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="TextBlock.FontSize" Value="12" />
+            <Setter Property="TextBlock.FontWeight" Value="Normal" />
+        </Style>
+    </Application.Resources>
+</Application>

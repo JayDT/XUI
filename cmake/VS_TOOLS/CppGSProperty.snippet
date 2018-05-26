@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>C++ Property Get Set</Title>
+			<Shortcut>CPP Property GS</Shortcut>
+			<Description>Code snippet for</Description>
+			<Author>JayD</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+				<SnippetType>SurroundsWith</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>type</ID>
+					<ToolTip>type of property</ToolTip>
+					<Default>1</Default>
+				</Literal>
+				<Literal>
+					<ID>name</ID>
+					<ToolTip>name of property</ToolTip>
+					<Default>2</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="cpp"><![CDATA[PROPERTY_($type$, $name$); 
+				$type$ Get$name$() const { return GetValue<$type$>($name$Property); }
+				void Set$name$($type$ const& value) { SetValue($name$Property, value); }
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

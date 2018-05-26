@@ -1,0 +1,27 @@
+/* ----------------------------------------------------------------------------
+** GENERATED SOURCE FILE
+** Do not modify the contents of this file.
+**
+** System::Resource Generator v{{version}}
+** --------------------------------------------------------------------------*/
+
+#include "System/Resource/ResourceDatabase.h"
+
+namespace m = System::Resource;
+
+void __AllocateModuleFile{{moduleFileName}}(m::ResourceDatabase &db)
+{
+    {{#resource}}{
+        m::ResourceObject* res = db.CreateResourceObject("{{& name}}");
+        {{#data}}{
+            const uint8_t _binary[{{& size}}] = { {{& binary}} };
+            res->LoadCompressRawData(_binary, {{& size}}, {{& total_size}});
+        }{{/data}}
+        res->CreateResource();
+    }{{/resource}}
+}
+
+void __DefineModuleFile{{moduleFileName}}(m::ResourceDatabase &db)
+{
+
+}

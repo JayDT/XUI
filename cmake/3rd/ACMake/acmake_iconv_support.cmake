@@ -1,0 +1,10 @@
+include(acmake_common)
+include(acmake_assert)
+
+# usage: acmake_iconv_support(<target>)
+macro(acmake_iconv_support TARGET)
+    acmake_assert(ACMAKE_SDK_PATH)
+    find_package(Iconv REQUIRED PATHS "${ACMAKE_SDK_PATH}")
+    include_directories(${ICONV_INCLUDE_DIRS})
+    target_link_libraries(${TARGET} ${ICONV_LIBRARIES})
+endmacro()

@@ -1,0 +1,1127 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+
+        <!--DocumentPaneControlStyle-->
+        <Style TargetType="LayoutDocumentPaneControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="LayoutDocumentPaneControl">
+                        <Grid   ClipToBounds="true"
+                                SnapsToDevicePixels="true">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <!--Following border is required to catch mouse events-->
+                            <Border Background="Transparent" Grid.RowSpan="2" />
+                            <!-- {Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type LayoutDocumentPaneControl}}, Path=Model.ShowHeader} -->
+                            <Grid IsVisible="true"
+                                  ZIndex="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <DocumentPaneTabPanel x:Name="PART_TabStrip"
+                                                      GID="414"
+                                                      Grid.Column="0"
+                                                      Grid.Row="0"
+                                                      SelectionMode="{x:TemplateBinding SelectionMode}"
+                                                      Items="{x:TemplateBinding Items}"
+                                                      SelectedIndex="{x:TemplateBinding Path=SelectedIndex, Mode=TwoWay}"/>
+                                <DropDownButton x:Name="MenuDropDownButton"
+                                                Focusable="False"
+                                                Grid.Column="1">
+                                    <!--<DropDownButton.DropDownContextMenu>
+                                        <ContextMenuEx Items="{Binding Model.ChildrenSorted, RelativeSource={RelativeSource TemplatedParent}}">
+                                            <ContextMenuEx.ItemContainerStyle>
+                                                <Style TargetType="{x:Type MenuItemEx}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                                    <Setter Property="HeaderTemplate" Value="{Binding Path=Root.Manager.DocumentPaneMenuItemHeaderTemplate}" />
+                                                    <Setter Property="HeaderTemplateSelector" Value="{Binding Path=Root.Manager.DocumentPaneMenuItemHeaderTemplateSelector}" />
+                                                    <Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />
+                                                    <Setter Property="IconTemplateSelector" Value="{Binding Path=Root.Manager.IconContentTemplateSelector}" />
+                                                    <Setter Property="Command" Value="{Binding Path=., Converter={StaticResource ActivateCommandLayoutItemFromLayoutModelConverter}}" />
+                                                </Style>
+                                            </ContextMenuEx.ItemContainerStyle>
+                                        </ContextMenuEx>
+                                    </DropDownButton.DropDownContextMenu>-->
+                                    <Border Background="White">
+                                        <Image Source="/XUI;Default/Generic/Images/PinDocMenu.png"></Image>
+                                    </Border>
+                                </DropDownButton>
+                            </Grid>
+                            <Border x:Name="ContentPanel"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}"
+                                    Grid.Column="0"
+                                    Grid.Row="1">
+                                <ContentPresenter x:Name="PART_Content" GID="412"
+                                            Content="{x:TemplateBinding SelectedContent}"
+                                            Margin="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </Border>
+                        </Grid>
+                        <!-- <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static Colors.Gray}}" />
+                            </Trigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Model.ChildrenCount}" Value="0">
+                                <Setter Property="IsVisible"
+                                        Value="Collapsed"
+                                        TargetName="MenuDropDownButton" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers> -->
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="DocumentPaneTabPanel">
+            <Setter Property="Background" Value="#30EEEEEE"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                        Background="{TemplateBinding Background}" 
+							            Padding="{TemplateBinding Padding}"
+   				                        BorderThickness="1,1,1,0" >
+                            <ItemsPresenter Name="PART_ItemsPresenter"  GID="416"
+                                   Items="{x:TemplateBinding Items}"
+                                   MemberSelector="{x:TemplateBinding MemberSelector}"
+                                   ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                                   ItemTemplate="{x:TemplateBinding ItemTemplate}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+      <Style TargetType="{x:Type LayoutDocumentTabItem}">
+        <Setter Property="Padding" Value="2,0,2,0" />
+        <Setter Property="Margin" Value="2,2,0,0" />
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="MinHeight" Value="12"/>
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type LayoutDocumentTabItem}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="15" />
+                    </Grid.ColumnDefinitions>
+                        <Border Name="Border" GID="12"
+                            Grid.ColumnSpan="2"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
+                            <ContentPresenter x:Name="Content" GID="417"
+                                        Content="{x:TemplateBinding Header}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        RecognizesAccessKey="True"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />                      
+                    <!-- Close button should be moved out to the container style --> 
+                    <Button x:Name="DocumentCloseButton"
+                            Grid.Column="1"
+                            Margin="5,0,0,0"
+                            IsVisible="false"
+                            Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Path Data="F1M54.0573,47.8776L38.1771,31.9974 54.0547,16.1198C55.7604,14.4141 55.7604,11.6511 54.0573,9.94531 52.3516,8.23962 49.5859,8.23962 47.8802,9.94531L32.0026,25.8229 16.1224,9.94531C14.4167,8.23962 11.6511,8.23962 9.94794,9.94531 8.24219,11.6511 8.24219,14.4141 9.94794,16.1198L25.8255,32 9.94794,47.8776C8.24219,49.5834 8.24219,52.3477 9.94794,54.0534 11.6511,55.7572 14.4167,55.7585 16.1224,54.0534L32.0026,38.1745 47.8802,54.0534C49.5859,55.7585 52.3516,55.7572 54.0573,54.0534 55.7604,52.3477 55.763,49.5834 54.0573,47.8776z" 
+                                    Stretch="Uniform" Fill="#FFAAAAAA" Width="6" Margin="0,0,0,0" ></Path>
+                    </Button>
+                </Grid>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true" GID="13">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="SteelBlue" />
+                    <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                    <Setter TargetName="DocumentCloseButton" Property="IsVisible" Value="true" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="SteelBlue" />
+                    <Setter TargetName="DocumentCloseButton" Property="IsVisible" Value="true" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+        <!--AnchorablePaneControlStyle-->
+        <Style TargetType="LayoutAnchorablePaneControl">
+            <Setter Property="Foreground" Value="{Binding Model.Root.Manager.Foreground, RelativeSource={RelativeSource Self}}" />
+            <Setter Property="Background" Value="{Binding Model.Root.Manager.Background, RelativeSource={RelativeSource Self}}" />
+            <Setter Property="TabStripPlacement" Value="Bottom" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="LayoutAnchorablePaneControl">
+                        <Grid   ClipToBounds="true"
+                                SnapsToDevicePixels="true">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Header">
+                                <AnchorablePaneTitle Model="{x:TemplateBinding SelectedItem}" />
+                            </Border>
+                            <Border x:Name="ContentPanel"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}"
+                                    Grid.Column="0"
+                                    Grid.Row="1">
+                                <ContentPresenter x:Name="PART_Content"
+                                        Content="{x:TemplateBinding SelectedContent}"
+                                        Margin="{TemplateBinding Padding}"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </Border>
+                            <AnchorablePaneTabPanel x:Name="PART_TabStrip"
+                                                    GID="414"
+                                                    Margin="2,0,2,2"
+                                                    Grid.Row="2"
+                                                    Panel.ZIndex="1"
+                                                    SelectionMode="{x:TemplateBinding SelectionMode}"
+                                                    Items="{x:TemplateBinding Items}"
+                                                    SelectedIndex="{x:TemplateBinding Path=SelectedIndex, Mode=TwoWay}" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static Colors.Gray}}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="AnchorablePaneTabPanel">
+            <Setter Property="Background" Value="#30EEEEEE"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                        Background="{TemplateBinding Background}" 
+							            Padding="{TemplateBinding Padding}"
+   				                        BorderThickness="1,1,1,0" >
+                            <ItemsPresenter Name="PART_ItemsPresenter"  GID="416"
+                                   Items="{x:TemplateBinding Items}"
+                                   MemberSelector="{x:TemplateBinding MemberSelector}"
+                                   ItemsPanel="{x:TemplateBinding ItemsPanel}"
+                                   ItemTemplate="{x:TemplateBinding ItemTemplate}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style TargetType="{x:Type LayoutAnchorableTabItem}">
+            <Setter Property="Padding" Value="2,0,2,0" />
+            <Setter Property="Margin" Value="2,2,0,0" />
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="MinHeight" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type LayoutAnchorableTabItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="15" />
+                            </Grid.ColumnDefinitions>
+                            <Border Name="Border" GID="12"
+                                    Grid.ColumnSpan="2"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" />
+                            <ContentPresenter x:Name="Content" GID="417"
+                                        Content="{x:TemplateBinding Header}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        RecognizesAccessKey="True"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            <!-- Close button should be moved out to the container style -->
+                            <Button x:Name="DocumentCloseButton"
+                                    Grid.Column="1"
+                                    Margin="5,0,0,0"
+                                    IsVisible="false"
+                                    Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <Path Data="F1M54.0573,47.8776L38.1771,31.9974 54.0547,16.1198C55.7604,14.4141 55.7604,11.6511 54.0573,9.94531 52.3516,8.23962 49.5859,8.23962 47.8802,9.94531L32.0026,25.8229 16.1224,9.94531C14.4167,8.23962 11.6511,8.23962 9.94794,9.94531 8.24219,11.6511 8.24219,14.4141 9.94794,16.1198L25.8255,32 9.94794,47.8776C8.24219,49.5834 8.24219,52.3477 9.94794,54.0534 11.6511,55.7572 14.4167,55.7585 16.1224,54.0534L32.0026,38.1745 47.8802,54.0534C49.5859,55.7585 52.3516,55.7572 54.0573,54.0534 55.7604,52.3477 55.763,49.5834 54.0573,47.8776z" 
+                                            Stretch="Uniform" Fill="#FFAAAAAA" Width="6" Margin="0,0,0,0" ></Path>
+                            </Button>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true" GID="13">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="SteelBlue" />
+                                <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                                <Setter TargetName="DocumentCloseButton" Property="IsVisible" Value="true" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="SteelBlue" />
+                                <Setter TargetName="DocumentCloseButton" Property="IsVisible" Value="true" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style TargetType="AnchorablePaneTitle">
+            <Setter Property="Background" Value="#E01E1E1E"/>
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Content="{TemplateBinding Model}"
+                                                  ContentTemplate="{x:DynamicResource AnchorableHeaderTemplate}"
+                                                  HorizontalAlignment="Left" 
+                                                  VerticalAlignment="Center"/>
+
+                                <DropDownButton 
+                                                 Focusable="False"
+                                                 Grid.Column="1"
+                                                 DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                                 DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <Border Background="White">
+                                        <Image Source="/XUI;Default/Generic/Images/PinMenu.png">
+                                        </Image>
+                                    </Border>
+                                </DropDownButton>
+
+                                <Button x:Name="PART_AutoHidePin"
+                                    Grid.Column="2"
+                                    Focusable="False"
+                                    IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}"
+                                    Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <Border Background="White">
+                                        <Image Source="/XUI;Default/Generic/Images/PinAutoHide.png">
+                                        </Image>
+                                    </Border>
+                                </Button>
+
+                                <Button x:Name="PART_HidePin"
+                                        Grid.Column="3"
+                                        Focusable="False"
+                                        IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}"
+                                        Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <Border Background="White">
+                                        <Image Source="/XUI;Default/Generic/Images/PinClose.png">
+                                        </Image>
+                                    </Border>
+                                </Button>
+                            </Grid>
+                        </Border>
+                        <!--<ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Model.IsAutoHidden, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                                <Setter Property="LayoutTransform" TargetName="PART_AutoHidePin">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="90" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Model.CanClose, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                                <Setter Property="Command"
+                                        TargetName="PART_HidePin"
+                                        Value="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <Setter Property="ToolTip"
+                                        TargetName="PART_HidePin"
+                                        Value="{x:Static Resources.Document_Close}" />
+
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>-->
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <ControlTemplate x:Key="AnchorSideTemplate" TargetType="{x:Type LayoutAnchorSideControl}">
+            <ItemsControl Items="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}">
+                <!--<ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="{Binding Path=Model.Side, RelativeSource={RelativeSource AncestorType={x:Type LayoutAnchorSideControl}, Mode=FindAncestor}, Converter={StaticResource AnchorSideToOrientationConverter}}" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>-->
+            </ItemsControl>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="AnchorGroupTemplate" TargetType="{x:Type LayoutAnchorGroupControl}">
+            <ItemsControl Items="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}">
+                <ItemsControl.RenderTransform>
+                    <RotateTransform Angle="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Model.Parent.Side, Converter={StaticResource AnchorSideToAngleConverter}}" />
+                </ItemsControl.RenderTransform>
+                <!--<ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>-->
+            </ItemsControl>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="AnchorTemplate" TargetType="{x:Type LayoutAnchorControl}">
+            <Border BorderThickness="1"
+                BorderBrush="{DynamicResource {x:Static Colors.DarkGray}}"
+                Margin="2"
+                Padding="2">
+                <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+                                  ContentTemplate="{Binding AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DockingManager}, Mode=FindAncestor}}" />
+            </Border>
+        </ControlTemplate>
+
+        <Style TargetType="OverlayWindow">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="OverlayWindow">
+                        <Canvas x:Name="PART_DropTargetsContainer" Opacity="0.9" GID="501">
+                            <Path x:Name="PART_PreviewBox"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Left"
+                                Fill="AliceBlue"
+                                StrokeThickness="2"
+                                Stroke="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                            <Grid x:Name="PART_DockingManagerDropTargets">
+                                <Image x:Name="PART_DockingManagerDropTargetLeft"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Left"
+                                    Source="/XUI;Default/Generic/Images/DockLeft.PNG"
+                                    Stretch="None">
+                                </Image>
+                                <Image x:Name="PART_DockingManagerDropTargetRight"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right"
+                                    Source="/XUI;Default/Generic/Images/DockRight.PNG"
+                                    Stretch="None">
+                                </Image>
+                                <Image x:Name="PART_DockingManagerDropTargetBottom"
+                                    VerticalAlignment="Bottom"
+                                    HorizontalAlignment="Center"
+                                    Source="/XUI;Default/Generic/Images/DockBottom.PNG"
+                                    Stretch="None">
+                                </Image>
+                                <Image x:Name="PART_DockingManagerDropTargetTop"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center"
+                                    Source="/XUI;Default/Generic/Images/DockTop.PNG"
+                                    Stretch="None">
+                                </Image>
+                            </Grid>
+                            <Grid x:Name="PART_AnchorablePaneDropTargets">
+                                <Grid Width="88"
+                                    Height="88"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.ColumnSpan="3"
+                                        Grid.RowSpan="3"
+                                        Source="/XUI;Default/Generic/Images/DockPaneEmpty.png"
+                                        Stretch="Uniform">
+                                    </Image>
+                                    <Border Name="PART_AnchorablePaneDropTargetTop" Background="Gray"
+                                            Grid.Column="1"
+                                            Grid.Row="0">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockPaneTop.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_AnchorablePaneDropTargetRight" Background="Gray"
+                                        Grid.Column="2"
+                                        Grid.Row="1">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockPaneRight.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_AnchorablePaneDropTargetBottom" Background="Gray"
+                                        Grid.Column="1"
+                                        Grid.Row="2">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockPaneBottom.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_AnchorablePaneDropTargetLeft" Background="Gray"
+                                            Grid.Column="0"
+                                            Grid.Row="1">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockPaneLeft.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_AnchorablePaneDropTargetInto" Background="Gray"
+                                            Grid.Column="1"
+                                            Grid.Row="1">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockPaneInside.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                            <Grid x:Name="PART_DocumentPaneDropTargets">
+                                <Grid Width="88"
+                                    Height="88"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.ColumnSpan="3"
+                                        Grid.RowSpan="3"
+                                        Source="/XUI;Default/Generic/Images/DockPaneEmpty.png"
+                                        Stretch="Uniform">
+                                    </Image>
+                                    <Border Name="PART_DocumentPaneDropTargetTop" Background="Green"
+                                            Grid.Column="1"
+                                            Grid.Row="0">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockDocPaneTop.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_DocumentPaneDropTargetRight" Background="Green"
+                                            Grid.Column="2"
+                                            Grid.Row="1">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockDocPaneRight.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_DocumentPaneDropTargetBottom" Background="Green"
+                                        Grid.Column="1"
+                                        Grid.Row="2">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockDocPaneBottom.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_DocumentPaneDropTargetLeft" Background="Green"
+                                            Grid.Column="0"
+                                            Grid.Row="1">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockDocPaneLeft.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                    <Border Name="PART_DocumentPaneDropTargetInto" Background="Blue"
+                                            Grid.Column="1"
+                                            Grid.Row="1">
+                                        <Image Source="/XUI;Default/Generic/Images/InnerDockPaneInside.png" Stretch="None">
+                                        </Image>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Canvas>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="DocumentHeaderTemplate">
+            <TextBlock Text="{Binding Title}" >
+            </TextBlock>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AnchorableHeaderTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image x:Name="icon"
+                       Source="{Binding IconSource}"
+                       Stretch="Uniform">
+                </Image>
+                <TextBlock x:Name="title"
+                     GID="519" Margin="4,0,0,0"
+                     Text="{Binding Title}"
+                     Grid.Column="1">
+                </TextBlock>
+            </Grid>
+            <!-- DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IconSource}" Value="{x:Null}">
+                    <Setter Property="Margin" Value="0" TargetName="title" />
+                </DataTrigger>
+            </ -->
+        </DataTemplate>
+
+        <DataTemplate x:Key="DocumentTitleTemplate">
+            <TextBlock Text="{Binding Title}">
+            </TextBlock>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AnchorableTitleTemplate">
+            <TextBlock Text="{Binding Title}">
+            </TextBlock>
+        </DataTemplate>
+
+        <DataTemplate x:Key="IconContentTemplate">
+            <Image Source="{Binding IconSource}" Stretch="Uniform">
+            </Image>
+        </DataTemplate>
+
+        <ContextMenu x:Key="AnchorableContextMenu">
+            <!--<MenuItem Header="{x:Static Resources.Anchorable_Float}" Command="{Binding Path=FloatCommand}" />
+            <MenuItem Header="{x:Static Resources.Anchorable_Dock}" Command="{Binding Path=DockCommand}" />
+            <MenuItem Header="{x:Static Resources.Anchorable_DockAsDocument}" Command="{Binding Path=DockAsDocumentCommand}" />
+            <MenuItem Header="{x:Static Resources.Anchorable_AutoHide}" Command="{Binding Path=AutoHideCommand}" />
+            <MenuItem Header="{x:Static Resources.Document_Close}"
+                  Command="{Binding Path=CloseCommand}"
+                  IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}" />-->
+            <!--<MenuItem Header="{x:Static Resources.Anchorable_Hide}" Command="{Binding Path=HideCommand}">
+            -->
+            <!--<MenuItem.IsVisible>
+                <MultiBinding Converter="{StaticResource AnchorableContextMenuHideIsVisibleConverter}">
+                    <Binding Path="IsEnabled" RelativeSource="{RelativeSource Self}" Mode="OneWay" />
+                    <Binding Path="CanClose" />
+                </MultiBinding>
+            </MenuItem.IsVisible>-->
+            <!--
+        </MenuItem>-->
+        </ContextMenu>
+
+        <ContextMenu x:Key="DocumentContextMenu">
+            <!--<MenuItem Header="{x:Static Resources.Document_Close}"
+              Command="{Binding Path=CloseCommand}" IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+            <MenuItem Header="{x:Static Resources.Document_CloseAllButThis}" Command="{Binding Path=CloseAllButThisCommand}" />
+            <MenuItem Header="{x:Static Resources.Document_CloseAll}" Command="{Binding Path=CloseAllCommand}" />
+            <MenuItem Header="{x:Static Resources.Document_Float}" Command="{Binding Path=FloatCommand}" />
+            <MenuItem Header="{x:Static Resources.Document_DockAsDocument}" Command="{Binding Path=DockAsDocumentCommand}" />
+            <MenuItem Header="{x:Static Resources.Document_NewHorizontalTabGroup}"
+                      Command="{Binding Path=NewHorizontalTabGroupCommand}"
+                      IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+            <MenuItem Header="{x:Static Resources.Document_NewVerticalTabGroup}"
+                      Command="{Binding Path=NewVerticalTabGroupCommand}"
+                      IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+            <MenuItem Header="{x:Static Resources.Document_MoveToNextTabGroup}"
+                      Command="{Binding Path=MoveToNextTabGroupCommand}"
+                      IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+            <MenuItem Header="{x:Static Resources.Document_MoveToPreviousTabGroup}"
+                      Command="{Binding Path=MoveToPreviousTabGroupCommand}"
+                      IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}" />-->
+        </ContextMenu>
+
+        <!--DockingManager-->
+        <Style TargetType="DockingManager">
+            <!--<Setter Property="DocumentPaneControlStyle" Value="{StaticResource DocumentPaneControlStyle}" />
+            <Setter Property="AnchorablePaneControlStyle" Value="{StaticResource AnchorablePaneControlStyle}" />
+            <Setter Property="AnchorSideTemplate" Value="{StaticResource AnchorSideTemplate}" />
+            <Setter Property="AnchorGroupTemplate" Value="{StaticResource AnchorGroupTemplate}" />
+            <Setter Property="AnchorTemplate" Value="{StaticResource AnchorTemplate}" />
+            <Setter Property="DocumentHeaderTemplate" Value="{StaticResource DocumentHeaderTemplate}" />
+            <Setter Property="AnchorableHeaderTemplate" Value="{StaticResource AnchorableHeaderTemplate}" />
+            <Setter Property="DocumentTitleTemplate" Value="{StaticResource DocumentTitleTemplate}" />
+            <Setter Property="AnchorableTitleTemplate" Value="{StaticResource AnchorableTitleTemplate}" />
+            <Setter Property="AnchorableContextMenu" Value="{StaticResource AnchorableContextMenu}" />
+            <Setter Property="DocumentContextMenu" Value="{StaticResource DocumentContextMenu}" />
+            <Setter Property="DocumentPaneMenuItemHeaderTemplate" Value="{StaticResource DocumentHeaderTemplate}" />
+            <Setter Property="IconContentTemplate" Value="{StaticResource IconContentTemplate}" />-->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DockingManager">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Content="{TemplateBinding LayoutRootPanel}"
+                                      Grid.Column="1"
+                                      Grid.Row="1" />
+                                <ContentPresenter Content="{TemplateBinding RightSidePanel}"
+                                      Grid.Column="2"
+                                      Grid.Row="1" />
+                                <ContentPresenter Content="{TemplateBinding LeftSidePanel}"
+                                      Grid.Column="0"
+                                      Grid.Row="1" />
+                                <ContentPresenter Content="{TemplateBinding TopSidePanel}"
+                                      Grid.Column="1"
+                                      Grid.Row="0" />
+                                <ContentPresenter Content="{TemplateBinding BottomSidePanel}"
+                                      Grid.Column="1"
+                                      Grid.Row="2" />
+                                <ContentPresenter x:Name="PART_AutoHideArea"
+                                      IsVisible="False"
+                                      Content="{TemplateBinding AutoHideWindow}"
+                                      VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                                      Grid.Column="1"
+                                      Grid.Row="1" />
+                                <OverlayWindow Name="PART_OverlayWindow" Grid.ColumnSpan="3" Grid.RowSpan="3" />
+                                <!---->
+                              </Grid>
+                          </Border>
+                      </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+      
+
+      <!--LayoutGridResizerControl-->
+      <Style TargetType="{x:Type LayoutGridResizerControl}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type LayoutGridResizerControl}">
+              <Border Background="{TemplateBinding Background}" />
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style TargetType="{x:Type LayoutDocumentControl}">
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type LayoutDocumentControl}">
+              <Border Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter Content="{TemplateBinding Content}"
+                                  ContentTemplate="{x:TemplateBinding ContentTemplate}" />
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style TargetType="{x:Type LayoutAnchorableControl}">
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type LayoutAnchorableControl}">
+              <Border Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}">
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                  </Grid.RowDefinitions>
+                  <Border x:Name="Header">
+                    <AnchorablePaneTitle Model="{TemplateBinding Model}" />
+                  </Border>
+
+                  <ContentPresenter Grid.Row="1"
+                                    Content="{TemplateBinding Content}" />
+
+                </Grid>
+              </Border>
+              <!--<ControlTemplate.Triggers>
+                <MultiDataTrigger>
+                  <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.IsFloating}"
+                               Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.Parent.IsDirectlyHostedInFloatingWindow}"
+                               Value="True" />
+                  </MultiDataTrigger.Conditions>
+                  <Setter Property="IsVisible" Value="false" TargetName="Header" />
+                </MultiDataTrigger>
+              </ControlTemplate.Triggers>-->
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>      
+
+      <Style TargetType="{x:Type LayoutDocumentFloatingWindowControl}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static Colors.Gray}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static Colors.DarkGray}}" />
+        <Setter Property="BorderThickness" Value="3" />
+        <!--<Setter Property="shell:WindowChrome.WindowChrome">
+          <Setter.Value>
+            <shell:WindowChrome ResizeBorderThickness="10"
+                                CaptionHeight="16"
+                                CornerRadius="3,3,3,3"
+                                GlassFrameThickness="0"
+                                ShowSystemMenu="False" />
+          </Setter.Value>
+        </Setter>-->
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type LayoutDocumentFloatingWindowControl}">
+              <Grid>
+                <Border x:Name="WindowBorder"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}">
+                  <Grid Margin="3">
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="16" />
+                      <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <ContentPresenter Content="{Binding Model.RootDocument, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                      <!--<Button 
+                              Focusable="False"
+                              IsVisible="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}}"
+                              Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
+                              CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                              ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
+                              Grid.Column="2">
+                        <Image Source="/XUI;Default/Generic/Images/PinMaximize.png" >
+                        </Image>
+                      </Button>
+
+                      <Button 
+                              Focusable="False"
+                              IsVisible="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}}"
+                              Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
+                              CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                              ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
+                              Grid.Column="2">
+                        <Image Source="/XUI;Default/Generic/Images/PinRestore.png" >
+                        </Image>
+                      </Button>
+
+                      <Button 
+                              Focusable="False"
+                              Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                              ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
+                              IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}"
+                              Grid.Column="3">
+                        <Image Source="/XUI;Default/Generic/Images/PinClose.png" >
+                        </Image>
+                      </Button>-->
+                    </Grid>
+                    <ContentPresenter Content="{TemplateBinding Content}" Grid.Row="1" />
+                  </Grid>
+                </Border>
+              </Grid>
+              <!--<ControlTemplate.Triggers>
+                <Trigger Property="WindowState"
+                         Value="Maximized">
+                  <Setter Property="Padding"
+                          Value="3"
+                          TargetName="WindowBorder" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Model.RootDocument.IsActive, RelativeSource={RelativeSource Self}}" Value="True">
+                  <Setter TargetName="WindowBorder"
+                          Property="BorderBrush"
+                          Value="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                </DataTrigger>
+              </ControlTemplate.Triggers>-->
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+     
+      <Style TargetType="{x:Type LayoutAnchorableFloatingWindowControl}">
+        <Setter Property="Background" Value="#E01E1E1E"/>
+        <Setter Property="BorderBrush" Value="DarkGray" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type LayoutAnchorableFloatingWindowControl}">
+              <Grid>
+                <Border x:Name="WindowBorder"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}">
+                  <Grid Margin="1">
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid x:Name="PART_TITLEBAR">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+
+                        <!-- IsVisible="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}}" -->
+                        <TextBlock Margin="4,0,0,4" VerticalAlignment="Center" 
+                                    Foreground="#FFAAAAAA" TextWrapping="NoWrap" 
+                                    Text="{x:TemplateBinding Title}" FontSize="16" />
+
+                      <DropDownButton x:Name="SinglePaneContextMenu"
+                                      IsVisible="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Focusable="False"
+                                      Grid.Column="1"
+                                      DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                      DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
+                        <Image Source="/XUI;Default/Generic/Images/PinMenu.png" >
+                        </Image>
+                      </DropDownButton>
+
+                      <Button x:Name="PART_MAXIMIZE_RESTORE" 
+                              Focusable="False"
+                              IsVisible="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}}"
+                              Grid.Column="2">
+                        <Image Source="/XUI;Default/Generic/Images/PinMaximize.png" >
+                        </Image>
+                      </Button>
+
+                      <Button  
+                              Focusable="False"
+                              IsVisible="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}}"
+                              Grid.Column="2">
+                        <Image Source="/XUI;Default/Generic/Images/PinRestore.png" >
+                        </Image>
+                      </Button>
+
+                      <Button x:Name="PART_CLOSE"
+                              Focusable="False"
+                              Command="{Binding HideWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                              IsVisible="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay}"
+                              Grid.Column="3">
+                        <Image Source="/XUI;Default/Generic/Images/PinClose.png" >
+                        </Image>
+                      </Button>
+                    </Grid>
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      Grid.Row="1" />
+                    <OverlayWindow Name="PART_OverlayWindow" IsVisible="false"  Grid.Row="1" />
+                  </Grid>
+                </Border>
+              </Grid>
+              <!--<ControlTemplate.Triggers>
+                <Trigger Property="WindowState"
+                         Value="Maximized">
+                  <Setter Property="Padding"
+                          Value="3"
+                          TargetName="WindowBorder" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Model.SinglePane.SelectedContent.IsActive, RelativeSource={RelativeSource Self}}"
+                             Value="True">
+                  <Setter TargetName="WindowBorder"
+                          Property="BorderBrush"
+                          Value="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Model.SinglePane.SelectedContent.CanClose, RelativeSource={RelativeSource Mode=Self}}"
+                             Value="True">
+                  <Setter Property="Command"
+                          TargetName="CloseButton"
+                          Value="{Binding CloseWindowCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                  <Setter Property="ToolTip"
+                          TargetName="CloseButton"
+                          Value="{x:Static avalonDockProperties:Resources.Document_Close}" />
+
+                </DataTrigger>
+              </ControlTemplate.Triggers>-->
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style TargetType="{x:Type LayoutAutoHideWindowControl}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static Colors.Gray}}" />
+      </Style>
+
+      <Style TargetType="{x:Type NavigatorWindow}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static Colors.Gray}}" />
+        <Setter Property="SizeToContent" Value="WidthAndHeight" />
+        <!--<Setter Property="ResizeMode" Value="NoResize" />-->
+        <!--<Setter Property="shell:WindowChrome.WindowChrome">
+          <Setter.Value>
+            <shell:WindowChrome ResizeBorderThickness="10"
+                                CaptionHeight="16"
+                                CornerRadius="3,3,3,3"
+                                GlassFrameThickness="4" />
+          </Setter.Value>
+        </Setter>-->
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type NavigatorWindow}">
+              <Grid>
+                <Border x:Name="WindowBorder"
+                        BorderThickness="3"
+                        Background="{DynamicResource {x:Static Colors.Gray}}"
+                        BorderBrush="{DynamicResource {x:Static Colors.DarkGray}}">
+                  <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="54" />
+                      <RowDefinition Height="*" />
+                      <RowDefinition Height="42" />
+                    </Grid.RowDefinitions>
+
+                    <Grid>
+                      <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                      </Grid.RowDefinitions>
+                      <Grid>
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding SelectedDocument.LayoutElement.IconSource}"
+                               Stretch="None" >
+                        </Image>
+                        <TextBlock Text="{Binding SelectedDocument.LayoutElement.Title}"
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   FontWeight="Bold"
+                                   Margin="4,0,0,0" >
+                        </TextBlock>
+                      </Grid>
+                      <TextBlock Text="{Binding SelectedDocument.LayoutElement.Description}"
+                                 VerticalAlignment="Center" >
+                      </TextBlock>
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                      </Grid.ColumnDefinitions>
+                      <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                          <RowDefinition Height="Auto" />
+                          <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Active Tool Windows"
+                                   FontWeight="Bold"
+                                   Margin="0,3,0,4" >
+                        </TextBlock>
+                        <ListBox Grid.Row="1"
+                                 Items="{Binding Anchorables}"
+                                 SelectedItem="{Binding SelectedAnchorable, Mode=TwoWay}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 MaxHeight="400"
+                                 FocusVisualStyle="{x:Null}">
+                          <!--<ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                              <Setter Property="Cursor"
+                                      Value="Hand" />
+                              <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                  <Setter Property="Background" Value="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                                  <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                                </Trigger>
+                              </Style.Triggers>
+                            </Style>
+                          </ListBox.ItemContainerStyle>-->
+                          <ListBox.ItemTemplate>
+                            <DataTemplate>
+                              <Grid>
+                                <Grid.ColumnDefinitions>
+                                  <ColumnDefinition Width="Auto" />
+                                  <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding LayoutElement.IconSource}"
+                                       Stretch="None">
+                                </Image>
+                                <TextBlock Text="{Binding LayoutElement.Title}"
+                                           Grid.Column="1"
+                                           Margin="4,2,0,2">
+                                </TextBlock>
+                              </Grid>
+                            </DataTemplate>
+                          </ListBox.ItemTemplate>
+                        </ListBox>
+                      </Grid>
+                      <Grid Grid.Column="1"
+                            Margin="5">
+                        <Grid.RowDefinitions>
+                          <RowDefinition Height="Auto" />
+                          <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Active Files"
+                                   FontWeight="Bold"
+                                   Margin="0,3,0,4">
+                        </TextBlock>
+                        <ListBox Grid.Row="1"
+                                 Items="{Binding Documents}"
+                                 SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 MaxHeight="400"
+                                 FocusVisualStyle="{x:Null}">
+                          <!--<ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                              <Setter Property="Cursor"
+                                      Value="Hand" />
+                              <Style.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                  <Setter Property="Background"
+                                          Value="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                                  <Setter Property="TextElement.Foreground"
+                                          Value="{DynamicResource {x:Static Colors.SteelBlue}}" />
+                                </Trigger>
+                              </Style.Triggers>
+                            </Style>
+                          </ListBox.ItemContainerStyle>-->
+                          <ListBox.ItemTemplate>
+                            <DataTemplate>
+                              <Grid>
+                                <Grid.ColumnDefinitions>
+                                  <ColumnDefinition Width="Auto" />
+                                  <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding LayoutElement.IconSource}"
+                                       Stretch="None">
+                                </Image>
+                                <TextBlock Text="{Binding LayoutElement.Title}"
+                                           Grid.Column="1"
+                                           Margin="4,2,0,2">
+                                </TextBlock>
+                              </Grid>
+                            </DataTemplate>
+                          </ListBox.ItemTemplate>
+                          <!--<ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                              <WrapPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                          </ListBox.ItemsPanel>-->
+                        </ListBox>
+                      </Grid>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                      <TextBlock Text="{Binding SelectedDocument.LayoutElement.ToolTip}" VerticalAlignment="Center">
+                      </TextBlock>
+                    </Grid>
+                  </Grid>
+                </Border>
+              </Grid>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+
+      </Style>
+
+      <Style TargetType="LayoutDocumentFloatingWindowControl">
+          <!-- <Setter Property="Template" Value="Default.Window"/> -->
+          <Setter Property="Background" Value="#E01E1E1E"/>
+      </Style> 
+    </Application.Resources>
+</Application>

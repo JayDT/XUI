@@ -1,0 +1,66 @@
+/* ----------------------------------------------------------------------------
+** GENERATED SOURCE FILE
+** Do not modify the contents of this file.
+**
+** System::Resource Generator v{{version}}
+** --------------------------------------------------------------------------*/
+
+#include "System/Resource/ResourceManager.h"
+#include "System/Resource/ResourceDatabase.h"
+
+namespace m = System::Resource;
+
+m::ResourceDatabase* __CurrentResource = nullptr;
+
+///////////////////////////////////////////////////////////////////////////////
+// Module Initialize and Declare
+///////////////////////////////////////////////////////////////////////////////
+
+{{#moduleFile}}
+extern void __AllocateModuleFile{{& name}}( m::ResourceDatabase & );
+extern void __DefineModuleFile{{& name}}( m::ResourceDatabase & );{{/moduleFile}}
+
+namespace System::Resource
+{
+    struct ResourceModul{{targetName}} : m::ResourceDatabase
+    {
+        ResourceModul{{targetName}}()
+            : ResourceDatabase("{{targetName}}")
+        {
+        }
+        
+        void CreateResourceDescriptor() override
+        {
+            ResourceDatabase::Initialize();
+
+            {{#moduleFile}}
+            __AllocateModuleFile{{& name}}( *this );{{/moduleFile}}
+        }
+        
+        void Initialize() override
+        {
+            {{#moduleFile}}
+            __DefineModuleFile{{& name}}( *this );{{/moduleFile}}
+        }
+    };
+}
+
+bool InitializeModulResource{{targetName}}()
+{
+    if (!__CurrentResource)
+    {
+        __CurrentResource = m::ResourceManager::Instance()->Register<System::Resource::ResourceModul{{targetName}}>();
+        m::ResourceManager::Instance()->InitResourceModule.push(__CurrentResource);
+    }
+    return true;
+}
+
+static bool Initalized{{targetName}} = InitializeModulResource{{targetName}}();
+
+namespace System::Resource::meta
+{
+    ResourceDatabase* __GetCurrent_RunTime__ResourceModule()
+    {
+        return __CurrentResource;
+    }
+}

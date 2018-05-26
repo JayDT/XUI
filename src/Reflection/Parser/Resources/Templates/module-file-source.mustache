@@ -1,0 +1,204 @@
+/* ----------------------------------------------------------------------------
+** GENERATED SOURCE FILE
+** Do not modify the contents of this file.
+**
+** System::Reflection Meta Generator v{{version}}
+** --------------------------------------------------------------------------*/
+
+namespace basens = System::Reflection::Assembly;
+
+namespace System::Reflection::Assembly
+{
+    class AssemblyModul{{targetName}};
+}
+
+#define _ALLOW_KEYWORD_MACROS true
+// open back door
+#   define protected friend class basens::AssemblyModul{{targetName}}; protected
+#   define private friend class basens::AssemblyModul{{targetName}}; private
+
+{{#hasReflType}}
+{{#usingPrecompiledHeader}}#include "{{precompiledHeader}}"
+{{/usingPrecompiledHeader}}
+
+//#include "{{moduleFileHeader}}"
+
+{{#standardIncludes}}
+#include {{& header}}{{/standardIncludes}}
+
+#include "{{moduleFileSourceHeader}}"
+{{/hasReflType}}
+
+#include "{{moduleHeaderFile}}"
+
+namespace m = System::Reflection::meta;
+
+void System::Reflection::Assembly::AssemblyModul{{targetName}}::AllocateModuleFile{{moduleFileName}}(m::ReflectionDatabase &db)
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // Class Allocation
+    ///////////////////////////////////////////////////////////////////////////
+    {{#class}}
+    DeclareReflTypeData(IDENTITY_VA({{& displayName}}), {{& qualifiedName}}) {{/class}}
+    ///////////////////////////////////////////////////////////////////////////
+    // Enum Allocation
+    ///////////////////////////////////////////////////////////////////////////
+    {{#enum}}
+    {
+        { // Base Type
+            auto id = db.AllocateType( "{{& displayName}}", typeid({{& qualifiedName}}) );
+            auto &type = db.types[ id ];
+            RegisterReflType(id, {{& displayName}}, type, nullptr);
+        }
+    }
+    {{/enum}}
+}
+
+// Virtual Base Helpers (return adjuter to Refl Object)
+intptr_t System::Reflection::Assembly::AssemblyModul{{targetName}}::offset_adjustment_{{moduleFileName}}_impl(size_t classId, m::Variant& from)
+{
+    switch (classId)
+    {
+        default: case 0: return 0;
+        // Properties
+        {{#class}}{{#isReflObject}}case {{& internalID}}: return reinterpret_cast<intptr_t>(static_cast<m::Object*>(from.ToObject())) - reinterpret_cast<intptr_t>(dynamic_cast<{{& qualifiedName}}*>(from.ToObject()));
+        {{/isReflObject}}{{/class}}
+    }
+}
+
+// Field Explicit Setter Invokers
+void System::Reflection::Assembly::AssemblyModul{{targetName}}::field_Setter_{{moduleFileName}}_impl(size_t fieldId, m::Variant&& obj, m::Variant&& value)
+{
+    switch (fieldId)
+    {
+        default: case 0: return;
+        // Properties
+        {{#class}}{{#property}}{{#isSetterAccessible}}case {{& internalID}}: (({{> instanceBody}})->{{> setterBody}})({{> argumentBody}}); break;
+        {{/isSetterAccessible}}{{/property}}{{#field}}{{#isSetterAccessible}}case {{& internalID}}: ((std::remove_const<{{& type}}>::type&)({{> instanceBody}})->{{& name}}) = {{> argumentBody}}; break;
+        {{/isSetterAccessible}}{{/field}}{{#staticField}}{{#isSetterAccessible}}case {{& internalID}}: ((std::remove_const<{{& type}}>::type&){{& parentQualifiedName}}::{{& name}}) = {{> argumentBody}}; break;
+        {{/isSetterAccessible}}{{/staticField}}{{/class}}
+    }
+}
+
+// Field Explicit Getter Invokers
+m::Variant System::Reflection::Assembly::AssemblyModul{{targetName}}::field_Getter_{{moduleFileName}}_impl(size_t fieldId, m::Variant&& obj)
+{
+    switch (fieldId)
+    {
+        default: case 0: return {};
+        // Properties
+        {{#class}}{{#property}}{{#isGetterAccessible}}case {{& internalID}}: {{#isReferenceValue}} return m::Variant((({{> instanceBody}})->{{> getterBody}})(), ReferenceVariantPolicy);{{/isReferenceValue}}{{^isReferenceValue}} return m::Variant((({{> instanceBody}})->{{> getterBody}})(), CopyVariantPolicy);{{/isReferenceValue}}
+        {{/isGetterAccessible}}{{/property}}{{#field}}{{#isGetterAccessible}}case {{& internalID}}: return m::Variant(({{> instanceBody}})->{{& name}}, ReferenceVariantPolicy);
+        {{/isGetterAccessible}}{{/field}}{{#staticField}}{{#isGetterAccessible}}case {{& internalID}}: return m::Variant({{& parentQualifiedName}}::{{& name}}, ReferenceVariantPolicy);
+        {{/isGetterAccessible}}{{/staticField}}{{/class}}
+    }
+}
+
+// FieldDesc infos
+m::FieldDesc const& System::Reflection::Assembly::AssemblyModul{{targetName}}::FieldDesc_{{moduleFileName}}_impl(size_t fieldId)
+{
+    switch (fieldId)
+    {
+        {{#class}}{{#property}}case {{& internalID}}: {
+            static m::FieldDesc f( {{& internalID}}, typeof({{& parentQualifiedName}}), typeof({{& type}}), m::FieldDesc::FieldType::PROPERTY, 0);
+            return f;
+        }{{/property}}{{#field}}case {{& internalID}}: {
+            static m::FieldDesc f( {{& internalID}}, typeof({{& parentQualifiedName}}), typeof({{& type}}), m::FieldDesc::FieldType::FIELD, ((size_t)&reinterpret_cast<char const volatile&>(((({{& parentQualifiedName}}*)0)->{{& name}}))));
+            return f;
+        }{{/field}}{{#staticField}}case {{& internalID}}: {
+            static m::FieldDesc f( {{& internalID}}, typeof({{& parentQualifiedName}}), typeof({{& type}}), m::FieldDesc::FieldType::STATIC_FIELD, 0 );
+            return f;
+        }{{/staticField}}{{/class}} default: case 0: {
+            static m::FieldDesc invalid(0, typeof(void), typeof(void), m::FieldDesc::FieldType::NONE, 0);
+            return invalid;
+        }
+    }
+}
+
+std::shared_ptr<m::Object> AssemblyModul{{targetName}}__SharedContructor_{{moduleFileName}}_impl(size_t methodId, const m::ArgumentList&& arguments)
+{
+    switch (methodId)
+    {
+        default: case 0: return nullptr;
+        {{#class}}{{#dynamicConstructor}}case {{& internalID}}: {
+            return std::make_shared<std::remove_cv<{{& parentQualifiedName}}>::type>({{& invoke_args}});
+        } {{/dynamicConstructor}}{{#HasDefaultConstructor}}case {{& ConstructorID}}: {
+            return std::make_shared<std::remove_cv<{{& qualifiedName}}>::type>();
+        }{{/HasDefaultConstructor}}{{/class}}
+    }
+}
+
+// Methods Invokers
+m::Variant System::Reflection::Assembly::AssemblyModul{{targetName}}::invoker_{{moduleFileName}}_impl(size_t methodId, m::Variant&& obj, const m::ArgumentList&& arguments)
+{
+    switch (methodId)
+    {
+        default: case 0: return {};
+        {{#class}}{{#method}}case {{& internalID}}: { {{#isVoidReturn}}
+            (({{> instanceBody}})->std::remove_cv<{{& parentQualifiedName}}>::type::{{& name}})({{& invoke_args}});
+            return {}; {{/isVoidReturn}}{{^isVoidReturn}}{{#isReferenceReturnType}}
+            return m::Variant((({{> instanceBody}})->std::remove_cv<{{& parentQualifiedName}}>::type::{{& name}})({{& invoke_args}}), ReferenceVariantPolicy); {{/isReferenceReturnType}}{{^isReferenceReturnType}}
+            return m::Variant((({{> instanceBody}})->std::remove_cv<{{& parentQualifiedName}}>::type::{{& name}})({{& invoke_args}}), CopyVariantPolicy); {{/isReferenceReturnType}}{{/isVoidReturn}}
+        } {{/method}}{{#staticMethod}}case {{& internalID}}: { {{#isVoidReturn}}
+            std::remove_cv<{{& parentQualifiedName}}>::type::{{& name}}({{& invoke_args}});
+            return {}; {{/isVoidReturn}}{{^isVoidReturn}}{{#isReferenceReturnType}}
+            static m::Type const& returnType = typeof({{& returnType}});
+            return m::Variant(std::remove_cv<{{& parentQualifiedName}}>::type::{{& name}}({{& invoke_args}}), ReferenceVariantPolicy); {{/isReferenceReturnType}}{{^isReferenceReturnType}}
+            return m::Variant(std::remove_cv<{{& parentQualifiedName}}>::type::{{& name}}({{& invoke_args}}), CopyVariantPolicy); {{/isReferenceReturnType}}{{/isVoidReturn}}
+        } {{/staticMethod}}{{#dynamicConstructor}}case {{& internalID}}: {
+            return m::Variant(new std::remove_cv<{{& parentQualifiedName}}>::type({{& invoke_args}}), CopyVariantPolicy);
+        } {{/dynamicConstructor}}{{#arrayTypeEnabled}}case {{& arrayConstructorID}}: {
+            return m::Variant(m::ArrayWrapper(new Array<{{& qualifiedName}}>()), CopyVariantPolicy);
+        }{{/arrayTypeEnabled}}{{#hasDestructor}} case {{& destructorID}}: {
+            ((({{& qualifiedName}}*)*({{& qualifiedName}}**)(obj.toPointer())))->~{{& Name}}();
+            return {};
+        }{{/hasDestructor}}{{#HasDefaultConstructor}}case {{& ConstructorID}}: {
+            return m::Variant(new {{& qualifiedName}}(), CopyVariantPolicy);
+        }{{/HasDefaultConstructor}}{{/class}}{{#globalFunction}}case {{& internalID}}: {
+            {{#isVoidReturn}} (std::remove_cv<{{& parentQualifiedName}}>::type::{{& qualifiedName}})({{& invoke_args}});
+            return {}; {{/isVoidReturn}}{{^isVoidReturn}}{{#isReferenceReturnType}}
+            return m::Variant(std::remove_cv<{{& parentQualifiedName}}>::type::{{& qualifiedName}}({{& invoke_args}}), ReferenceVariantPolicy); {{/isReferenceReturnType}}{{^isReferenceReturnType}}
+            return m::Variant(std::remove_cv<{{& parentQualifiedName}}>::type::{{& qualifiedName}}({{& invoke_args}}), CopyVariantPolicy); {{/isReferenceReturnType}}{{/isVoidReturn}}
+        }{{/globalFunction}}
+    }
+}
+    
+// Methods infos
+m::MethodDesc const& System::Reflection::Assembly::AssemblyModul{{targetName}}::MethodDesc_{{moduleFileName}}_impl(size_t methodId)
+{
+    switch (methodId)
+    {
+        {{#class}}{{#method}}case {{& internalID}}: {
+            static m::MethodDesc m({{& internalID}}, typeof({{& parentQualifiedName}}), typeof({{& returnType}}), m::MethodDesc::MethodType::CLASS_METHOD, { {{& signature_args}} });
+            return m;
+        }{{/method}}{{#staticMethod}}case {{& internalID}}: {
+            static m::MethodDesc m({{& internalID}}, {{#parentQualifiedName}}
+                typeof({{& parentQualifiedName}}), {{/parentQualifiedName}}{{^parentQualifiedName}}
+                m::Type::Invalid( ), {{/parentQualifiedName}}
+                typeof({{& returnType}}), m::MethodDesc::MethodType::STATIC_METHOD, { {{& signature_args}} });
+            return m;
+        }{{/staticMethod}}{{#dynamicConstructor}}case {{& internalID}}: {
+            static m::MethodDesc m({{& internalID}}, typeof({{& parentQualifiedName}}), m::Type::Invalid( ), m::MethodDesc::MethodType::DYNAMIC_CONSTRUCTOR, { {{& signature_args}} });
+            return m;
+        }{{/dynamicConstructor}}{{#arrayTypeEnabled}}case {{& arrayConstructorID}}: {
+            static m::MethodDesc m( {{& arrayConstructorID}}, typeof({{& qualifiedName}}), m::Type::Invalid( ), m::MethodDesc::MethodType::ARRAY_CONSTRUCTOR, { });
+            return m;
+        }{{/arrayTypeEnabled}}{{#hasDestructor}} case {{& destructorID}}: {
+            static m::MethodDesc m({{& destructorID}}, typeof({{& qualifiedName}}), m::Type::Invalid( ), m::MethodDesc::MethodType::DESTRUCTOR, { });
+            return m;
+        }{{/hasDestructor}}{{#HasDefaultConstructor}} case {{& ConstructorID}}: {
+            static m::MethodDesc m( {{& ConstructorID}}, typeof({{& qualifiedName}}), m::Type::Invalid( ), m::MethodDesc::MethodType::CONSTRUCTOR, { });
+            return m;
+        }{{/HasDefaultConstructor}}{{/class}}{{#globalFunction}}case {{& internalID}}: {
+            static m::MethodDesc m( {{& internalID}}, m::Type::Invalid( ), typeof({{& returnType}}), m::MethodDesc::MethodType::GLOBAL_METHOD, { {{& signature_args}} });
+            return m;
+        }{{/globalFunction}} default: case 0: {
+            static m::MethodDesc invalid( 0, typeof(void), typeof(void), m::MethodDesc::MethodType::NONE, { });
+            return invalid;
+        }
+    }
+}
+
+#   undef private
+#   undef protected
+#undef _ALLOW_KEYWORD_MACROS

@@ -1,0 +1,17 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="PopupRoot">
+            <ContentPresenter Name="PART_ContentPresenter" GID="8"
+                              Background="{x:TemplateBinding Background}"
+                              ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                              Content="{x:TemplateBinding Content}" 
+                              Padding="{x:TemplateBinding Padding}"/>
+        </ControlTemplate>
+        <Style TargetType="PopupRoot">
+            <Setter Property="Background" Value="#E01E1E1E"/>
+        </Style>
+    </Application.Resources>
+</Application>

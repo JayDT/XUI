@@ -1,0 +1,69 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <Style x:Key="ButtonFocusVisual">
+            <Setter
+                Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle
+                            Margin="2"
+                            SnapsToDevicePixels="true"
+                            StrokeThickness="1"
+                            StrokeDashArray="1 2" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ControlTemplate TargetType="Button">
+            <Border Name="Border"
+                BorderThickness="{x:TemplateBinding BorderThickness}"
+                BorderBrush="{x:TemplateBinding BorderBrush}"
+                Background="{x:TemplateBinding Background}">
+                 <ContentPresenter
+                     HorizontalContentAlignment="{x:TemplateBinding HorizontalContentAlignment}"
+                     VerticalContentAlignment="{x:TemplateBinding VerticalContentAlignment}"
+                     Padding="{x:TemplateBinding Padding}"
+                     Content="{x:TemplateBinding Content}"
+                     ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                     Foreground="{x:TemplateBinding Foreground}"
+                     RecognizesAccessKey="True"/>
+            </Border>
+        </ControlTemplate>
+        <ControlTemplate TargetType="RepeatButton">
+            <Border Name="Border"
+                BorderThickness="{x:TemplateBinding BorderThickness}"
+                BorderBrush="{x:TemplateBinding BorderBrush}"
+                Background="{x:TemplateBinding Background}">
+                <ContentPresenter
+                     HorizontalContentAlignment="{x:TemplateBinding HorizontalContentAlignment}"
+                     VerticalContentAlignment="{x:TemplateBinding VerticalContentAlignment}"
+                     Padding="{x:TemplateBinding Padding}"
+                     Content="{x:TemplateBinding Content}"
+                     ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                     Foreground="{x:TemplateBinding Foreground}"
+                     RecognizesAccessKey="True"/>
+            </Border>
+        </ControlTemplate>
+        <Style TargetType="Button">
+            <Setter Property="FocusVisualStyle" Value="{x:StaticResource ButtonFocusVisual}"/>
+            <Setter Property="Background" Value="#EEEEEEEE"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style TargetType="RepeatButton">
+            <Setter Property="FocusVisualStyle" Value="{x:StaticResource ButtonFocusVisual}"/>
+            <Setter Property="Background" Value="#EEEEEEEE"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="4" />
+        </Style>
+    </Application.Resources>
+</Application>

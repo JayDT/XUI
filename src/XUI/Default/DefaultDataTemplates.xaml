@@ -1,0 +1,40 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:sys="clr-namespace:System;assembly=CFramework"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <SolidColorBrush x:Key="ThemeBackgroundBrush">#FFFFFFFF</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeBorderLightBrush">#FFAAAAAA</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeBorderMidBrush">#FF888888</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeBorderDarkBrush">#FF333333</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlLightBrush">#FFFFFFFF</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlMidBrush">#FFAAAAAA</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlDarkBrush">#FF888888</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeForegroundBrush">#FF000000</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeForegroundLightBrush">#FF808080</SolidColorBrush>
+
+        <SolidColorBrush x:Key="HighlightBrush">#FF086F9E</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush">#CC119EDA</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush2">#99119EDA</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush3">#66119EDA</SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush4">#33119EDA</SolidColorBrush>
+        <SolidColorBrush x:Key="ErrorBrush">Red</SolidColorBrush>
+        <SolidColorBrush x:Key="ErrorBrushLight">#10ff0000</SolidColorBrush>
+
+        <sys:Double x:Key="ThemeBorderThickness">2</sys:Double>
+        <sys:Double x:Key="ThemeDisabledOpacity">0.5</sys:Double>
+
+        <sys:Double x:Key="FontSizeSmall">10</sys:Double>
+        <sys:Double x:Key="FontSizeNormal">12</sys:Double>
+        <sys:Double x:Key="FontSizeLarge">16</sys:Double>
+    </Application.Resources>
+    <Application.DataTemplates>
+        <DataTemplate DataType="{x:Type sys:String}">
+            <TextBlock Text="{x:TemplateBinding Content}" Foreground="{x:TemplateBinding Foreground}"
+                     HorizontalAlignment="{x:TemplateBinding HorizontalContentAlignment}"
+                     VerticalAlignment="{x:TemplateBinding VerticalContentAlignment}"
+            />
+        </DataTemplate>
+    </Application.DataTemplates>
+</Application>

@@ -1,0 +1,6 @@
+macro(opencv_support TARGET)
+    find_package(OpenCV REQUIRED)
+    message("opencv lib dir: ${OpenCV_LIB_DIR}")
+    link_directories(${OpenCV_LIB_DIR})
+    target_link_libraries(${TARGET} ${OpenCV_LIBS})
+endmacro()

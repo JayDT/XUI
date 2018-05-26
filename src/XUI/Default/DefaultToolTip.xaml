@@ -1,0 +1,22 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <ControlTemplate TargetType="ToolTip">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Background="{TemplateBinding Background}"
+                              BorderBrush="{TemplateBinding BorderBrush}"
+                              BorderThickness="{TemplateBinding BorderThickness}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Content="{TemplateBinding Content}" 
+                              Padding="{TemplateBinding Padding}"/>
+        </ControlTemplate>
+        <Style TargetType="ToolTip">
+            <Setter Property="Background" Value="{StaticResource ThemeBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ThemeBorderMidBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="4,2"/>
+        </Style>
+    </Application.Resources>
+</Application>

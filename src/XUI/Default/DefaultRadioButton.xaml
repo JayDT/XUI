@@ -1,0 +1,78 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml">
+    <Application.Resources>
+        <Style TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{x:StaticResource ThemeBorderMidBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid Background="{x:TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Name="Border"
+                                 Stroke="{x:TemplateBinding BorderBrush}"
+                                 StrokeThickness="{x:TemplateBinding BorderThickness}"
+                                 Width="18"
+                                 Height="18"
+                                 VerticalAlignment="Center"/>
+                            <Ellipse Name="CheckMark"
+                                 Fill="{x:StaticResource HighlightBrush}"
+                                 Width="10"
+                                 Height="10"
+                                 Stretch="Uniform"
+                                 IsVisible="False"
+                                 UseLayoutRounding="False"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+                            <Ellipse Name="IndeterminateMark"
+                                 Fill="{x:StaticResource ThemeAccentBrush}"
+                                 Width="10"
+                                 Height="10"
+                                 Stretch="Uniform"
+                                 IsVisible="False"
+                                 UseLayoutRounding="False"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                          ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                                          Content="{x:TemplateBinding Content}"
+                                          Margin="4,0,0,0"
+                                          VerticalAlignment="Center"
+                                          Grid.Column="1"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="{x:Static ToggleButtonState.TBS_NONE}">
+                                <Setter TargetName="CheckMark" Property="IsVisible" Value="false"/>
+                                <Setter TargetName="IndeterminateMark" Property="IsVisible" Value="false" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Static ToggleButtonState.TBS_INTERMEDIATE}">
+                                <Setter TargetName="CheckMark" Property="IsVisible" Value="false"/>
+                                <Setter TargetName="IndeterminateMark" Property="IsVisible" Value="true" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Static ToggleButtonState.TBS_CHECKED}">
+                                <Setter TargetName="IndeterminateMark" Property="IsVisible" Value="false" />
+                                <Setter TargetName="CheckMark" Property="IsVisible" Value="true"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Border" Property="Shape.Fill" Value="Gray" />
+                            </Trigger>
+                            <!-- <Trigger Property="IsPressed" Value="true">
+                          <Setter TargetName="Border" Property="Background" Value="{x:StaticResource PressedBrush}" />
+                          <Setter TargetName="Border" Property="BorderBrush" Value="{x:StaticResource PressedBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                          <Setter TargetName="Border" Property="Background" Value="{x:StaticResource DisabledBackgroundBrush}" />
+                          <Setter TargetName="Border" Property="BorderBrush" Value="{x:StaticResource DisabledBorderBrush}" />
+                          <Setter Property="Foreground" Value="{x:StaticResource DisabledForegroundBrush}"/>
+                        </Trigger> -->
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,165 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <Style TargetType="ScrollViewer">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid>
+                            <!--  ColumnDefinitions="*,Auto" RowDefinitions="*,Auto" -->
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Column="0"
+                                  BorderBrush="{x:TemplateBinding BorderBrush}"
+                                  BorderThickness="0,1,1,1">
+                                <ScrollContentPresenter Name="PART_ContentPresenter" GID="4003"
+                                                    Background="{x:TemplateBinding Background}"
+                                                    Content="{x:TemplateBinding Content}"
+                                                    Extent="{x:TemplateBinding Path=Extent, Mode=TwoWay}"
+                                                    Margin="{x:TemplateBinding Padding}"
+                                                    Offset="{x:TemplateBinding Path=Offset, Mode=TwoWay}"
+                                                    Viewport="{x:TemplateBinding Path=Viewport, Mode=TwoWay}"
+                                                    CanScrollHorizontally="{x:TemplateBinding CanScrollHorizontally}"/>
+                            </Border>
+                            <ScrollBar Name="PART_HorizontalScrollBar"
+                                   Orientation="Horizontal"
+                                   Maximum="{x:TemplateBinding HorizontalScrollBarMaximum}"
+                                   Value="{x:TemplateBinding Path=HorizontalScrollBarValue, Mode=TwoWay}"
+                                   ViewportSize="{x:TemplateBinding HorizontalScrollBarViewportSize}"
+                                   Visibility="{x:TemplateBinding HorizontalScrollBarVisibility}"
+                                   Height="10"
+                                   Grid.Row="1"
+                                   Style="{x:StaticResource ScrollBarHorizontal}"/>
+                            <ScrollBar Name="PART_VerticalScrollBar"
+                                   Orientation="Vertical"
+                                   Maximum="{x:TemplateBinding VerticalScrollBarMaximum}"
+                                   Value="{x:TemplateBinding Path=VerticalScrollBarValue, Mode=TwoWay}"
+                                   ViewportSize="{x:TemplateBinding VerticalScrollBarViewportSize}"
+                                   Visibility="{x:TemplateBinding VerticalScrollBarVisibility}"
+                                   Width="10"
+                                   Grid.Row="0"
+                                   Grid.Column="1"/>
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate Name="ScrollBarVertical">
+                        <Border Background="Transparent">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition />
+                                    <RowDefinition Height="10" />
+                                </Grid.RowDefinitions>
+                                <RepeatButton Name="PART_LineUpButton"
+                                              Grid.Row="0"
+                                              Grid.Column="0">
+                                    <Path Data="M 0,4 C0,4 0,6 0,6 0,6 3.5,2.5 3.5,2.5 3.5,2.5 7,6 7,6 7,6 7,4 7,4 7,4 3.5,0.5 3.5,0.5 3.5,0.5 0,4 0,4 z"
+                                          Stretch="Uniform"
+                                          Fill="Gray" />
+                                </RepeatButton>
+                                <Track Grid.Row="1"
+                                       Grid.Column="1"
+                                       Minimum="{x:TemplateBinding Minimum}"
+                                       Maximum="{x:TemplateBinding Maximum}"
+                                       Value="{x:TemplateBinding Path=Value, Mode=TwoWay}"
+                                       ViewportSize="{x:TemplateBinding ViewportSize}"
+                                       Orientation="{x:TemplateBinding Orientation}">
+                                    <Track.DecreaseButton>
+                                        <RepeatButton Name="PART_PageUpButton" />
+                                    </Track.DecreaseButton>
+                                    <Track.IncreaseButton>
+                                        <RepeatButton Name="PART_PageDownButton" />
+                                    </Track.IncreaseButton>
+                                    <Thumb Name="thumb">
+                                        <Thumb.Template>
+                                            <ControlTemplate>
+                                                <Border Background="#50000000" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track>
+                                <RepeatButton Name="PART_LineDownButton"
+                                              Grid.Row="2"
+                                              Grid.Column="2">
+                                    <Path Data="M 0,2.5 C0,2.5 0,0.5 0,0.5 0,0.5 3.5,4 3.5,4 3.5,4 7,0.5 7,0.5 7,0.5 7,2.5 7,2.5 7,2.5 3.5,6 3.5,6 3.5,6 0,2.5 0,2.5 z"
+                                          Stretch="Uniform"
+                                          Fill="Gray" />
+                                </RepeatButton>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ScrollBarHorizontal" TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate Name="ScrollBarHorizontal">
+                        <Border Background="Transparent">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="10" />
+                                </Grid.ColumnDefinitions>
+                                <RepeatButton Name="PART_LineUpButton"
+                                              Grid.Row="0"
+                                              Grid.Column="0">
+                                    <Path Data="M 3.18,7 C3.18,7 5,7 5,7 5,7 1.81,3.5 1.81,3.5 1.81,3.5 5,0 5,0 5,0 3.18,0 3.18,0 3.18,0 0,3.5 0,3.5 0,3.5 3.18,7 3.18,7 z"
+                                          Stretch="Uniform"
+                                          Fill="Gray" />
+                                </RepeatButton>
+                                <Track Grid.Row="1"
+                                       Grid.Column="1"
+                                       Minimum="{x:TemplateBinding Minimum}"
+                                       Maximum="{x:TemplateBinding Maximum}"
+                                       Value="{x:TemplateBinding Path=Value, Mode=TwoWay}"
+                                       ViewportSize="{x:TemplateBinding ViewportSize}"
+                                       Orientation="Horizontal">
+                                    <Track.DecreaseButton>
+                                        <RepeatButton Name="PART_PageUpButton" />
+                                    </Track.DecreaseButton>
+                                    <Track.IncreaseButton>
+                                        <RepeatButton Name="PART_PageDownButton" />
+                                    </Track.IncreaseButton>
+                                    <Thumb Name="thumb">
+                                        <Thumb.Template>
+                                            <ControlTemplate>
+                                                <Border Background="#50000000" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track>
+                                <RepeatButton Name="PART_LineDownButton"
+                                              Grid.Row="2"
+                                              Grid.Column="2">
+                                    <Path Data="M 1.81,7 C1.81,7 0,7 0,7 0,7 3.18,3.5 3.18,3.5 3.18,3.5 0,0 0,0 0,0 1.81,0 1.81,0 1.81,0 5,3.5 5,3.5 5,3.5 1.81,7 1.81,7 z"
+                                          Stretch="Uniform"
+                                          Fill="Gray" />
+                                </RepeatButton>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

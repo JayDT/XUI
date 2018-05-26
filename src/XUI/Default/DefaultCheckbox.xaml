@@ -1,0 +1,86 @@
+<Application xmlns="http://git.tauri.hu/XUI"
+        xmlns:x="http://git.tauri.hu/Xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Application.Resources>
+        <Style TargetType="CheckBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{x:StaticResource ThemeBorderMidBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid Background="{x:TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Border Name="Border"
+                                BorderBrush="{x:TemplateBinding BorderBrush}"
+                                BorderThickness="{x:TemplateBinding BorderThickness}"
+                                Width="18"
+                                Height="18"
+                                VerticalAlignment="Center">
+                                <Panel
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center">
+                                    <Path Name="CheckMark"
+                                          Fill="{x:StaticResource HighlightBrush}"
+                                          Width="10"
+                                          Height="10"
+                                          Stretch="Uniform"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          IsVisible="False"
+                                          Data="M 1145.607177734375,430 C1145.607177734375,430 1141.449951171875,435.0772705078125 1141.449951171875,435.0772705078125 1141.449951171875,435.0772705078125 1139.232177734375,433.0999755859375 1139.232177734375,433.0999755859375 1139.232177734375,433.0999755859375 1138,434.5538330078125 1138,434.5538330078125 1138,434.5538330078125 1141.482177734375,438 1141.482177734375,438 1141.482177734375,438 1141.96875,437.9375 1141.96875,437.9375 1141.96875,437.9375 1147,431.34619140625 1147,431.34619140625 1147,431.34619140625 1145.607177734375,430 1145.607177734375,430 z"/>
+                                    <Rectangle Name="IndeterminateMark"
+                                       Fill="{x:StaticResource HighlightBrush}"
+                                       Width="10"
+                                       Height="10"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsVisible="False"
+                                       />
+                                </Panel>
+                            </Border>
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                          Content="{x:TemplateBinding Content}"
+                                          Foreground="{x:TemplateBinding Foreground}"
+                                          ContentTemplate="{x:TemplateBinding ContentTemplate}"
+                                          Margin="4,0,0,0"
+                                          VerticalAlignment="Center"
+                                          Grid.Column="1"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="{x:Static ToggleButtonState.TBS_NONE}">
+                                <Setter TargetName="CheckMark" Property="IsVisible" Value="false"/>
+                                <Setter TargetName="IndeterminateMark" Property="IsVisible" Value="false" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Static ToggleButtonState.TBS_INTERMEDIATE}">
+                                <Setter TargetName="CheckMark" Property="IsVisible" Value="false"/>
+                                <Setter TargetName="IndeterminateMark" Property="IsVisible" Value="true" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Static ToggleButtonState.TBS_CHECKED}">
+                                <Setter TargetName="IndeterminateMark" Property="IsVisible" Value="false" />
+                                <Setter TargetName="CheckMark" Property="IsVisible" Value="true"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="SteelBlue" />
+                            </Trigger>
+                            <!-- <Trigger Property="IsPressed" Value="true">
+                          <Setter TargetName="Border" Property="Background" Value="{x:StaticResource PressedBrush}" />
+                          <Setter TargetName="Border" Property="BorderBrush" Value="{x:StaticResource PressedBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                          <Setter TargetName="Border" Property="Background" Value="{x:StaticResource DisabledBackgroundBrush}" />
+                          <Setter TargetName="Border" Property="BorderBrush" Value="{x:StaticResource DisabledBorderBrush}" />
+                          <Setter Property="Foreground" Value="{x:StaticResource DisabledForegroundBrush}"/>
+                        </Trigger> -->
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

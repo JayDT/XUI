@@ -1,0 +1,75 @@
+/* ----------------------------------------------------------------------------
+** GENERATED SOURCE FILE
+** Do not modify the contents of this file.
+**
+** System::Reflection Meta Generator v{{version}}
+** --------------------------------------------------------------------------*/
+{{#usingPrecompiledHeader}}#include "{{precompiledHeader}}"{{/usingPrecompiledHeader}}
+#include "{{moduleHeaderFile}}"
+
+///////////////////////////////////////////////////////////////////////////////
+// Module Files
+///////////////////////////////////////////////////////////////////////////////
+
+{{#moduleFile}}
+//#include "{{& header}}"{{/moduleFile}}
+
+namespace m = System::Reflection::meta;
+
+m::ReflectionModule* __CurrentRunTime = nullptr;
+
+///////////////////////////////////////////////////////////////////////////////
+// Module Initialize and Declare
+///////////////////////////////////////////////////////////////////////////////
+
+bool InitializeModulAssembly()
+{
+    if (!__CurrentRunTime)
+    {
+        __CurrentRunTime = m::ReflectionModulManager::Instance().RegisterAssembly<System::Reflection::Assembly::AssemblyModul{{targetName}}>();
+        m::ReflectionModulManager::Instance().InitReflectionModule.push(__CurrentRunTime);
+    }
+    return true;
+}
+
+static bool Initalized = InitializeModulAssembly();
+
+namespace System::Reflection::meta
+{
+    ReflectionModule* __GetCurrent_RunTime__ReflectionModule()
+    {
+        return __CurrentRunTime;
+    }
+}
+
+System::Reflection::Assembly::AssemblyModul{{targetName}}::AssemblyModul{{targetName}}()
+    : ReflectionModule("{{targetName}}", m::GetCurrentModule())
+{
+}
+
+void System::Reflection::Assembly::AssemblyModul{{targetName}}::CreateTypes()
+{
+    ReflectionModule::Initialize();
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Module File Allocation
+    ///////////////////////////////////////////////////////////////////////////
+    {{#moduleFile}}
+    AllocateModuleFile{{& name}}( *_db );{{/moduleFile}}
+}
+
+void System::Reflection::Assembly::AssemblyModul{{targetName}}::Initialize()
+{
+    {{#assembly}}
+    AddMetaData( { {{> metaDataInitializerList}} } ); {{/assembly}}
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Module File Definition
+    ///////////////////////////////////////////////////////////////////////////
+    {{#moduleFile}}
+    DefineModuleFile{{& name}}( *_db );{{/moduleFile}}
+}
+
+System::Reflection::Assembly::AssemblyModul{{targetName}}::~AssemblyModul{{targetName}}(void)
+{
+}

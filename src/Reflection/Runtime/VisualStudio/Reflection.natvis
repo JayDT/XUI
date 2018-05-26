@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="System::Reflection::meta::Type">
+        <DisplayString>{{ [Type] {fullname} }}</DisplayString>
+        <Expand>
+            <Item Name="[Typeid]">m_id</Item>
+            <Item Name="[Typename]">name</Item>
+            <Item Name="[Namespace]">nameSpace</Item>
+            <Item Name="[Fields]">fields</Item>
+            <Item Name="[Properties]">Properties</Item>
+            <Item Name="[Methods]">methods</Item>
+        </Expand>
+    </Type>
+    
+    <Type Name="System::Reflection::meta::Variant">  
+      <DisplayString Condition="m_base == 0">[Variant] empty</DisplayString>  
+      <DisplayString Condition="m_base != 0">[Variant] {m_base}</DisplayString>  
+      <Expand>  
+        <ExpandedItem>m_base</ExpandedItem>  
+      </Expand>  
+    </Type>
+
+    <Type Name="System::Reflection::meta::VariantCopyObject&lt;*&gt;">
+        <DisplayString>[Copy] Type: {m_type.fullname}}</DisplayString>
+        <Expand>
+            <Item Name="[Object]">m_isObject</Item>
+            <Item Name="[Pointer]">m_isPointer</Item>
+            <Item Name="[Type]">m_type</Item>
+            <Item Name="[Value]">m_value</Item>
+            <ExpandedItem>m_value</ExpandedItem>
+        </Expand>
+    </Type>
+
+    <Type Name="System::Reflection::meta::VariantRefObject">
+        <DisplayString>[Ref] Type: {m_type.fullname}}</DisplayString>
+        <Expand>
+            <Item Name="[Object]">m_isObject</Item>
+            <Item Name="[Pointer]">m_isPointer</Item>
+            <Item Name="[Type]">m_type</Item>
+            <Item Name="[Value]">m_value</Item>
+            <ExpandedItem>m_value</ExpandedItem>
+        </Expand>
+    </Type>
+
+    <Type Name="System::Reflection::meta::VariantSharedObject&lt;*&gt;">
+        <DisplayString>[SharedPtr] Type: {m_type.fullname}}</DisplayString>
+        <Expand>
+            <Item Name="[Object]">m_isObject</Item>
+            <Item Name="[Pointer]">m_isPointer</Item>
+            <Item Name="[Type]">m_type</Item>
+            <Item Name="[Value]">m_value</Item>
+            <ExpandedItem>m_value</ExpandedItem>
+        </Expand>
+    </Type>
+    
+</AutoVisualizer>

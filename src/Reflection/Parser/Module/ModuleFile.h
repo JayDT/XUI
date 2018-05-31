@@ -27,9 +27,9 @@ struct ModuleFile
 {
     std::string name;
 
-    std::vector<std::shared_ptr<Class>> classes;
-    std::vector<std::shared_ptr<Global>> globals;
-    std::vector<std::shared_ptr<Function>> globalFunctions;
-    std::vector<std::shared_ptr<Enum>> enums;
+    std::list<std::shared_ptr<Class>> classes;
+    std::list<std::shared_ptr<Global>> globals;
+    std::list<std::shared_ptr<Function>> globalFunctions;
+    std::list<std::shared_ptr<Enum>> enums;
     std::set<std::string> includes;
 };

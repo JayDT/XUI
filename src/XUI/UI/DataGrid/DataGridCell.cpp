@@ -228,7 +228,7 @@ void XUI::UI::DataGridCell::PrepareCell(System::Reflection::Variant const & item
 
 void XUI::UI::DataGridCell::ClearCell(DataGridRow * ownerRow)
 {
-    ASSERT(_owner.lock().get() == ownerRow, "_owner should be the same as the DataGridRow that is clearing the cell.");
+    ASSERT(_owner.lock().get() == ownerRow && "_owner should be the same as the DataGridRow that is clearing the cell.");
     _owner.reset();
 }
 

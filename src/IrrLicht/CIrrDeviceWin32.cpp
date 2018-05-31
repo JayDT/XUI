@@ -1300,7 +1300,7 @@ void CIrrDeviceWin32::setTimer(u32 id, uint interval, std::function<void()> cons
         (TIMERPROC)[](
             HWND hwnd,          // handle to window for timer messages 
             UINT message,       // WM_TIMER message 
-            UINT idTimer,       // timer identifier 
+            UINT_PTR idTimer,   // timer identifier 
             DWORD dwTime)       // current system time 
     {
         CIrrDeviceWin32* dev = getDeviceFromHWnd(hwnd);

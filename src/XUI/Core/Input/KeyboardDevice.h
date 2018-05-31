@@ -105,7 +105,7 @@ namespace XUI::Core::Input
 
         rxcpp::subscription _inputmgr_subcribe;
 
-        void Move(
+        bool Move(
             XUI::UI::Controls::InputElement* element,
             UI::Presenters::NavigationDirection direction,
             Interfaces::InputModifiers modifiers = Interfaces::InputModifiers::None);

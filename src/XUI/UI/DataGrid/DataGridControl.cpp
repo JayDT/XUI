@@ -2378,7 +2378,7 @@ DataGridCell * XUI::UI::DataGrid::GetCellNearMouse()
 
 DataGridRow * XUI::UI::DataGrid::GetRowNearMouse()
 {
-    ASSERT(GetRelativeMousePosition() != RelativeMousePositions::Over, "The mouse is not supposed to be over the DataGrid.");
+    ASSERT(GetRelativeMousePosition() != RelativeMousePositions::Over && "The mouse is not supposed to be over the DataGrid.");
 
     auto itemsHost = Presenter->Panel.get();
     if (itemsHost)

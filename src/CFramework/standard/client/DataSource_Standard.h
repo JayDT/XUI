@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __C_DATASOURCE_CASC_H__
-#define __C_DATASOURCE_CASC_H__
+#ifndef __C_DATASOURCE_STANARD_H__
+#define __C_DATASOURCE_STANARD_H__
 
 #include <stdio.h>
 #include <standard/client/IDataSourceClient.h>

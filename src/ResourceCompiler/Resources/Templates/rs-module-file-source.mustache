@@ -14,7 +14,7 @@ void __AllocateModuleFile{{moduleFileName}}(m::ResourceDatabase &db)
     {{#resource}}{
         m::ResourceObject* res = db.CreateResourceObject("{{& name}}");
         {{#data}}{
-            const uint8_t _binary[{{& size}}] = { {{& binary}} };
+            static const uint8_t _binary[{{& size}}] = { {{& binary}} };
             res->LoadCompressRawData(_binary, {{& size}}, {{& total_size}});
         }{{/data}}
         res->CreateResource();

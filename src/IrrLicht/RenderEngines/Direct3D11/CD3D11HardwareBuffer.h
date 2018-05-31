@@ -112,7 +112,7 @@ namespace irr
                 bool initialize : 1;
             };
 
-            core::array<BufferDesc> VertexBufferStreams;
+            std::vector<BufferDesc> VertexBufferStreams;
 
             ID3D11Device* Device;
             CD3D11Driver* Driver;

@@ -235,8 +235,8 @@ Core::Media::Size TextPresenter::MeasureOverride(Core::Media::Size const& availa
 int TextPresenter::CoerceCaretIndex(int value)
 {
     auto text = Text;
-    auto length = text.empty() ? 0 : text.size();
-    return std::max(0u, std::min(length, uint(value)));
+    auto length = text.empty() ? size_t(0) : text.size();
+    return std::max(size_t(0), std::min(length, size_t(value)));
 }
 
 void TextPresenter::CaretTimerTick(void *sender, System::Events::EventArg& e)

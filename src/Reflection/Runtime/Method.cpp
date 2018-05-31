@@ -127,7 +127,7 @@ namespace System::Reflection
                 "Non-const method invoked on const object." 
             );
 
-            UAssert( *instance.GetType( ) == m_classType, 
+            UAssert(m_classType.IsAssignableFrom(*instance.GetType( )),
                 "Incompatible method invoked with instance." 
             );
 

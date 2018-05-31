@@ -7,12 +7,20 @@ if (NOT DEFINED LIBCLANG_USE_STATIC_LIBRARY)
     endif ()
 endif ()
 
-set(LLVM_SEARCH_PATHS
-    ${LLVM_ROOT}
-    $ENV{LLVM_ROOT}
-    "c:/Program Files (x86)/LLVM/"
-    "c:/Program Files/LLVM/"
-)
+IF (PLATFORM EQUAL 32)
+    set(LLVM_SEARCH_PATHS
+        "c:/Program Files (x86)/LLVM/"
+        ${LLVM_ROOT}
+        $ENV{LLVM_ROOT}
+        "c:/Program Files/LLVM/"
+    )
+ELSE(PLATFORM EQUAL 32)
+    set(LLVM_SEARCH_PATHS
+        "c:/Program Files/LLVM/"
+    )
+ENDIF(PLATFORM EQUAL 32)
+
+message("--- SEARCH ${LLVM_SEARCH_PATHS}")
 
 set(LIBCLANG_STATIC_LIBRARY_NAME
     "libclang${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -25,7 +33,7 @@ set(LIBCLANG_SHARED_LIBRARY_NAME
 # include directories
 find_path(LLVM_INCLUDE_DIRS
     NAMES "clang-c/Index.h"
-    PATHS ${LLVM_SEARCH_PATHS}
+    HINTS ${LLVM_SEARCH_PATHS}
     PATH_SUFFIXES "include"
 )
 
@@ -33,7 +41,7 @@ if (LIBCLANG_USE_STATIC_LIBRARY)
     # find static library directory
     find_path(LLVM_LIBRARY_DIR
         NAMES ${LIBCLANG_STATIC_LIBRARY_NAME}
-        PATHS ${LLVM_SEARCH_PATHS}
+        HINTS ${LLVM_SEARCH_PATHS}
         PATH_SUFFIXES "lib" "bin"
     )
 endif ()
@@ -41,7 +49,7 @@ endif ()
 # shared library directory
 find_path(LLVM_BINARY_DIR
     NAMES ${LIBCLANG_SHARED_LIBRARY_NAME}
-    PATHS ${LLVM_SEARCH_PATHS}
+    HINTS ${LLVM_SEARCH_PATHS}
     PATH_SUFFIXES "bin" "lib"
 )
 

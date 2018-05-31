@@ -349,8 +349,9 @@ bool CD3D11HardwareBuffer::UpdateBuffer(E_HARDWARE_BUFFER_TYPE Type, E_HARDWARE_
 
     if (VertexBufferStreams.size() <= (int)Type)
     {
-        for (s32 i = 0; i <= (((s32)Type - (s32)VertexBufferStreams.size()) + 1); ++i)
-            VertexBufferStreams.push_back(CD3D11HardwareBuffer::BufferDesc());
+        VertexBufferStreams.resize(int(Type) + 1);
+        //for (s32 i = 0; i <= (((s32)Type - (s32)VertexBufferStreams.size()) + 1); ++i)
+        //    VertexBufferStreams.push_back(CD3D11HardwareBuffer::BufferDesc());
     }
 
     CD3D11HardwareBuffer::BufferDesc& desc = VertexBufferStreams[(u32)Type];

@@ -361,15 +361,17 @@ void XUI::UI::Window::__OnTitle_Click(void * sender, XUI::Core::Observer::Routed
     if (pressArg)
     {
         DragMove();
+        e.Handled = true;
     }
     else
     {
         Interfaces::PointerReleasedEventArgs* releasedArg = e.As<Interfaces::PointerReleasedEventArgs>();
-        if (releasedArg)
+        if (releasedArg && _inDragMove)
         {
             _inDragMove = false;
             auto mouseDevice = XUI::Platform::UIService::Instance()->Get<Interfaces::IMouseDevice>();
             mouseDevice->Capture(nullptr);
+            e.Handled = true;
         }
     }
 }
@@ -483,6 +485,8 @@ void XUI::UI::Window::OnPointerMoved(Interfaces::PointerEventArgs& e)
             InvalidateArrange();
             _lastMousePosition = pointerPos;
         }
+
+        e.Handled = true;
     }
     else if (_inResizing && (!_windowImpl || WindowStyle == UI::WindowStyle::None))
     {
@@ -666,6 +670,7 @@ void XUI::UI::Window::OnPointerPressed(Interfaces::PointerPressedEventArgs& e)
 
         auto mouseDevice = XUI::Platform::UIService::Instance()->Get<Interfaces::IMouseDevice>();
         mouseDevice->Capture(this);
+        e.Handled = true;
     }
 }
 

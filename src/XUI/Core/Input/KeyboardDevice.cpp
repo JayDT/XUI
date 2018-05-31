@@ -38,7 +38,7 @@ void Core::Input::KeyboardDevice::StaticClassInitializer()
     TabNavigationProperty = (Core::Dependency::BindProperty<Core::Input::KeyboardNavigationMode>::RegisterAttached<Core::Input::KeyboardDevice, XUI::UI::Controls::InputElement>(nameof(TabNavigation), Core::Input::KeyboardNavigationMode::Continue));
 }
 
-void XUI::Core::Input::KeyboardDevice::Move(XUI::UI::Controls::InputElement * element, UI::Presenters::NavigationDirection direction, Interfaces::InputModifiers modifiers)
+bool XUI::Core::Input::KeyboardDevice::Move(XUI::UI::Controls::InputElement * element, UI::Presenters::NavigationDirection direction, Interfaces::InputModifiers modifiers)
 {
     System::ThrowIfFailed<System::ArgumentNullException>(element);
     
@@ -49,7 +49,10 @@ void XUI::Core::Input::KeyboardDevice::Move(XUI::UI::Controls::InputElement * el
         Interfaces::NavigationMethod method = direction == UI::Presenters::NavigationDirection::Next || direction == UI::Presenters::NavigationDirection::Previous ? Interfaces::NavigationMethod::Tab : Interfaces::NavigationMethod::Directional;
         SetFocusedElement(next, method, modifiers); // Raise event and set keyboard focus
         next->Focus(); // set focused element
+        return true;
     }
+
+    return false;
 }
 
 XUI::UI::Controls::InputElement * XUI::Core::Input::KeyboardDevice::GetNext(XUI::UI::Controls::InputElement * element, UI::Presenters::NavigationDirection direction)
@@ -269,8 +272,8 @@ void XUI::Core::Input::KeyboardDevice::OnKeyDown(void * sender, Interfaces::KeyE
 
         if (direction != UI::Presenters::NavigationDirection::None)
         {
-            Move(focus->Static_As<UI::Controls::InputElement>(), direction, e.Modifiers);
-            e.Handled = true;
+            if (Move(focus->Static_As<UI::Controls::InputElement>(), direction, e.Modifiers))
+                e.Handled = true;
         }
     }
 }

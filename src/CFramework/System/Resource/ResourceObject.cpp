@@ -71,10 +71,14 @@ std::vector<byte> const& System::Resource::ResourceObject::ToBytes() const
 
 System::IO::MemoryStreamReader * System::Resource::ResourceObject::ToMemoryStreamReader() const
 {
-    return new System::IO::MemoryStreamReader((byte*)_data.data(), _data.size());
+    auto stream = new System::IO::MemoryStreamReader((byte*)_data.data(), _data.size());
+    stream->FileName = _name;
+    return stream;
 }
 
 std::shared_ptr<System::IO::MemoryStreamReader> System::Resource::ResourceObject::ToSharedMemoryStreamReader() const
 {
-    return std::make_shared<System::IO::MemoryStreamReader>((byte*)_data.data(), _data.size());
+    auto stream = std::make_shared<System::IO::MemoryStreamReader>((byte*)_data.data(), _data.size());
+    stream->FileName = _name;
+    return stream;
 }

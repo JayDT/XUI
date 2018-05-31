@@ -18,8 +18,6 @@
 #include "irrList.h"
 #include "IAttributes.h"
 
-#include <unordered_set>
-
 namespace irr
 {
 namespace video
@@ -34,7 +32,7 @@ namespace scene
     class ISceneManager;
 
     //! Typedef for list of scene nodes
-    typedef std::unordered_set<ISceneNode*> ISceneNodeList;
+    typedef std::set<ISceneNode*> ISceneNodeList;
     //! Typedef for list of scene node animators
     typedef core::list<ISceneNodeAnimator*> ISceneNodeAnimatorList;
 

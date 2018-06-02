@@ -86,8 +86,6 @@ namespace XUI::UI
 
         static void StaticClassInitializer();
 
-    public:
-
         Button();
         virtual ~Button();
 

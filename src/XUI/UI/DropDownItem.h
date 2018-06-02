@@ -28,6 +28,11 @@ namespace XUI::UI
     /// </summary>
     class DropDownItem : public ListBoxItem
     {
+    public:
+
+        DropDownItem() {}
+        virtual ~DropDownItem() {}
+
     };
 }
 

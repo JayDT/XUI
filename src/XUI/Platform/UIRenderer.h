@@ -45,6 +45,7 @@
 
 MetaAssemblyBegin
 Meta(modul: ReflInclude("XUI/Core/Input/MouseDevice.h"))
+Meta(modul: ReflInclude("XamlCPP/DataBind/InstancedBinding.h"))
 MetaAssemblyEnd
 
 namespace XUI::Interfaces

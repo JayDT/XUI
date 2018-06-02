@@ -232,14 +232,14 @@ bool CIrrDeviceStub::postEventFromUser(const SEvent& event)
     if (ConsoleReceiver)
         absorbed = ConsoleReceiver->OnEvent(event);
 
+    if (!absorbed && WorldReceiver)
+        absorbed = WorldReceiver->OnEvent(event);
+
     if (!absorbed && UserReceiver)
         absorbed = UserReceiver->OnEvent(event);
 
     if (!absorbed && GUIEnvironment)
         absorbed = GUIEnvironment->postEventFromUser(event);
-
-    if (!absorbed && WorldReceiver)
-        absorbed = WorldReceiver->OnEvent(event);
 
     scene::ISceneManager* inputReceiver = InputReceivingSceneManager;
     if (!inputReceiver)

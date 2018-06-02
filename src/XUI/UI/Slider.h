@@ -64,6 +64,7 @@ namespace XUI::UI
         /// </summary>
     public:
         Slider();
+        virtual ~Slider() {}
 
         /// <summary>
         /// Gets or sets the orientation of a <see cref="Slider"/>.

@@ -489,7 +489,7 @@ double XUI::UI::DataGridColumn::GetConstraintWidth(bool isHeader)
 /// <returns></returns>
 std::shared_ptr<DataGridColumn> XUI::UI::DataGridColumn::CreateDefaultColumn(System::Reflection::Field const * itemProperty)
 {
-    ASSERT(itemProperty != nullptr && itemProperty->GetFieldType()->IsValid(), "itemProperty and/or its PropertyType member cannot be null");
+    ASSERT(itemProperty != nullptr && itemProperty->GetFieldType()->IsValid() && "itemProperty and/or its PropertyType member cannot be null");
 
     std::shared_ptr<DataGridColumn> dataGridColumn;
     std::shared_ptr<DataGridComboBoxColumn> comboBoxColumn;

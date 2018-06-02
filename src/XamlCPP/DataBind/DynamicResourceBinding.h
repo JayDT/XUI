@@ -70,7 +70,7 @@ namespace XamlCPP::DataBind
             Core::Dependency::IPropertyObject* targetProperty,
             System::Reflection::Object* anchor = nullptr,
             bool enableDataValidation = false,
-            std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope = nullptr) override;
+            std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope = nullptr) override;
     };
 }
 

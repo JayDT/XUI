@@ -311,6 +311,8 @@ namespace System::Reflection
 
             Type const& GetType(void) const override
             {
+                if (!m_type)
+                    return Type::Invalid();
                 if (!m_type->IsValid() && m_isObject)
                     return *ToObject()->GetType();
                 return *m_type;

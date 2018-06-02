@@ -23,6 +23,7 @@
 #include <standard/misc.h>
 #include "Interfaces/IMarkupExtension.h"
 #include "Interfaces/IValueConverter.h"
+#include "Interfaces/ITypeRepository.h"
 
 namespace XamlCPP::Markup
 {

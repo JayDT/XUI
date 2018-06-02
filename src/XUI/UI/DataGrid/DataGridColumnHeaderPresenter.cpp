@@ -667,7 +667,7 @@ bool XUI::UI::DataGridColumnHeadersPresenter::IsMousePositionValidForColumnDrag(
 
 void XUI::UI::DataGridColumnHeadersPresenter::StartColumnHeaderDrag()
 {
-    ASSERT(ParentDataGrid() != nullptr, "ParentDataGrid is nullptr");
+    ASSERT(ParentDataGrid() != nullptr  &&  "ParentDataGrid is nullptr");
     
     _columnHeaderDragStartPosition = _columnHeaderDragCurrentPosition;
     if (ParentDataGrid()->ColumnHeaderDragStarted)

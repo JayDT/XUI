@@ -149,7 +149,7 @@ namespace XamlCPP::DataBind
             Core::Dependency::IPropertyObject* targetProperty,
             System::Reflection::Object* anchor = nullptr,
             bool enableDataValidation = false,
-            std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope = nullptr) override;
+            std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope = nullptr) override;
 
         std::shared_ptr<XamlCPP::DataBind::SourceObserverNode> GetSourceObserver();
 
@@ -170,7 +170,7 @@ namespace XamlCPP::DataBind
 			System::Reflection::Object* anchor,
 			bool enableDataValidation);
 
-        std::shared_ptr<XamlCPP::DataBind::SourceObserver> CreateElementObserver(XamlCPP::Core::Dependency::IDependencyObject* target, std::string const& elementName, std::string const& path, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope);
+        std::shared_ptr<XamlCPP::DataBind::SourceObserver> CreateElementObserver(XamlCPP::Core::Dependency::IDependencyObject* target, std::string const& elementName, std::string const& path, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope);
 
         std::shared_ptr<XamlCPP::DataBind::SourceObserver> CreateSourceObserver(
             System::Reflection::RefObject source,

@@ -43,10 +43,12 @@ namespace XUI::UI
         /// </summary>
         static void StaticClassInitializer();
 
+        WrapPanel() {}
+        virtual ~WrapPanel() {}
+
         /// <summary>
         /// Gets or sets the orientation in which child controls will be layed out.
         /// </summary>
-    public:
         PROPERTY_(UI::Orientation , Orientation);
         UI::Orientation GetOrientation() const;
         void SetOrientation(UI::Orientation value);

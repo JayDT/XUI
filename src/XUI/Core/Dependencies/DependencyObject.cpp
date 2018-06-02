@@ -557,7 +557,7 @@ rxcpp::subscription XUI::Core::Dependency::DependencyObject::Bind(DependencyObje
         property,
         anchor,
         metadata ? metadata->GetEnableDataValidation() : false,
-        &namedScope);
+        namedScope);
 
     if (instanceBinding != nullptr)
     {

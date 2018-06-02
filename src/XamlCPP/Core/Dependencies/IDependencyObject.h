@@ -42,7 +42,7 @@ namespace XamlCPP
 
 namespace XamlCPP::Core::Dependency
 {
-    struct IDependencyObject : public Core::NotifyPropertyChanged, public System::EnableSharedFromThisEx<IDependencyObject>
+    struct TC_XAMLCPP_API IDependencyObject : public Core::NotifyPropertyChanged, public System::EnableSharedFromThisEx<IDependencyObject>
     {
         virtual System::Reflection::meta::Variant GetValue(XamlCPP::Core::Dependency::IPropertyObject* _property) const = 0;
         virtual bool IsSet(IPropertyObject *_property) = 0;
@@ -79,7 +79,7 @@ namespace XamlCPP::Core::Dependency
         virtual uint32 GetGID() const = 0;
     };
 
-    struct IDependencyPropertyMgr
+    struct TC_XAMLCPP_API IDependencyPropertyMgr
     {
         //// {5E896A26-5971-4480-8360-9308AA5632AF}
         static constexpr boost::uuids::uuid __uuid = { 0x5e, 0x89, 0x6a, 0x26, 0x59, 0x71, 0x44, 0x80, 0x83, 0x60, 0x93, 0x8, 0xaa, 0x56, 0x32, 0xaf };

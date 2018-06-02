@@ -58,8 +58,8 @@
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="true">
-                    <Setter TargetName="PART_HeaderPresenter" Property="Background" Value="SteelBlue" />
-                    <Setter TargetName="PART_HeaderPresenter" Property="BorderThickness" Value="1" />
+                    <Setter TargetName="root" Property="Background" Value="Gray" />
+                    <Setter TargetName="root" Property="BorderThickness" Value="1" />
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -135,20 +135,11 @@
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="true">
-                    <Setter TargetName="PART_HeaderPresenter" Property="Background" Value="SteelBlue" />
-                    <Setter TargetName="PART_HeaderPresenter" Property="BorderThickness" Value="1" />
+                    <Setter TargetName="root" Property="Background" Value="Gray" />
+                    <Setter TargetName="root" Property="BorderThickness" Value="1" />
                 </Trigger>
                 <Trigger GID="602" Property="Checked" Value="true">
-                    <Setter TargetName="icon" Property="ContentPresenter.Content" GID="602">
-                        <Path Name="CheckMark"
-                              Fill="{x:StaticResource HighlightBrush}"
-                              Width="10"
-                              Height="10"
-                              Stretch="Uniform"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Data="M 1145.607177734375,430 C1145.607177734375,430 1141.449951171875,435.0772705078125 1141.449951171875,435.0772705078125 1141.449951171875,435.0772705078125 1139.232177734375,433.0999755859375 1139.232177734375,433.0999755859375 1139.232177734375,433.0999755859375 1138,434.5538330078125 1138,434.5538330078125 1138,434.5538330078125 1141.482177734375,438 1141.482177734375,438 1141.482177734375,438 1141.96875,437.9375 1141.96875,437.9375 1141.96875,437.9375 1147,431.34619140625 1147,431.34619140625 1147,431.34619140625 1145.607177734375,430 1145.607177734375,430 z"/>
-                    </Setter>
+                    <Setter TargetName="check" Property="IsVisible" Value="true" />
                 </Trigger>
             </ControlTemplate.Triggers>            
         </ControlTemplate>

@@ -56,6 +56,9 @@ namespace XUI::UI
         /// </summary>
         static void StaticClassInitializer();
 
+        DropDown() {}
+        virtual ~DropDown() {}
+
         /// <summary>
         /// Gets or sets a value indicating whether the dropdown is currently open.
         /// </summary>

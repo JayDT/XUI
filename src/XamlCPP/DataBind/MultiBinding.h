@@ -80,7 +80,7 @@ namespace XamlCPP::Markup
         RelativeSource RelativeSource;
 
         /// <inheritdoc/>
-        std::shared_ptr<DataBind::InstancedBinding> Initiate(Core::Dependency::IDependencyObject *target, Core::Dependency::IPropertyObject *targetProperty, System::Reflection::Object *anchor = nullptr, bool enableDataValidation = false, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope = nullptr);
+        std::shared_ptr<DataBind::InstancedBinding> Initiate(Core::Dependency::IDependencyObject *target, Core::Dependency::IPropertyObject *targetProperty, System::Reflection::Object *anchor = nullptr, bool enableDataValidation = false, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope = nullptr);
 
         /// <summary>
         /// Applies a binding subject to a property on an instance.

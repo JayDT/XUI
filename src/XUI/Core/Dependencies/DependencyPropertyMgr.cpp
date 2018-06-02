@@ -35,7 +35,7 @@ using namespace XUI::Core::Dependency;
 using namespace XamlCPP::Core::Dependency;
 
 uint s_nextId = 0;
-System::Reflection::meta::Variant XUI::Core::Dependency::DependencyPropertyMgr::UnsetValue;
+TC_XUI_API System::Reflection::meta::Variant XUI::Core::Dependency::DependencyPropertyMgr::UnsetValue(new System::Reflection::Object());
 
 DependencyPropertyMgr * XUI::Core::Dependency::DependencyPropertyMgr::Instance()
 {

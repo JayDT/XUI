@@ -251,7 +251,7 @@ void XUI::UI::DataGridRow::ItemsPanelChanged(XamlCPP::Core::Dependency::Dependen
 void XUI::UI::DataGridRow::PrepareRow(System::Reflection::Variant const & item, DataGrid * owningDataGrid)
 {
     bool fireOwnerChanged = (_owner.lock().get() != owningDataGrid);
-    ASSERT(_owner.expired() || !fireOwnerChanged, "_owner should be null before PrepareRow is called or the same as the owningDataGrid.");
+    ASSERT(_owner.expired() || !fireOwnerChanged  && "_owner should be null before PrepareRow is called or the same as the owningDataGrid.");
     bool forcePrepareCells = false;
     _owner = owningDataGrid->shared_from_base_static<DataGrid>();
 

@@ -474,11 +474,10 @@ void XUI::UI::Controls::InputElement::RaiseEventImpl(RoutedEventArgs const & e)
     auto iRouteHandler = _eventHandlers.find(e.RoutedEvent);
     if (iRouteHandler != _eventHandlers.end())
     {
-        //for(auto const& sub : iRouteHandler->second)
-        for (std::list<std::shared_ptr<Core::Observer::RoutedEventHandler>>::iterator it = iRouteHandler->second.begin(), next; it != iRouteHandler->second.end();)
+        for (auto it = iRouteHandler->second.begin(); it != iRouteHandler->second.end();)
         {
             auto const& sub = *it;
-            next = ++it;
+            ++it;
 
             bool correctRoute = (e.Route & sub->Routes) != 0;
             bool notFinished = !e.Handled || sub->AlsoIfHandled;

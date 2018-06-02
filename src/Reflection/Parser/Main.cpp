@@ -66,23 +66,23 @@ int main(int argc, char *argv[])
         argc = 18;
         argv = new char*[19]
         {
-            _SOURCE_DIRECTORY "/win/bin/Debug/MetaParser.exe",
+            _SOURCE_DIRECTORY "/win64/bin/Debug/MetaParser.exe",
             "--target-name",
 			_TEST_MODUL,
             "--source-root",
-            _SOURCE_DIRECTORY "/src/" _TEST_MODUL,
+            _SOURCE_DIRECTORY "/moduls/XUI/src/" _TEST_MODUL,
             "--in-source",
-            _SOURCE_DIRECTORY "/win/src/" _TEST_MODUL "/.Assembly/Assembly_" _TEST_MODUL ".dsc",
+            _SOURCE_DIRECTORY "/win64/moduls/XUI/src/" _TEST_MODUL "/.Assembly/Assembly_" _TEST_MODUL ".dsc",
             "--module-header",
-            _SOURCE_DIRECTORY "/src/" _TEST_MODUL "AssemblyModul.h",
+            _SOURCE_DIRECTORY "/moduls/XUI/src/" _TEST_MODUL "AssemblyModul.h",
             "--out-source",
-            _SOURCE_DIRECTORY "/win/src/" _TEST_MODUL "/.Assembly/Assembly_Modul_" _TEST_MODUL ".cpp",
+            _SOURCE_DIRECTORY "/win64/moduls/XUI/src/" _TEST_MODUL "/.Assembly/Assembly_Modul_" _TEST_MODUL ".cpp",
             "--out-dir",
-            _SOURCE_DIRECTORY "/win/src/" _TEST_MODUL "/.Assembly",
+            _SOURCE_DIRECTORY "/win64/moduls/XUI/src/" _TEST_MODUL "/.Assembly",
             "--includes",
-            _SOURCE_DIRECTORY "/win/src/" _TEST_MODUL "/.Assembly/Module." _TEST_MODUL ".Includes.txt",
+            _SOURCE_DIRECTORY "/win64/moduls/XUI/src/" _TEST_MODUL "/.Assembly/Module." _TEST_MODUL ".Includes.txt",
             "--pch",
-            _SOURCE_DIRECTORY "/src/" _TEST_MODUL "/StdAfx.h",
+            _SOURCE_DIRECTORY "/moduls/XUI/src/" _TEST_MODUL "/StdAfx.h",
             "--display-diagnostics",
             nullptr
         };

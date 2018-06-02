@@ -32,7 +32,7 @@ MetaAssemblyEnd
 
 namespace XUI::UI
 {
-    class Theme;
+    class Theme {};
     class DropTargetBase;
     class LayoutGroupBase;
     class LayoutContent;

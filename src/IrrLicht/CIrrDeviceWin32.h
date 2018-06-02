@@ -44,7 +44,7 @@ namespace irr
 		//! runs the device. Returns false if device wants to be deleted
 		virtual bool run();
 
-        virtual int getHandle() { return (int)HWnd; }
+        virtual intptr_t getHandle() { return (intptr_t)HWnd; }
 
 		//! Cause the device to temporarily pause execution and let other processes to run
 		// This should bring down processor usage without major performance loss for Irrlicht

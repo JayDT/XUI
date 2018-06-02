@@ -113,6 +113,8 @@ namespace XUI::UI
 
         static void StaticClassInitializer();
         Grid();
+        virtual ~Grid() {}
+
 
     private:
         Meta(Disable) ColumnDefinitionList _columnDefinitions;

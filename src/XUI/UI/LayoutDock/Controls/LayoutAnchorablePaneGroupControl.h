@@ -4,6 +4,10 @@
 #include "UI/LayoutDock/Controls/LayoutGridControl.h"
 #include "UI/LayoutDock/Layouts/LayoutAnchorablePane.h"
 
+MetaAssemblyBegin
+Meta(modul: ReflInclude("UI/LayoutDock/Layouts/LayoutAnchorablePaneGroup.h"))
+MetaAssemblyEnd
+
 namespace XUI::UI
 {
     class LayoutAnchorablePaneGroup;

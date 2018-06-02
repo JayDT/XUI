@@ -42,7 +42,9 @@ namespace XUI::UI
 
         static void StaticClassInitializer();
 
-    public:
+        Expander() {}
+        virtual ~Expander() {}
+
         //PROPERTY_(IPageTransition * , ContentTransition);
         //IPageTransition *GetContentTransition() const;
         //void SetContentTransition(IPageTransition *value);

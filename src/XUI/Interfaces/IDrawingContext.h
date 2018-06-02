@@ -21,6 +21,10 @@
 
 #include "Core/Media/MediaTypes.h"
 #include "standard/BasicPrimities.h"
+#include "XUI/Interfaces/IFormatedText.h"
+#include "XUI/Interfaces/IGeometry.h"
+#include "XUI/Interfaces/IBitmap.h"
+#include "XUI/Interfaces/IBrush.h"
 
 #include <vector>
 #include <string>

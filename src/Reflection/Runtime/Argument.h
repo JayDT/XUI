@@ -57,6 +57,7 @@ namespace System::Reflection
 
             Object* ToObject(void) const;
             RefObject ToSharedObject(void) const;
+            std::shared_ptr<void> ToSharedPointer(void) const;
             void *GetPtr(void) const;
 
             template<typename T>

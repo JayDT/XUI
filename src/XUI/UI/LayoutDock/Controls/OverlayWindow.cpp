@@ -147,7 +147,7 @@ std::list<std::shared_ptr<DropTargetBase>> XUI::UI::OverlayWindow::GetTargets()
                 auto lastAreaTabItemScreenArea = lastAreaTabItem->TransformedBounds;
                 auto newAreaTabItemScreenArea = Core::Media::Rect(lastAreaTabItemScreenArea.TopRight, Core::Media::Point(lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
                 if (newAreaTabItemScreenArea.Right < dropAreaAnchorablePane->AreaElement->TransformedBounds.Right)
-                    _result.push_back(std::make_shared<AnchorablePaneDropTarget>(dropAreaAnchorablePane->AreaElement.get(), newAreaTabItemScreenArea, DropTargetType::AnchorablePaneDockInside, parentPaneModel->Children.size()));
+                    _result.push_back(std::make_shared<AnchorablePaneDropTarget>(dropAreaAnchorablePane->AreaElement.get(), newAreaTabItemScreenArea, DropTargetType::AnchorablePaneDockInside, int(parentPaneModel->Children.size())));
             }
 
             if (dropAreaTitle)
@@ -190,7 +190,7 @@ std::list<std::shared_ptr<DropTargetBase>> XUI::UI::OverlayWindow::GetTargets()
                     auto lastAreaTabItemScreenArea = lastAreaTabItem->TransformedBounds;
                     auto newAreaTabItemScreenArea = Core::Media::Rect(lastAreaTabItemScreenArea.TopRight, Core::Media::Point(lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Height));
                     if (newAreaTabItemScreenArea.Right < dropAreaDocumentPane->AreaElement->TransformedBounds.Right)
-                        _result.push_back(std::make_shared<DocumentPaneDropTarget>(dropAreaDocumentPane->AreaElement.get(), newAreaTabItemScreenArea, DropTargetType::DocumentPaneDockInside, parentPaneModel->Children.size()));
+                        _result.push_back(std::make_shared<DocumentPaneDropTarget>(dropAreaDocumentPane->AreaElement.get(), newAreaTabItemScreenArea, DropTargetType::DocumentPaneDockInside, int(parentPaneModel->Children.size())));
                 }
 
                 if (_documentPaneDropTargetLeftAsAnchorablePane->IsVisible)
@@ -236,7 +236,7 @@ std::list<std::shared_ptr<DropTargetBase>> XUI::UI::OverlayWindow::GetTargets()
                     auto lastAreaTabItemScreenArea = lastAreaTabItem->TransformedBounds;
                     auto newAreaTabItemScreenArea = Core::Media::Rect(lastAreaTabItemScreenArea.TopRight, Core::Media::Point(lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Height));
                     if (newAreaTabItemScreenArea.Right < dropAreaDocumentPane->AreaElement->TransformedBounds.Right)
-                        _result.push_back(std::make_shared<DocumentPaneDropTarget>(dropAreaDocumentPane->AreaElement.get(), newAreaTabItemScreenArea, DropTargetType::DocumentPaneDockInside, parentPaneModel->Children.size()));
+                        _result.push_back(std::make_shared<DocumentPaneDropTarget>(dropAreaDocumentPane->AreaElement.get(), newAreaTabItemScreenArea, DropTargetType::DocumentPaneDockInside, int(parentPaneModel->Children.size())));
                 }
             }
         }
@@ -481,7 +481,7 @@ void XUI::UI::OverlayWindow::DragEnter(IDropArea * area)
             {
                 int indexOfDocumentPane = parentDocumentPaneGroup->Children.IndexOf(layoutDocumentPane->shared_from_base_static<LayoutElement>());
                 bool isFirstChild = indexOfDocumentPane == 0;
-                bool isLastChild = indexOfDocumentPane == parentDocumentPaneGroup->Children.size() - 1;
+                bool isLastChild = int(indexOfDocumentPane == parentDocumentPaneGroup->Children.size()) - 1;
 
                 auto manager = parentDocumentPaneGroup->Root->GetManager();
                 if (!manager->AllowMixedOrientation)

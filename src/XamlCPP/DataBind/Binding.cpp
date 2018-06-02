@@ -38,7 +38,7 @@
 
 using namespace XamlCPP;
 
-std::shared_ptr<DataBind::InstancedBinding> XamlCPP::DataBind::Binding::Initiate(Core::Dependency::IDependencyObject * target, Core::Dependency::IPropertyObject * targetProperty, System::Reflection::Object * anchor, bool enableDataValidation, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope)
+std::shared_ptr<DataBind::InstancedBinding> XamlCPP::DataBind::Binding::Initiate(Core::Dependency::IDependencyObject * target, Core::Dependency::IPropertyObject * targetProperty, System::Reflection::Object * anchor, bool enableDataValidation, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope)
 {
     System::ThrowIfFailed<System::ArgumentNullException>(target != nullptr);
 
@@ -219,7 +219,7 @@ std::shared_ptr<XamlCPP::DataBind::SourceObserver> XamlCPP::DataBind::Binding::C
 		path.c_str());
 }
 
-std::shared_ptr<XamlCPP::DataBind::SourceObserver> XamlCPP::DataBind::Binding::CreateElementObserver(XamlCPP::Core::Dependency::IDependencyObject* target, std::string const & elementName, std::string const & path, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope)
+std::shared_ptr<XamlCPP::DataBind::SourceObserver> XamlCPP::DataBind::Binding::CreateElementObserver(XamlCPP::Core::Dependency::IDependencyObject* target, std::string const & elementName, std::string const & path, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope)
 {
     System::ThrowIfFailed<System::ArgumentNullException>(target != nullptr);
 
@@ -230,7 +230,7 @@ std::shared_ptr<XamlCPP::DataBind::SourceObserver> XamlCPP::DataBind::Binding::C
         false,
         description.c_str());
 
-    observer->Initialize(elementName, namedScope ? *namedScope : target->GetSharedNamedScope());
+    observer->Initialize(elementName, namedScope ? namedScope : target->GetSharedNamedScope());
     return observer;
 }
 

@@ -275,7 +275,7 @@ namespace irr
 
         virtual void addExternalSceneManager(scene::ISceneManager* SceneManager) = 0;
 
-        virtual int getHandle() = 0;
+        virtual intptr_t getHandle() = 0;
 
         virtual irr::core::vector2df GetPostionToScreen(irr::core::vector2df const&)
         {

@@ -77,6 +77,7 @@ namespace XUI::UI
         static void StaticClassInitializer();
 
         ProgressBar();
+        virtual ~ProgressBar() {}
 
         PROPERTY_(bool , IsIndeterminate);
         bool GetIsIndeterminate() const;

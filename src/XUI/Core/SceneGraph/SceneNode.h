@@ -42,7 +42,7 @@ namespace XUI::UI::Controls
 namespace XUI::Core::SceneGraph
 {
     // Not Implement Yet
-    class SpriteBatch;
+    class SpriteBatch {};
 
     // Simple render cache object
     class SceneNode : public System::Reflection::Object

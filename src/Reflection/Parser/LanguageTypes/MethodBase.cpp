@@ -92,7 +92,7 @@ Mustache::Data<std::string> MethodBase::CompileStandardTemplate(Mustache::Data<s
             data["isTypeReflPointer"] = utils::TemplateBool(true);
             for (auto defClass : ArgTypeClass->m_definations)
             {
-                if (m_arguments[i]->GetQualifiedName() == defClass->m_qualifiedName)
+                if (defClass->m_astType && (m_arguments[i] == defClass->m_astType || m_arguments[i]->GetElaboratedType() == defClass->m_astType || m_arguments[i]->GetElaboratedType()->GetDeclarationType() == defClass->m_astType))
                 {
                     // Special case for std::shared_ptr
                     if (!defClass->m_templateTypes.empty())
@@ -128,10 +128,12 @@ Mustache::Data<std::string> MethodBase::CompileStandardTemplate(Mustache::Data<s
                 else
                     invoke_args += "std::static_pointer_cast";
 
-                invoke_args += (boost::format("<System::Reflection::meta_traits::RemoveSharedPtr<%2%>::type>(arguments[%1%]->ToSharedObject())") % i % m_signature[i]).str();
+                invoke_args += (boost::format("<System::Reflection::meta::CleanedType<%2%>>(arguments[%1%]->ToSharedObject())") % i % m_signature[i]).str();
             }
             else
-                invoke_args += (boost::format("*static_cast<std::remove_reference<%2%>::type*>(arguments[%1%]->GetPtr())") % i % m_signature[i]).str();
+            {
+                invoke_args += (boost::format("std::static_pointer_cast<System::Reflection::meta::CleanedType<%2%>>(arguments[%1%]->ToSharedPointer())") % i % m_signature[i]).str();
+            }
         }
         else
         {
@@ -166,7 +168,9 @@ Mustache::Data<std::string> MethodBase::CompileStandardTemplate(Mustache::Data<s
                 }
             }
             else
+            {
                 invoke_args += (boost::format("*static_cast<std::remove_reference<%2%>::type*>(arguments[%1%]->GetPtr())") % i % m_signature[i]).str();
+            }
         }
         signature_args += (boost::format("typeid(%1%).hash_code()") % m_signature[i]).str();
     }

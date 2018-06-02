@@ -61,6 +61,9 @@ namespace XUI::UI
         /// </summary>
         static void StaticClassInitializer();
 
+        Menu() {}
+        virtual ~Menu() {}
+
         /// <summary>
         /// Gets a value indicating whether the menu is open.
         /// </summary>

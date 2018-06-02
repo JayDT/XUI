@@ -24,7 +24,7 @@
 namespace XUI::UI::Detail
 {
     template<typename TState>
-    class TC_XUI_API UndoRedoHelper
+    class UndoRedoHelper
     {
     public:
         struct IUndoRedoHost
@@ -142,10 +142,10 @@ namespace XUI::UI::Detail
             }
         }
 
-        void Snapshot()
+        void Snapshot(bool force = false)
         {
             auto const& current = _host->GetUndoRedoState();
-            if (_currentNode == _states.end() || *_currentNode == current)
+            if (force || _currentNode == _states.end() || *_currentNode == current)
             {
                 if (_currentNode != _states.end())
                     DiscardRedo();

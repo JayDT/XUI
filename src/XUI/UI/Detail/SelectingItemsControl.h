@@ -117,6 +117,7 @@ namespace XUI::UI
         static void StaticClassInitializer();
 
         SelectingItemsControl();
+        virtual ~SelectingItemsControl() {}
 
         /// <summary>
         /// Occurs when the control's selection changes.

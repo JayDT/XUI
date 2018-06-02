@@ -51,6 +51,8 @@ namespace XUI::UI
         /// Initializes static members of the <see cref="Carousel"/> class.
         /// </summary>
         static void StaticClassInitializer();
+        Carousel() {}
+        virtual ~Carousel() {}
 
         /// <summary>
         /// Gets or sets a value indicating whether the items in the carousel are virtualized.

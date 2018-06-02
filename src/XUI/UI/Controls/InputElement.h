@@ -38,7 +38,7 @@ namespace XUI
 
 namespace XUI::UI::Controls
 {
-    Meta(AbstractType) class TC_XUI_API InputElement : public Visual
+    class TC_XUI_API InputElement : public Visual
     {
     public:
 

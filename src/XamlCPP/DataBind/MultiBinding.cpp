@@ -27,7 +27,7 @@
 
 using namespace XamlCPP;
 
-std::shared_ptr<DataBind::InstancedBinding> XamlCPP::Markup::MultiBinding::Initiate(Core::Dependency::IDependencyObject * target, Core::Dependency::IPropertyObject * targetProperty, System::Reflection::Object * anchor, bool enableDataValidation, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope)
+std::shared_ptr<DataBind::InstancedBinding> XamlCPP::Markup::MultiBinding::Initiate(Core::Dependency::IDependencyObject * target, Core::Dependency::IPropertyObject * targetProperty, System::Reflection::Object * anchor, bool enableDataValidation, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope)
 {
     System::ThrowIfFailed<System::NotSupportedException>(Converter, "MultiBinding without Converter not currently supported.");
     

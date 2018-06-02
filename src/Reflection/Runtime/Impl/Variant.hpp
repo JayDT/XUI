@@ -125,20 +125,54 @@ namespace System::Reflection
         {
             static T GetValue(Variant const& v)
             {
-                if (v.GetBase())
+                if (v.GetBase() && !v.IsObject())
                     return *(typename std::remove_reference<T>::type*)(v.GetBase()->GetPtr());
                 throw System::NotSupportedException("Invalid Value Conversion");
             }
 
             static T TryGetValue(Variant const& v)
             {
-                if (v.GetBase())
+                if (v.GetBase() && !v.IsObject())
                 {
-                    if (v.IsObject())
-                        return dynamic_cast<typename std::remove_reference<T>::type>(v.GetBase()->ToObject());
                     // we can determinate base can't use dynamic_cast (ToDo: reflect_cast implement)
                     return *(typename std::remove_reference<T>::type*)(v.GetBase()->GetPtr());
                 }
+                throw System::NotSupportedException("Invalid Value Conversion");
+            }
+        };
+
+        template <typename T>
+        struct __VariantGetValueHelper<T, typename std::enable_if<std::is_pointer<typename std::remove_cv<typename std::remove_reference<T>::type>::type>::value && std::is_base_of<Object, typename std::remove_pointer<typename std::remove_reference<T>::type>::type>::value>::type>
+        {
+            static T GetValue(Variant const& v)
+            {
+                if (v.GetBase() && v.IsObject())
+                    return (typename std::remove_pointer<typename std::remove_reference<T>::type>::type*)(static_cast<typename std::remove_cv<typename std::remove_reference<T>::type>::type>(v.GetBase()->ToObject()));
+                throw System::NotSupportedException("Invalid Value Conversion");
+            }
+
+            static T TryGetValue(Variant const& v)
+            {
+                if (v.GetBase() && v.IsObject())
+                    return (typename std::remove_pointer<typename std::remove_reference<T>::type>::type*)(dynamic_cast<typename std::remove_cv<typename std::remove_reference<T>::type>::type>(v.GetBase()->ToObject()));
+                throw System::NotSupportedException("Invalid Value Conversion");
+            }
+        };
+
+        template <typename T>
+        struct __VariantGetValueHelper<T, typename std::enable_if<!std::is_pointer<typename std::remove_cv<typename std::remove_reference<T>::type>::type>::value && std::is_base_of<Object, typename std::remove_pointer<typename std::remove_reference<T>::type>::type>::value>::type>
+        {
+            static T GetValue(Variant const& v)
+            {
+                if (v.GetBase() && v.IsObject())
+                    return *static_cast<typename std::remove_cv<typename std::remove_reference<T>::type>::type*>(v.GetBase()->ToObject());
+                throw System::NotSupportedException("Invalid Value Conversion");
+            }
+
+            static T TryGetValue(Variant const& v)
+            {
+                if (v.GetBase() && v.IsObject())
+                    return *dynamic_cast<typename std::remove_cv<typename std::remove_reference<T>::type>::type*>(v.GetBase()->ToObject());
                 throw System::NotSupportedException("Invalid Value Conversion");
             }
         };
@@ -153,11 +187,10 @@ namespace System::Reflection
                     if (v.GetBase()->IsSharedPointer())
                     {
                         if (v.GetBase()->IsObject())
-                            return std::move(std::static_pointer_cast<T>(v.GetBase()->ToSharedObject()));
+                            return (std::static_pointer_cast<T>(v.GetBase()->ToSharedObject()));
                     }
                 }
-
-                return {};
+                return nullptr;
             }
 
             static std::shared_ptr<typename std::remove_reference<T>::type> TryGetValue(Variant const& v)
@@ -167,11 +200,10 @@ namespace System::Reflection
                     if (v.GetBase()->IsSharedPointer())
                     {
                         if (v.GetBase()->IsObject())
-                            return std::move(std::dynamic_pointer_cast<T>(v.GetBase()->ToSharedObject()));
+                            return (std::dynamic_pointer_cast<T>(v.GetBase()->ToSharedObject()));
                     }
                 }
-
-                return {};
+                return nullptr;
             }
         };
 
@@ -184,39 +216,28 @@ namespace System::Reflection
                 {
                     if (v.GetBase()->IsSharedPointer())
                     {
-                        return std::move(std::static_pointer_cast<T>(v.GetBase()->ToSharedPointer()));
+                        return (std::static_pointer_cast<T>(v.GetBase()->ToSharedPointer()));
                     }
                 }
-
-                return {};
+                return nullptr;
             }
             
-            static std::shared_ptr<typename std::remove_reference<T>::type> TryGetValue(Variant const& v)
+            static std::reference_wrapper<std::shared_ptr<typename std::remove_reference<T>::type>> TryGetValue(Variant const& v)
             {
                 throw System::NotSupportedException("Invalid Value Conversion");
-                //if (v.GetBase())
-                //{
-                //    if (v.GetBase()->IsSharedPointer())
-                //    {
-                //        if (v.GetBase()->IsObject())
-                //            return std::dynamic_pointer_cast<T>(v.GetBase()->ToSharedPointer());
-                //    }
-                //}
-                //
-                //return {};
             }
         };
 
         template<typename T>
-        T Variant::GetValue() const
+        typename T Variant::GetValue() const
         {
             return __VariantGetValueHelper<T>::GetValue(*this);
         }
 
         template<typename T>
-        T Variant::TryGetValue() const
+        typename T Variant::TryGetValue() const
         {
-            return std::move(__VariantGetValueHelper<T>::TryGetValue(*this));
+            return __VariantGetValueHelper<T>::TryGetValue(*this);
         }
     }
 }

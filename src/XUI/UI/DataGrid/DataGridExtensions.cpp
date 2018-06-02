@@ -79,7 +79,7 @@ System::Reflection::Variant XUI::UI::DataGridHelper::GetCoercedTransferPropertyV
 
 void XUI::UI::DataGridHelper::OnColumnWidthChanged(Controls::Control * cell, Core::Dependency::DependencyPropertyChangedEventArgs & e)
 {
-    ASSERT((cell->Is<DataGridCell>()) || (cell->Is<DataGridColumnHeader>()), "provideColumn should be one of the cell or header containers.");
+    ASSERT((cell->Is<DataGridCell>()) || (cell->Is<DataGridColumnHeader>()) && "provideColumn should be one of the cell or header containers.");
 
     bool isColumnHeader = false;
     DataGridColumn* column = nullptr;

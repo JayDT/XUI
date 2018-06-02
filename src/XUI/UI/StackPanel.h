@@ -49,6 +49,8 @@ namespace XUI::UI
         /// Initializes static members of the <see cref="StackPanel"/> class.
         /// </summary>
         static void StaticClassInitializer();
+        StackPanel() {}
+        virtual ~StackPanel() {}
 
         /// <summary>
         /// Gets or sets the size of the gap to place between child controls.

@@ -677,7 +677,7 @@ void XUI::UI::DataGridColumnHeader::SetNextHeaderLeftGripperVisibility(bool canU
 
 void XUI::UI::DataGridColumnHeader::OnColumnVisibilityChanged(Core::Dependency::DependencyPropertyChangedEventArgs& e)
 {
-    ASSERT(Column() != nullptr, "column can't be nullptr if we got a notification for this property change");
+    ASSERT(Column() != nullptr  &&  "column can't be nullptr if we got a notification for this property change");
     DataGrid* dataGrid = Column()->DataGridOwner();
     if (dataGrid != nullptr)
     {

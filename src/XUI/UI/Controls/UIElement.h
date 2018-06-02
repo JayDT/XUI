@@ -59,7 +59,7 @@ namespace XUI::UI::Controls
         std::weak_ptr<Control> Root;
     };
 
-    Meta(AbstractType) class TC_XUI_API UIElement : public InputElement
+    class TC_XUI_API UIElement : public InputElement
     {
         friend class XUI::Core::Dependency::DependencyObject;
         friend class XUI::UI::Popup;

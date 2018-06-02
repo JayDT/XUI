@@ -70,7 +70,7 @@ namespace XamlCPP::Interfaces
             XamlCPP::Core::Dependency::IPropertyObject* targetProperty,
             System::Reflection::meta::Object* anchor = nullptr,
             bool enableDataValidation = false,
-            std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope = nullptr) = 0;
+            std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope = nullptr) = 0;
     };
 }
 

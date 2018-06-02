@@ -58,7 +58,7 @@ namespace irr
 		//! destructor
 		virtual ~CIrrDeviceStub();
 
-        virtual int getHandle() { return 0; }
+        virtual intptr_t getHandle() { return 0; }
 
 		//! returns the video driver
 		virtual video::IVideoDriver* getVideoDriver();

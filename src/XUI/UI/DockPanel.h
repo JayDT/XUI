@@ -56,6 +56,9 @@ namespace XUI::UI
 
         static void StaticConstructor();
 
+        DockPanel() {}
+        virtual ~DockPanel() {}
+
         /// <summary>
         /// Gets the value of the Dock attached property on the specified control.
         /// </summary>

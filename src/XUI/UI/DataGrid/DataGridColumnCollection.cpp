@@ -1788,8 +1788,7 @@ double XUI::UI::DataGridColumnCollection::TakeAwayWidthFromStarColumns(DataGridC
 double XUI::UI::DataGridColumnCollection::ComputeStarColumnWidths(double availableStarSpace)
 {
 	ASSERT(
-		!std::isnan(availableStarSpace) && !std::isinf(availableStarSpace),
-		"availableStarSpace is not valid");
+		!std::isnan(availableStarSpace) && !std::isinf(availableStarSpace) && "availableStarSpace is not valid");
 
 	std::vector<DataGridColumn*> unResolvedColumns;
 	std::vector<DataGridColumn*> partialResolvedColumns;

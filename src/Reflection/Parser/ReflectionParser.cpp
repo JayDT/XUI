@@ -1216,6 +1216,7 @@ void ReflectionModulParser::PrepareObjectsForAssembly()
         {
             auto modul = file.second;
             {
+                //for (auto& klass : modul->classes)
                 for (auto itr = modul->classes.begin(); itr != modul->classes.end();)
                 {
                     auto klass = *itr;

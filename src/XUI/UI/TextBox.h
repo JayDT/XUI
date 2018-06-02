@@ -22,6 +22,7 @@
 #include "UI/Controls/Control.h"
 #include "UI/Detail/UndoRedoHelper.h"
 #include "Interfaces/IFormatedText.h"
+#include "XamlCPP/DataBind/BindingNotification.h"
 
 MetaAssemblyBegin
 Meta(modul: ReflInclude("UI/Presenters/TextPresenter.h"))

@@ -39,6 +39,7 @@ namespace XUI::UI
         static void StaticClassInitializer();
 
         ContextMenu();
+        virtual ~ContextMenu() {}
 
         /// <summary>
         /// Called when the <see cref="Control.ContextMenu"/> property changes on a control.

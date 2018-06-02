@@ -123,6 +123,7 @@ private:
     ModuleFile* m_modulFile = nullptr;
 
     CursorType m_type;
+    AstType* m_astType;
 
     std::string m_templateBaseModulFile;
     std::string m_name;

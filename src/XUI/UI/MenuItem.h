@@ -108,6 +108,7 @@ namespace XUI::UI
 
 
         MenuItem();
+        virtual ~MenuItem() {}
 
         /// <summary>
         /// Occurs when a <see cref="MenuItem"/> without a submenu is clicked.

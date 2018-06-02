@@ -129,6 +129,7 @@ namespace XUI::UI
         virtual void InstanceInitializer();
 
         TopLevel();
+        virtual ~TopLevel() {}
 
         /// <summary>
         /// Fired when the window is activated.

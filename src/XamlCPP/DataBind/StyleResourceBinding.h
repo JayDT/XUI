@@ -60,7 +60,7 @@ namespace XamlCPP::Markup
 		void SetBindingLevel(XamlCPP::BindingLevel level) override { _bindinglevel = level; }
 
         /// <inheritdoc/>
-        std::shared_ptr<DataBind::InstancedBinding> Initiate(Core::Dependency::IDependencyObject *target, Core::Dependency::IPropertyObject *targetProperty, System::Reflection::Object *anchor = nullptr, bool enableDataValidation = false, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope = nullptr);
+        std::shared_ptr<DataBind::InstancedBinding> Initiate(Core::Dependency::IDependencyObject *target, Core::Dependency::IPropertyObject *targetProperty, System::Reflection::Object *anchor = nullptr, bool enableDataValidation = false, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope = nullptr);
     };
 }
 

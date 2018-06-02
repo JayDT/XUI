@@ -43,6 +43,9 @@ namespace XUI::UI
 
         static void StaticConstructor();
 
+        Image() {}
+        virtual ~Image() {}
+
         /// <summary>
         /// Gets or sets the bitmap image that will be displayed.
         /// </summary>

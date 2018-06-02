@@ -35,6 +35,7 @@
 
 MetaAssemblyBegin
 Meta(modul: ReflInclude("Core/Dependencies/BindValue.h"))
+Meta(modul: ReflInclude("XamlCPP/DataBind/BindingNotification.h"))
 MetaAssemblyEnd
 
 #undef FindResource
@@ -74,7 +75,7 @@ namespace XUI::Core::Dependency
         RDF_DRAW_DIRTY_RECTS   = 0x00000004,
     };
 
-    struct IBindValueOwner
+    struct TC_XUI_API IBindValueOwner
     {
         /// <inheritdoc/>
         virtual void Changed(BindValue* sender, System::Reflection::meta::Variant const& oldValue, System::Reflection::meta::Variant const& newValue) = 0;

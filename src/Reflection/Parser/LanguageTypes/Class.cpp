@@ -78,6 +78,7 @@ Class::Class(const Cursor &cursor, const Namespace &currentNamespace)
     , m_noDestructor(false)
     , m_isAbstract(false)
 {
+    m_astType = AstType::Create(cursor.GetType());
     m_modulFile = nullptr;
     m_namespace = utils::GetNamespaceParent(cursor);
     hasVirtualBase = false;
@@ -387,6 +388,9 @@ void Class::DeclareTemplate(AstType const& defination, const Cursor* cursor)
         if (klass->m_qualifiedName == qName)
             return;
     }
+
+    m_astType = (AstType*)&defination;
+
     auto templateArgs(std::move(tType->GetTemplateArguments()));
     DeclareTemplate(qName, templateArgs, cursor);
 }

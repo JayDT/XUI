@@ -41,7 +41,7 @@ void TopDownValueContext::Add(System::Reflection::Object *instance, Proto::XamlT
     if (privateStore.find(StoredInstance(instance, xamlType)) != privateStore.end())
         return;
 
-    privateStore.emplace(instance, xamlType, privateStore.size());
+    privateStore.emplace(instance, xamlType, int(privateStore.size()));
 }
 
 System::Reflection::Object *TopDownValueContext::GetLastInstance(Proto::XamlType *xamlType)

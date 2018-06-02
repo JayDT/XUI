@@ -72,6 +72,7 @@ Mustache::Data<std::string> Constructor::CompileTemplate(
 
     data[ "enableNonDynamic" ] = ::utils::TemplateBool( enableNonDynamic );
 
+    // TODO: Build template
     std::string invoke_args;
     std::string signature_args;
     for (int i = 0; i != m_signature.size(); ++i)
@@ -81,7 +82,97 @@ Mustache::Data<std::string> Constructor::CompileTemplate(
             invoke_args += " ,";
             signature_args += " ,";
         }
-        invoke_args += (boost::format("arguments[%1%]->GetValue< %2% >()") % i % m_signature[i]).str();
+
+        bool hasVirtualBase = false;
+        bool isReflObject = false;
+        bool isPointer = m_arguments[i]->IsPointer();
+        auto ArgTypeClass = m_arguments[i]->FindClassLangType();  //GetDeclarationType()->GetKind() != CXTypeKind::CXType_Invalid ? m_arguments[i]->GetDeclarationType()->GetClassLangType() : m_arguments[i]->GetClassLangType();
+        if (ArgTypeClass && ArgTypeClass->IsTemplate() && ArgTypeClass->GetDisplayName() == "shared_ptr")
+        {
+            data["isTypeReflPointer"] = utils::TemplateBool(true);
+            for (auto defClass : ArgTypeClass->m_definations)
+            {
+                //if (m_arguments[i]->GetQualifiedName() == defClass->m_qualifiedName)
+                if (defClass->m_astType && (m_arguments[i] == defClass->m_astType || m_arguments[i]->GetElaboratedType() == defClass->m_astType || m_arguments[i]->GetElaboratedType()->GetDeclarationType() == defClass->m_astType))
+                {
+                    // Special case for std::shared_ptr
+                    if (!defClass->m_templateTypes.empty())
+                    {
+                        auto templateArgClass = defClass->m_templateTypes[0]->GetClassLangType().get();
+
+                        if (!templateArgClass)
+                        {
+                            auto hash = defClass->m_templateTypes[0]->GetDeclarationHash();
+                            if (defClass->m_templateTypes[0]->GetElaboratedType())
+                                hash = defClass->m_templateTypes[0]->GetElaboratedType()->GetDeclarationHash();
+
+                            templateArgClass = ReflectionModulParser::Instance->GetClassDesc(hash);
+                        }
+
+                        if (templateArgClass)
+                        {
+                            // Note: This class not part of assembly but required init for correct typeinfo
+                            if (!templateArgClass->IsPreparedForAssembly())
+                                templateArgClass->PrepareForAssembly();
+                            isReflObject = templateArgClass->IsReflObject();
+                            hasVirtualBase = templateArgClass->HasVirtualBase();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!isPointer && isReflObject)
+            {
+                if (hasVirtualBase)
+                    invoke_args += "std::dynamic_pointer_cast";
+                else
+                    invoke_args += "std::static_pointer_cast";
+
+                invoke_args += (boost::format("<System::Reflection::meta::CleanedType<%2%>>(arguments[%1%]->ToSharedObject())") % i % m_signature[i]).str();
+            }
+            else
+            {
+                invoke_args += (boost::format("std::static_pointer_cast<System::Reflection::meta::CleanedType<%2%>>(arguments[%1%]->ToSharedPointer())") % i % m_signature[i]).str();
+            }
+        }
+        else
+        {
+            if (m_arguments[i]->GetElaboratedType())
+            {
+                Class* klass = ReflectionModulParser::Instance->GetClassDesc(m_arguments[i]->GetElaboratedType()->GetDeclarationHash());
+                if (klass)
+                {
+                    // Note: This class not part of assembly but required init for correct typeinfo
+                    if (!klass->IsPreparedForAssembly())
+                        klass->PrepareForAssembly();
+                    isReflObject = klass->IsReflObject();
+                    hasVirtualBase = klass->HasVirtualBase();
+                }
+            }
+
+            if (isReflObject)
+            {
+                if (hasVirtualBase)
+                {
+                    if (isPointer)
+                        invoke_args += (boost::format("dynamic_cast<std::remove_reference<%2%>::type>(arguments[%1%]->ToObject())") % i % m_signature[i]).str();
+                    else
+                        invoke_args += (boost::format("*dynamic_cast<std::remove_reference<%2%>::type*>(arguments[%1%]->ToObject())") % i % m_signature[i]).str();
+                }
+                else
+                {
+                    if (isPointer)
+                        invoke_args += (boost::format("static_cast<std::remove_reference<%2%>::type>(arguments[%1%]->ToObject())") % i % m_signature[i]).str();
+                    else
+                        invoke_args += (boost::format("*static_cast<std::remove_reference<%2%>::type*>(arguments[%1%]->ToObject())") % i % m_signature[i]).str();
+                }
+            }
+            else
+            {
+                invoke_args += (boost::format("*static_cast<std::remove_reference<%2%>::type*>(arguments[%1%]->GetPtr())") % i % m_signature[i]).str();
+            }
+        }
         signature_args += (boost::format("typeid(%1%).hash_code()") % m_signature[i]).str();
     }
 

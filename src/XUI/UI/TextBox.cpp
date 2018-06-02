@@ -950,7 +950,6 @@ void TextBox::SetSelectionForControlDelete(Interfaces::InputModifiers modifiers)
     SelectionEnd = CaretIndex;
 }
 
-
 XUI::UI::UndoRedoState TextBox::GetUndoRedoState() const
 {
     return UndoRedoState(Text, CaretIndex);

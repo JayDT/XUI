@@ -367,13 +367,19 @@ Core::Media::Point Popup::GetPosition(Controls::Control *target, UI::PlacementMo
         case PlacementMode::Pointer:
             if (popupRoot)
             {
+                Core::Media::Point position;
                 auto mouseDevice = XUI::Platform::UIService::Instance()->Get<Interfaces::IMouseDevice>();
 
                 // Scales the Horizontal and Vertical offset to screen co-ordinates.
                 auto screenOffset = Core::Media::Point(horizontalOffset * popupRoot->LayoutScaling, verticalOffset * popupRoot->LayoutScaling);
                 if (target && (popupRoot && popupRoot->IsEmbed()))
-                    return mouseDevice->GetRelativePosition(target->VisualRoot->ToVisual()) + screenOffset;
-                return mouseDevice->Position + screenOffset;
+                    position = mouseDevice->GetRelativePosition(target->VisualRoot->ToVisual()) + screenOffset;
+                position = mouseDevice->Position + screenOffset;
+
+                if (target->RenderScene() && (target->GetVisualRoot()->ToVisual() == Platform::UIService::Instance()->Get<Platform::UIRender>()->ToVisual() || (popupRoot && popupRoot->IsEmbed())))
+                    position += (glm::vec2)target->RenderScene()->ClipRect.TopLeft;
+
+                return position;
             }
 
             return Core::Media::Point::Zero();

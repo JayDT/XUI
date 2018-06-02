@@ -71,6 +71,13 @@ namespace System::Reflection
             return System::Reflection::RefObject(nullptr);
         }
 
+        std::shared_ptr<void> Argument::ToSharedPointer(void) const
+        {
+            if (m_data.GetBase() && m_data.GetBase()->IsSharedPointer() && m_data.IsObject())
+                return m_data.ToSharedPointer();
+            return std::shared_ptr<void>(nullptr);
+        }
+
         void *Argument::GetPtr(void) const
         {
             return m_data.getPtr();

@@ -30,7 +30,7 @@
 
 using namespace XamlCPP;
 
-std::shared_ptr<DataBind::InstancedBinding> XamlCPP::Markup::StyleResourceBinding::Initiate(Core::Dependency::IDependencyObject * target, Core::Dependency::IPropertyObject * targetProperty, System::Reflection::Object * anchor, bool enableDataValidation, std::shared_ptr<XamlCPP::Interfaces::INameScope>* namedScope)
+std::shared_ptr<DataBind::InstancedBinding> XamlCPP::Markup::StyleResourceBinding::Initiate(Core::Dependency::IDependencyObject * target, Core::Dependency::IPropertyObject * targetProperty, System::Reflection::Object * anchor, bool enableDataValidation, std::shared_ptr<XamlCPP::Interfaces::INameScope> namedScope)
 {
     static const System::Reflection::Type* ControlType = &System::Reflection::ReflectionModulManager::Instance().GetType("XUI::UI::Controls::Control");
 

@@ -51,6 +51,7 @@ namespace XUI::UI
         /// Initializes a new instance of the <see cref="Panel"/> class.
         /// </summary>
         Panel();
+        virtual ~Panel() {}
 
         /// <summary>
         /// Gets or sets the children of the <see cref="Panel"/>.

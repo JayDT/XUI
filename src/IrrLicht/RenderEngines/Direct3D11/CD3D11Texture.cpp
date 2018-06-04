@@ -153,10 +153,10 @@ CD3D11Texture::CD3D11Texture(IImage* image, CD3D11Driver* driver,
     Device->GetImmediateContext( &ImmediateContext );
 
     // Load a dds file
-    if (core::hasFileExtension(name, "dds"))
-    {
-        
-    }
+    //if (core::hasFileExtension(name, "dds"))
+    //{
+    //    
+    //}
 
     if (image)
     {

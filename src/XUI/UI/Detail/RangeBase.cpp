@@ -29,6 +29,7 @@ Core::Dependency::RefDependencyProperty RangeBase::MaximumProperty;
 Core::Dependency::RefDependencyProperty RangeBase::ValueProperty;
 Core::Dependency::RefDependencyProperty RangeBase::SmallChangeProperty;
 Core::Dependency::RefDependencyProperty RangeBase::LargeChangeProperty;
+Core::Observer::RefRoutedEvent          RangeBase::ValueChangedEvent;
 
 void XUI::UI::RangeBase::StaticClassInitializer()
 {
@@ -36,6 +37,7 @@ void XUI::UI::RangeBase::StaticClassInitializer()
         [](RangeBase* x) { return x->Minimum; },
         [](RangeBase* x, double v) { x->Minimum = v; })
         );
+
     MaximumProperty = (Core::Dependency::DirectProperty<RangeBase, double>::RegisterDirect(nameof(Maximum),
         [](RangeBase* x) { return x->Maximum; },
         [](RangeBase* x, double v) { x->Maximum = v; })
@@ -45,11 +47,28 @@ void XUI::UI::RangeBase::StaticClassInitializer()
         [](RangeBase* x) { return x->Value; },
         [](RangeBase* x, double v) { x->Value = v; })
         );
+
+    ValueChangedEvent = (Core::Observer::RoutedEvent::Register<XUI::UI::SelectingItemsControl, Core::Observer::RoutedEventArgs>(nameof(ValueChanged), Core::Observer::RoutingStrategies::Bubble));
+
     SmallChangeProperty = (Core::Dependency::BindProperty<double>::Register<RangeBase>(nameof(ItemsPanel), 0.1));
     LargeChangeProperty = (Core::Dependency::BindProperty<double>::Register<RangeBase>(nameof(ItemsPanel), 1.0));
+
+    //ValueChangedEventArgs
+
+    ValueProperty->Changed.get_observable().subscribe([](XamlCPP::Core::Dependency::DependencyPropertyChangedEventArgs const & e)
+    {
+        RangeBase* control = e.Sender->Dynamic_As<RangeBase>();
+        if (control)
+        {
+            Interfaces::ValueChangedEventArgs _e(ValueChangedEvent.get());
+            _e.Value = e.NewValue;
+            control->RaiseEvent(_e);
+        }
+    });
 }
 
 RangeBase::RangeBase()
+    : ValueChanged(this)
 {
 }
 

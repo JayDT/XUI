@@ -182,21 +182,25 @@ void System::Resource::ResourceBuilder::GenerateFile()
         resourceData["name"] = _options.inputSourceFile;
         for (size_t id = 0; id < _compiler.m_output.size(); ++id)
         {
-            Mustache::Data<std::string> rowData{ Mustache::Data<std::string>::Type::Object };
-            rowData["id"] = std::to_string(id);
-            rowData["size"] = std::to_string(_compiler.m_output[id]->size());
-            rowData["total_size"] = std::to_string(_compiler.m_input[id]->size());
-
             std::string binary;
             for (size_t bi = 0; bi < _compiler.m_output[id]->size(); ++bi)
             {
                 binary += System::String::format("0x%X, ", _compiler.m_output[id]->at(bi));
             }
 
+            if (binary.empty())
+                continue;
+
+            if (binary.size() > 2)
+                binary.resize(binary.size() - 2);
+
+            Mustache::Data<std::string> rowData{ Mustache::Data<std::string>::Type::Object };
+            rowData["id"] = std::to_string(id);
+            rowData["size"] = std::to_string(_compiler.m_output[id]->size());
+            rowData["total_size"] = std::to_string(_compiler.m_input[id]->size());
+
             delete _compiler.m_output[id];
             delete _compiler.m_input[id];
-
-            binary.resize(binary.size() - 2);
 
             rowData["binary"] = binary;
 

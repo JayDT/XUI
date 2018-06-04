@@ -115,9 +115,12 @@ void XUI::UI::Generators::ItemContainerGeneratorGeneric::InsertSpace(int index, 
                 continue;
             
             auto node = _containers.extract(i.second->Index);
-            i.second->Index += count;
-            node.key() = i.second->Index;
-            _containers.insert(std::move(node));
+            if (node)
+            {
+                i.second->Index += count;
+                node.key() = i.second->Index;
+                _containers.insert(std::move(node));
+            }
         }
     }
 }
@@ -148,9 +151,12 @@ std::vector<Interfaces::ItemContainerInfo> XUI::UI::Generators::ItemContainerGen
                 continue;
 
             auto node = _containers.extract(i.second->Index);
-            i.second->Index -= count;
-            node.key() = i.second->Index;
-            _containers.insert(std::move(node));
+            if (node)
+            {
+                i.second->Index -= count;
+                node.key() = i.second->Index;
+                _containers.insert(std::move(node));
+            }
         }
         
         if (Dematerialized)
@@ -265,6 +271,9 @@ std::shared_ptr<UI::Controls::Control> XUI::UI::Generators::ItemContainerGenerat
 Interfaces::ItemContainerInfo const& XUI::UI::Generators::ItemContainerGeneratorGeneric::MoveContainer(int oldIndex, int newIndex, System::Reflection::Variant const & item)
 {
     auto node = _containers.extract(oldIndex);
+    if (!node)
+        throw System::ArgumentException();
+
     node.mapped().Index = newIndex;
     node.mapped().Item = item;
     node.key() = newIndex;

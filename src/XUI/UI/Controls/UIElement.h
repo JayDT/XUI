@@ -138,6 +138,8 @@ namespace XUI::UI::Controls
         UIElement();
         virtual ~UIElement();
 
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&TemplateAppliedEvent>    TemplateApplied;
 
         PROPERTY_(bool, SnapsToDevicePixels);

@@ -285,39 +285,18 @@ XUI::UI::Controls::Control* XUI::UI::Presenters::ContentPresenter::CreateChild()
         // Performance Note: Default content template apply from code (less xaml parse)
         if (contentType->IsValid() && (contentType->IsEnum() || *contentType == typeid(std::wstring) || *contentType == typeid(std::string) || *contentType == typeid(System::String)))
         {
-            if (!_inBuildHost || !Child)
-            {
-                RemoveDataTemplate();
-
-                _inBuildHost = true;
-
-                std::shared_ptr<UI::TextBlock> textBlock = std::make_shared<UI::TextBlock>();
-                textBlock->BeginInit();
-                SyncProperties(textBlock.get());
-                if (*contentType == typeid(System::String))
-                    textBlock->Text = System::String::ToWString(content.ToString());
-                else
-                    textBlock->Text = System::String::ToWString(content.ToString());
-                textBlock->EndInit();
-                Child = textBlock;
-            }
-            else
-            {
-                SyncProperties(Child.get());
-                static_cast<UI::TextBlock*>(Child.get())->Text = System::String::ToWString(content.ToString());
-            }
-
+            ApplyBuildInTemplate(content);
             newChild = Child.get();
         }
         else
         {
             auto newDataTemplate = FindDataTemplate(contentType);
 
-            if (newDataTemplate == m_dataTemplate)
+            if (newDataTemplate && newDataTemplate == m_dataTemplate)
             {
                 newChild = oldChild;
             }
-            else
+            else if (newDataTemplate)
             {
                 RemoveDataTemplate();
 
@@ -328,6 +307,11 @@ XUI::UI::Controls::Control* XUI::UI::Presenters::ContentPresenter::CreateChild()
                 if (m_dataTemplateRoot)
                     newChild = m_dataTemplateRoot->Static_As<Controls::Control>();
             }
+            else
+            {
+                ApplyBuildInTemplate(content);
+                newChild = Child.get();
+            }
         }
     }
     else
@@ -337,6 +321,33 @@ XUI::UI::Controls::Control* XUI::UI::Presenters::ContentPresenter::CreateChild()
     }
 
     return newChild;
+}
+
+void XUI::UI::Presenters::ContentPresenter::ApplyBuildInTemplate(System::Reflection::Variant const& content)
+{
+    auto contentType = content.GetType();
+
+    if (!_inBuildHost || !Child)
+    {
+        RemoveDataTemplate();
+
+        _inBuildHost = true;
+
+        std::shared_ptr<UI::TextBlock> textBlock = std::make_shared<UI::TextBlock>();
+        textBlock->BeginInit();
+        SyncProperties(textBlock.get());
+        if (*contentType == typeid(System::String))
+            textBlock->Text = System::String::ToWString(content.ToString());
+        else
+            textBlock->Text = System::String::ToWString(content.ToString());
+        textBlock->EndInit();
+        Child = textBlock;
+    }
+    else
+    {
+        SyncProperties(Child.get());
+        static_cast<UI::TextBlock*>(Child.get())->Text = System::String::ToWString(content.ToString());
+    }
 }
 
 void XUI::UI::Presenters::ContentPresenter::ApplyDataTemplate()

@@ -48,6 +48,7 @@ namespace XUI
     namespace UI
     {
         class ContextMenu;
+        class TabControl;
     }
 
     namespace UI::DataTemplates
@@ -116,6 +117,7 @@ namespace XUI::UI::Controls
         friend class XUI::UI::Controls::Visual;
         friend class UI::DataTemplates::ControlTemplate;
         friend class UI::DataTemplates::DataTemplate;
+        friend class UI::TabControl;
 
     public:
         typedef System::Collection::List<std::shared_ptr<Control>> LogicalChildrens;
@@ -165,6 +167,8 @@ namespace XUI::UI::Controls
 
         static void StaticClassInitializer();
 
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&RequestBringIntoViewEvent> RequestBringIntoView;
 
     protected:

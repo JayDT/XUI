@@ -309,6 +309,8 @@ bool IrrBackend::IrrWindowImpl::OnEvent(const irr::SEvent & event)
                 e.Delta.y = event.MouseInput.Wheel;
                 if (m_inputFn)
                     m_inputFn(&e);
+
+                return e.Handled;
             }
             else
             {
@@ -327,6 +329,8 @@ bool IrrBackend::IrrWindowImpl::OnEvent(const irr::SEvent & event)
                 e.Type = eventType;
                 if (m_inputFn)
                     m_inputFn(&e);
+
+                return e.Handled;
             }
             break;
         }
@@ -351,7 +355,8 @@ bool IrrBackend::IrrWindowImpl::OnEvent(const irr::SEvent & event)
             e.Char = event.KeyInput.Char;
             if (m_inputFn)
                 m_inputFn(&e);
-            break;
+
+            return e.Handled;
         }
         case EET_TEXT_INPUT_EVENT:
         {
@@ -366,7 +371,8 @@ bool IrrBackend::IrrWindowImpl::OnEvent(const irr::SEvent & event)
 
             if (m_inputFn)
                 m_inputFn(&e);
-            break;
+
+            return e.Handled;
         }
         break;
         default:

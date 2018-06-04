@@ -38,7 +38,7 @@ namespace XUI::Core::Media
     /// <summary>
     /// Defines a rectangle.
     /// </summary>
-    struct Rect : System::Reflection::Object
+    struct TC_XUI_API Rect : System::Reflection::Object
     {
     private:
 

@@ -39,8 +39,8 @@ DEFINE_SWITCH_FULL( DisplayDiagnostics,        "display-diagnostics", "o" );
 
 struct ResourceOptions
 {
-    bool forceRebuild;
-    bool displayDiagnostics;
+    bool forceRebuild = false;
+    bool displayDiagnostics = false;
 
     std::string targetName;
 

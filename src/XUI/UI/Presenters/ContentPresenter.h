@@ -183,6 +183,8 @@ namespace XUI::UI::Presenters
         /// <returns>The child control or null.</returns>
         Controls::Control* CreateChild();
 
+        void ApplyBuildInTemplate(System::Reflection::Variant const& content);
+
         /// <inheritdoc/>
         Core::Media::Size MeasureOverride(Core::Media::Size const& availableSize) override;
 

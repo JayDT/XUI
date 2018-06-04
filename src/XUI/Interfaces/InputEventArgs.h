@@ -352,6 +352,17 @@ namespace XUI::Interfaces
         std::vector<System::Reflection::Variant> RemovedItems;
     };
 
+    struct ValueChangedEventArgs : Core::Observer::RoutedEventArgs
+    {
+        ValueChangedEventArgs(Core::Observer::RoutedEvent* routedEvent)
+            : RoutedEventArgs(routedEvent)
+        {
+        }
+
+        
+        System::Reflection::Variant Value;
+    };
+
     /// <summary>
     /// Describes how an area is painted.
     /// </summary>

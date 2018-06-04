@@ -9,6 +9,8 @@
 #include "XUI/Core/Media/Geometries/PathGeometry.h"
 #include "XUI/Interfaces/IBitmap.h"
 
+#include "IrrXUI/XUIIrrDrawingContextImpl.h"
+
 #include "IrrLicht/include/IVideoDriver.h"
 
 namespace irr

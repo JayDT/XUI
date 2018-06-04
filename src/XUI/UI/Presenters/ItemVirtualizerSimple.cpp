@@ -135,6 +135,7 @@ void ItemVirtualizerSimple::ItemsChanged(System::Collection::Generic::IContainer
                 // drop through to Reset to recreate all the containers.
 
             case System::Collection::NotifyCollectionChangedAction::Reset:
+                ItemCount = 0; //TODO: WorkAround for System collections notify for reset is wrong but huge job this rework
                 RecycleContainersOnRemove();
                 CreateAndRemoveContainers();
                 panel->ForceInvalidateMeasure();
@@ -430,6 +431,7 @@ void XUI::UI::Presenters::ItemVirtualizerSimple::RecycleContainersForMove(int de
 void XUI::UI::Presenters::ItemVirtualizerSimple::RecycleContainersOnRemove()
 {
     auto panel = VirtualizingPanel;
+    auto generator = Owner->ItemContainerGenerator;
 
     if (NextIndex <= ItemCount)
     {
@@ -531,6 +533,9 @@ void XUI::UI::Presenters::ItemVirtualizerSimple::RecycleContainers()
 
     for(auto container : containers)
     {
+        if (!Items || Items->size() <= itemIndex)
+            break;
+
         auto item = Items->ElementAt(itemIndex);
 
         if (!container.second.Item.IsFastEqual(item))

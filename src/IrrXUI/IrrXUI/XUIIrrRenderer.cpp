@@ -19,6 +19,7 @@
 #include "XUI/Interfaces/IInputDevices.h"
 
 #include "Log/Log.h"
+#include "Config/Config.h"
 
 #include "CLogger.h"
 
@@ -37,21 +38,21 @@ void InitializeInlineComponents()
 {
     irr::video::E_DRIVER_TYPE _driverType = irr::video::E_DRIVER_TYPE::EDT_DIRECT3D11;
 
-    int _xres = 1024;
-    int _yres = 768;
+    int _xres = sConfig.GetDBValue("WorldClient.Config.Resolution.x", 1024);
+    int _yres = sConfig.GetDBValue("WorldClient.Config.Resolution.y", 768);
 
-    int _colordepth = 32;
+    int _colordepth = sConfig.GetDBValue("WorldClient.Config.Resolution.colordepth", 32);
 
-    bool _windowed = true,
-        _shadows = true,
-        _vsync = false;
+    bool _windowed = sConfig.GetDBValue("WorldClient.Config.Resolution.windowed", true),
+        _shadows = sConfig.GetDBValue("WorldClient.Config.Resolution.shadows", true),
+        _vsync = sConfig.GetDBValue("WorldClient.Config.Resolution.vsync", false);
 
     m_mainDevice = irr::createDevice(_driverType, irr::core::dimension2d<uint>(_xres, _yres), _colordepth, !_windowed, _shadows, _vsync, nullptr);
 
     irr::os::Printer::Logger->setLogLevel(irr::ELL_DEBUG);
 
     m_mainDevice->setWindowCaption(L"- Initializing");
-    m_mainDevice->setResizable(true);
+    m_mainDevice->setResizable(sConfig.GetDBValue("WorldClient.Config.Resolution.MainWindow.Resizeable", true));
 
     // Clear Screen
     m_mainDevice->getVideoDriver()->beginScene();
@@ -104,13 +105,15 @@ void IrrBackend::XUIIrrPlatformDriver::SetIrrMainHwnd(irr::IrrlichtDevice * cont
     SetWindowDevice(m_renderWindow);
 }
 
-void IrrBackend::XUIIrrPlatformDriver::InitializeInlineMainWindow()
+void* IrrBackend::XUIIrrPlatformDriver::InitializeInlineMainWindow()
 {
     if (!m_mainDevice)
     {
         InitializeInlineComponents();
         SetIrrMainHwnd(m_mainDevice);
     }
+
+    return m_mainDevice;
 }
 
 IFormattedText * IrrBackend::XUIIrrPlatformDriver::CreateFormattedText(std::wstring const & text, Core::Media::Typeface const & typeface, Core::Media::TextAlignment textAlignment, Core::Media::TextWrapping wrapping, Core::Media::Size const & constraint, std::initializer_list<FormattedTextStyleSpan> spans)
@@ -164,6 +167,21 @@ std::shared_ptr<IBitmapImpl> IrrBackend::XUIIrrPlatformDriver::CreateWritableBit
         case System::Imaging::PixelFormat::Bgr888:
         {
             irr_format = irr::video::ECOLOR_FORMAT::ECF_R8G8B8;
+            break;
+        }
+        case System::Imaging::PixelFormat::S3TC_DXT1:
+        {
+            irr_format = irr::video::ECOLOR_FORMAT::ECF_RGBA_S3TC_DXT1;
+            break;
+        }
+        case System::Imaging::PixelFormat::S3TC_DXT3:
+        {
+            irr_format = irr::video::ECOLOR_FORMAT::ECF_RGBA_S3TC_DXT3;
+            break;
+        }
+        case System::Imaging::PixelFormat::S3TC_DXT5:
+        {
+            irr_format = irr::video::ECOLOR_FORMAT::ECF_RGBA_S3TC_DXT5;
             break;
         }
         default:
@@ -306,21 +324,31 @@ void CreateKeyMap()
     //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Delete, irr::KEY_DELETE));
     //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Equal, 0)); // ???
     //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Multiply, irr::KEY_MULTIPLY));
-    //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Add, irr::KEY_ADD));
-    //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Separator, irr::KEY_SEPARATOR));
-    //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Subtract, irr::KEY_SUBTRACT));
-    //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Decimal, irr::KEY_DECIMAL));
-    //KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::KP_Divide, irr::KEY_DIVIDE));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad0, irr::KEY_KEY_0));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad1, irr::KEY_KEY_1));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad2, irr::KEY_KEY_2));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad3, irr::KEY_KEY_3));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad4, irr::KEY_KEY_4));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad5, irr::KEY_KEY_5));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad6, irr::KEY_KEY_6));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad7, irr::KEY_KEY_7));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad8, irr::KEY_KEY_8));
-    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad9, irr::KEY_KEY_9));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::Add, irr::KEY_ADD));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::Separator, irr::KEY_SEPARATOR));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::Subtract, irr::KEY_SUBTRACT));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::Decimal, irr::KEY_DECIMAL));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::Divide, irr::KEY_DIVIDE));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D0, irr::KEY_KEY_0));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D1, irr::KEY_KEY_1));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D2, irr::KEY_KEY_2));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D3, irr::KEY_KEY_3));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D4, irr::KEY_KEY_4));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D5, irr::KEY_KEY_5));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D6, irr::KEY_KEY_6));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D7, irr::KEY_KEY_7));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D8, irr::KEY_KEY_8));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::D9, irr::KEY_KEY_9));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad0, irr::KEY_NUMPAD0));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad1, irr::KEY_NUMPAD1));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad2, irr::KEY_NUMPAD2));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad3, irr::KEY_NUMPAD3));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad4, irr::KEY_NUMPAD4));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad5, irr::KEY_NUMPAD5));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad6, irr::KEY_NUMPAD6));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad7, irr::KEY_NUMPAD7));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad8, irr::KEY_NUMPAD8));
+    KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::NumPad9, irr::KEY_NUMPAD9));
     KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::F1, irr::KEY_F1));
     KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::F2, irr::KEY_F2));
     KeyMap.push_back(SKeyMap(XUI::Interfaces::Key::F3, irr::KEY_F3));
@@ -723,6 +751,7 @@ void IrrBackend::XUIIrrPlatformDriver::Update(const uint32 time_diff)
         if (context->run())
         {
             context->getVideoDriver()->beginScene();
+
             context->getSceneManager()->drawAll();
             //context->getGUIEnvironment()->drawAll();                      // irr: draw gui elements
             //Invalidate(Bounds);
@@ -772,6 +801,7 @@ void IrrBackend::XUIIrrPlatformDriver::OnExecuteWndProgress(const uint32 time_di
         if (context->run())
         {
             context->getVideoDriver()->beginScene();
+            
             context->getSceneManager()->drawAll();
             //context->getGUIEnvironment()->drawAll();                      // irr: draw gui elements
             //Invalidate(Bounds);

@@ -311,6 +311,7 @@ namespace XUI::UI
 
         static void OnExecutedMinimizeWindow(void * sender, Core::Observer::ExecutedRoutedEventArgs & e);
         static void OnExecutedMaximizeWindow(void * sender, Core::Observer::ExecutedRoutedEventArgs & e);
+        static void OnCanExecuteCloseWindow(void * sender, Core::Observer::CanExecuteRoutedEventArgs & e);
         static void OnExecutedCloseWindow(void * sender, Core::Observer::ExecutedRoutedEventArgs & e);
         static void OnExecutedRestoreWindow(void * sender, Core::Observer::ExecutedRoutedEventArgs & e);
 

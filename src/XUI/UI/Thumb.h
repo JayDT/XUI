@@ -38,8 +38,14 @@ namespace XUI::UI
         Thumb();
         virtual ~Thumb();
 
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&DragStartedEvent>       DragStarted;
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&DragDeltaEvent>         DragDelta;
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&DragCompletedEvent>     DragCompleted;
 
     private:

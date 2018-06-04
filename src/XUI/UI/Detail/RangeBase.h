@@ -54,6 +54,8 @@ namespace XUI::UI
         /// </summary>
         static Core::Dependency::RefDependencyProperty LargeChangeProperty;
 
+        static Core::Observer::RefRoutedEvent ValueChangedEvent;
+
     private:
         double _minimum = 0;
         double _maximum = 100.0;
@@ -68,6 +70,10 @@ namespace XUI::UI
         RangeBase();
         virtual ~RangeBase()
         {}
+
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
+        Core::Observer::SpecPropertyRoutedEventHandler<&ValueChangedEvent> ValueChanged;
 
         /// <summary>
         /// Gets or sets the minimum value.

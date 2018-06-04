@@ -11,7 +11,10 @@ namespace System::Imaging
         Rgba8888,
         Bgra8888,
         Rgb888,
-        Bgr888
+        Bgr888,
+        S3TC_DXT1,
+        S3TC_DXT3,
+        S3TC_DXT5
     };
 
     struct PixelFormatDesc

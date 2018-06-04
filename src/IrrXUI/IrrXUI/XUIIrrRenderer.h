@@ -22,6 +22,10 @@
 
 #undef LoadBitmap
 
+MetaAssemblyBegin
+Meta(modul: ReflInclude("IrrlichtDevice.h"))
+MetaAssemblyEnd
+
 namespace irr
 {
     class IrrlichtDevice;
@@ -78,7 +82,7 @@ namespace IrrBackend
         virtual ~XUIIrrPlatformDriver();
 
         void SetIrrMainHwnd(irr::IrrlichtDevice* context);
-        virtual void InitializeInlineMainWindow() override;
+        virtual void* InitializeInlineMainWindow() override;
 
         // Inherited via Visual
         virtual XUI::Interfaces::IDrawingContextImpl* GetDrawingContext() override { return m_renderWindow ? m_renderWindow->GetDrawingContext() : nullptr; }

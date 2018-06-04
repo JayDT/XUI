@@ -17,6 +17,7 @@
 
 MetaAssemblyBegin
 Meta(modul: ReflInclude("XUI/Core/Media/Pen.h"))
+Meta(modul: ReflInclude("IrrlichtDevice.h"))
 MetaAssemblyEnd
 
 namespace irr

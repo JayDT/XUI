@@ -219,7 +219,14 @@ void XUI::UI::TabControl::UpdateSelectedTab()
                 if (!m_SelectedContentHost.expired())
                     m_SelectedContentHost.lock()->IsEnabledCore = true;
 
+                if (oldControl)
+                    oldControl->_isMovingInLogicalTemplate = true;
+                control->_isMovingInLogicalTemplate = true;
                 SelectedContent = content;
+                if (oldControl)
+                    oldControl->_isMovingInLogicalTemplate = false;
+                control->_isMovingInLogicalTemplate = false;
+
                 //NotifyPropertyChanged::RaisePropertyChanged("SelectedContent");
                 //presenter->Content = content;
 

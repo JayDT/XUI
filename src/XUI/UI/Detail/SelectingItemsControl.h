@@ -122,7 +122,11 @@ namespace XUI::UI
         /// <summary>
         /// Occurs when the control's selection changes.
         /// </summary>
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&IsSelectedChangedEvent> IsSelectedChanged;
+        Meta(XamlCPP::EventAttribute())
+        Meta(XamlCPP::TypeConverterAttribute(typeid(XamlCPP::Core::ReflEx::TypeConversion::EventHookValueConverter)))
         Core::Observer::SpecPropertyRoutedEventHandler<&SelectionChangedEvent> SelectionChanged;
 
     public:

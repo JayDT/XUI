@@ -72,6 +72,9 @@ Mustache::Data<std::string> MethodBase::CompileStandardTemplate(Mustache::Data<s
     data["isDynamicCast"] = utils::TemplateBool(m_parent && m_parent->HasVirtualBase());
     data["instanceBody"] = context->LoadTemplatePartial(kPartialInstanceDefination);
 
+    if (m_name.find("SetContextMenu") != std::string::npos)
+        printf("");
+
     // TODO: Build template
     std::string invoke_args;
     std::string signature_args;
@@ -92,6 +95,10 @@ Mustache::Data<std::string> MethodBase::CompileStandardTemplate(Mustache::Data<s
             data["isTypeReflPointer"] = utils::TemplateBool(true);
             for (auto defClass : ArgTypeClass->m_definations)
             {
+                if (defClass->m_qualifiedName.find("ContextMenu") != std::string::npos)
+                    printf("");
+
+                // if (m_arguments[i]->GetQualifiedName() == defClass->m_qualifiedName)
                 if (defClass->m_astType && (m_arguments[i] == defClass->m_astType || m_arguments[i]->GetElaboratedType() == defClass->m_astType || m_arguments[i]->GetElaboratedType()->GetDeclarationType() == defClass->m_astType))
                 {
                     // Special case for std::shared_ptr

@@ -45,7 +45,7 @@ namespace XUI::Core::SceneGraph
     class SpriteBatch {};
 
     // Simple render cache object
-    class SceneNode : public System::Reflection::Object
+    class TC_XUI_API SceneNode : public System::Reflection::Object
     {
         friend class UI::Controls::Visual;
     private:

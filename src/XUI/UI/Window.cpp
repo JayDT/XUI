@@ -67,7 +67,7 @@ void XUI::UI::Window::StaticClassInitializer()
 
     MinimizeWindowCommand->AddClassHandler(&typeof(Window), std::make_shared<Core::Observer::CommandBinding>(MinimizeWindowCommand.get(), System::make_shared_eventhandler(Window::OnExecutedMinimizeWindow)));
     MaximizeWindowCommand->AddClassHandler(&typeof(Window), std::make_shared<Core::Observer::CommandBinding>(MaximizeWindowCommand.get(), System::make_shared_eventhandler(Window::OnExecutedMaximizeWindow)));
-    CloseWindowCommand->AddClassHandler(&typeof(Window), std::make_shared<Core::Observer::CommandBinding>(CloseWindowCommand.get(), System::make_shared_eventhandler(Window::OnExecutedCloseWindow)));
+    CloseWindowCommand->AddClassHandler(&typeof(Window), std::make_shared<Core::Observer::CommandBinding>(CloseWindowCommand.get(), System::make_shared_eventhandler(Window::OnExecutedCloseWindow), System::make_shared_eventhandler(Window::OnCanExecuteCloseWindow)));
     RestoreWindowCommand->AddClassHandler(&typeof(Window), std::make_shared<Core::Observer::CommandBinding>(RestoreWindowCommand.get(), System::make_shared_eventhandler(Window::OnExecutedRestoreWindow)));
 
     IsVisibleProperty->OverrideDefaultValue<Window>(false);
@@ -290,24 +290,6 @@ void XUI::UI::Window::SetWindowStyle(UI::WindowStyle value)
 
 void XUI::UI::Window::Close()
 {
-    auto renderService = Platform::UIService::Instance()->Get<Platform::UIRender>();
-    //if (VisualParent == nullptr)
-    //{
-    //    if (!_windowImpl /*&& Parent != renderService*/)
-    //    {
-    //        renderService->RemoveLogicalChild(this);
-    //        renderService->RemoveVisualChild(this);
-    //    }
-    //    else
-    //    {
-    //        renderService->RemoveTopLevelHandle(this);
-    //    }
-    //}
-
-    renderService->RemoveLogicalChild(this);
-    renderService->RemoveVisualChild(this);
-    renderService->RemoveTopLevelHandle(this);
-
     TopLevel::Close();
 }
 
@@ -435,8 +417,25 @@ void XUI::UI::Window::OnExecutedMaximizeWindow(void * sender, Core::Observer::Ex
 {
 }
 
+void XUI::UI::Window::OnCanExecuteCloseWindow(void * sender, Core::Observer::CanExecuteRoutedEventArgs & e)
+{
+    Window* wnd = GENERIC_SAFE_AS(Window, sender);
+    if (wnd)
+    {
+        if (wnd->Closing)
+        {
+            Interfaces::CancelEventArgs _e;
+            wnd->Closing(wnd, _e);
+            e.CanExecute = !_e.Cancel;
+        }
+    }
+}
+
 void XUI::UI::Window::OnExecutedCloseWindow(void * sender, Core::Observer::ExecutedRoutedEventArgs & e)
 {
+    Window* wnd = GENERIC_SAFE_AS(Window, sender);
+    if (wnd)
+        wnd->Close();
 }
 
 void XUI::UI::Window::OnExecutedRestoreWindow(void * sender, Core::Observer::ExecutedRoutedEventArgs & e)
@@ -454,6 +453,25 @@ void XUI::UI::Window::HandlePaint(Core::Media::Rect const & rect)
 
 void XUI::UI::Window::HandleClosed()
 {
+    auto renderService = Platform::UIService::Instance()->Get<Platform::UIRender>();
+    //if (VisualParent == nullptr)
+    //{
+    //    if (!_windowImpl /*&& Parent != renderService*/)
+    //    {
+    //        renderService->RemoveLogicalChild(this);
+    //        renderService->RemoveVisualChild(this);
+    //    }
+    //    else
+    //    {
+    //        renderService->RemoveTopLevelHandle(this);
+    //    }
+    //}
+
+
+    renderService->RemoveLogicalChild(this);
+    renderService->RemoveVisualChild(this);
+    renderService->RemoveTopLevelHandle(this);
+
     _windowImpl = nullptr;
     TopLevel::HandleClosed();
 }

@@ -6,6 +6,8 @@
 #include "Reflection/Runtime/Object.h"
 
 #include "XUI/Interfaces/IDrawingContext.h"
+#include "XUI/Interfaces/IGeometry.h"
+#include "XUI/Interfaces/IBitmap.h"
 
 #include "IrrLicht/include/rect.h"
 #include "IrrLicht/include/matrix4.h"
@@ -18,6 +20,7 @@ MetaAssemblyBegin
 Meta(modul: ReflInclude("XUI/Core/Media/Pen.h"))
 Meta(modul: ReflInclude("XUI/Interfaces/IBitmap.h"))
 Meta(modul: ReflInclude("XUI/Interfaces/IStandardCursorFactory.h"))
+Meta(modul: ReflInclude("IrrlichtDevice.h"))
 MetaAssemblyEnd
 
 namespace irr

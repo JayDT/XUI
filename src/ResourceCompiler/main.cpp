@@ -36,6 +36,9 @@
 
 #include "ResourceBuilder.h"
 
+#include <common_data.h>
+#include <buildin_data.h>
+
 boost::program_options::options_description program("System::Resource Compiler");
 boost::program_options::variables_map cmdLine;
 
@@ -98,17 +101,17 @@ void ParseCommandLineArgs(int argc, char *argv[])
         argc = 12;
         argv = new char*[13]
         {
-            "C:/Project/XUI/XUI/win/bin/Debug/rs.exe",
+            _SOURCE_DIRECTORY "/win64/bin/Debug/rs.exe",
             "--target-name",
             "XUI",
             "--source-root",
-            "C:/Project/XUI/XUI/src/XUI",
+            _SOURCE_DIRECTORY "/moduls/XUI/src/XUI",
             "--in-source",
-            "C:/Project/XUI/XUI/win/src/XUI/.Resource/Resource_XUI.dsc",
+            _SOURCE_DIRECTORY "/win/moduls/XUI/src/XUI/.Resource/Resource_XUI.dsc",
             "--out-source",
-            "C:/Project/XUI/XUI/win/src/XUI/.Resource/Resource_Modul_XUI.cpp",
+            _SOURCE_DIRECTORY "/win/moduls/XUI/src/XUI/.Resource/Resource_Modul_XUI.cpp",
             "--out-dir",
-            "C:/Project/XUI/XUI/win/src/XUI/.Resource",
+            _SOURCE_DIRECTORY "/win/moduls/XUI/src/XUI/.Resource",
             "--display-diagnostics",
             nullptr
         };

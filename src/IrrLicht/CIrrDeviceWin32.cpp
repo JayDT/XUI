@@ -55,6 +55,11 @@ namespace irr
         IVideoDriver* createOpenGLDriver(const irr::SIrrlichtCreationParameters& params,
             io::IFileSystem* io, CIrrDeviceWin32* device);
         #endif
+
+        #ifdef _IRR_COMPILE_WITH_VULKAN_
+        IVideoDriver* createVulkanDriver(const SIrrlichtCreationParameters& params,
+            io::IFileSystem* io, HWND hwnd);
+        #endif
     }
 } // end namespace irr
 
@@ -764,6 +769,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_CREATE:
+    {
+        break;
+    }
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -1242,7 +1251,9 @@ void CIrrDeviceWin32::setActiveWindow() const
 
 void CIrrDeviceWin32::setParent(IrrlichtDevice* parentDev) const
 {
-    SetParent(HWnd, (HWND)parentDev->getHandle());
+    HWND dwRet = SetParent(HWnd, (HWND)parentDev->getHandle());
+
+    DWORD dwError = GetLastError();
 
     LONG lStyle = GetWindowLong(HWnd, GWL_STYLE);
     lStyle |= WS_CHILD;
@@ -1414,7 +1425,20 @@ void CIrrDeviceWin32::createDriver()
         os::Printer::log("OpenGL driver was not compiled in.", ELL_ERROR);
         #endif
         break;
+    case video::EDT_VULKAN:
+        #ifdef _IRR_COMPILE_WITH_VULKAN_
 
+        VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, HWnd);
+
+        if ( !VideoDriver )
+        {
+            os::Printer::log("Could not create Vulkan Driver.", ELL_ERROR);
+        }
+        #else
+        os::Printer::log("Vulkan Driver was not compiled into this dll. Try another one.", ELL_ERROR);
+        #endif
+
+        break;
     case video::EDT_SOFTWARE:
 
         #ifdef _IRR_COMPILE_WITH_SOFTWARE_

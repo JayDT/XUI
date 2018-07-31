@@ -12,6 +12,7 @@
 #include "SVertexIndex.h"
 #include "EHardwareBufferFlags.h"
 #include "EPrimitiveTypes.h"
+#include "RenderEngines/General/CIrrVertexDeclaration.h"
 
 #include <mutex>
 
@@ -19,7 +20,7 @@ namespace irr
 {
     namespace video
     {
-        enum E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE;
+        enum E_VERTEX_ELEMENT_SEMANTIC : irr::u8;
         class IHardwareBuffer;
         struct IShader;
         struct IShaderDataBuffer;
@@ -125,12 +126,13 @@ namespace scene
     class IRRLICHT_API IMeshBuffer : public virtual IReferenceCounted
 	{
         mutable video::IHardwareBuffer* m_HWBuffer;
+        mutable video::VertexDeclaration* m_vertexDecl;
         scene::E_PRIMITIVE_TYPE m_renderType : 8;
         bool m_forceVBO : 1;
         bool m_3DMode : 1;
     public:
 
-        IMeshBuffer() : m_renderType(EPT_TRIANGLES), m_HWBuffer(nullptr), m_forceVBO(false), m_3DMode(true) {}
+        IMeshBuffer() : m_renderType(EPT_TRIANGLES), m_HWBuffer(nullptr), m_vertexDecl(nullptr), m_forceVBO(false), m_3DMode(true) {}
         virtual ~IMeshBuffer() {}
 
 		//! Get the material of this meshbuffer
@@ -225,6 +227,7 @@ namespace scene
 
 		//! get the current hardware mapping hint
 		virtual E_HARDWARE_MAPPING getHardwareMappingHint_Index() const = 0;
+        virtual E_HARDWARE_MAPPING getHardwareMappingHint_Instance() const = 0;
 
 		//! set the hardware mapping hint, for driver
 		virtual void setHardwareMappingHint( E_HARDWARE_MAPPING newMappingHint, E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX ) = 0;
@@ -248,6 +251,8 @@ namespace scene
 
         virtual video::IShader* GetGPUProgram() const { return nullptr; }
         virtual void SetGPUProgram(video::IShader* gpuProgram) { }
+        // Fast implementation for shader reload
+        virtual void SetGPUProgram(irr::video::IVideoDriver* driver, s32 gpuProgramId) { }
 
         virtual s32 GetVertexRangeStart() const { return 0; }
         virtual s32 GetVertexRangeEnd() const { return getVertexCount(); }
@@ -289,6 +294,16 @@ namespace scene
 
         video::IHardwareBuffer* GetHWBuffer() const { return m_HWBuffer; }
         void SetHWBuffer(video::IHardwareBuffer* hwb) const { m_HWBuffer = hwb; }
+
+        video::VertexDeclaration* GetVertexDeclaration() const { return m_vertexDecl; }
+        void SetVertexDeclaration(video::VertexDeclaration* vrd) const
+        {
+            if (m_vertexDecl)
+                m_vertexDecl->drop();
+            m_vertexDecl = vrd;
+            if (m_vertexDecl)
+                m_vertexDecl->grab();
+        }
 
         virtual video::IShaderDataBuffer* GetHWInstanceBuffer() { return nullptr; }
         virtual void SetHWInstanceBuffer(video::IShaderDataBuffer* instanceBuffer) {}

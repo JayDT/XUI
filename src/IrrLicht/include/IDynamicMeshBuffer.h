@@ -17,7 +17,13 @@ namespace scene
 	/** a dynamic meshBuffer */
 	class IRRLICHT_API IDynamicMeshBuffer : public IMeshBuffer
 	{
+    protected:
+
+        E_HARDWARE_MAPPING MappingHintInstance = E_HARDWARE_MAPPING::EHM_NEVER;
+
 	public:
+        virtual ~IDynamicMeshBuffer() {}
+
 		virtual IVertexBuffer &getVertexBuffer() const =0;
 		virtual IIndexBuffer &getIndexBuffer() const =0;
 
@@ -77,6 +83,11 @@ namespace scene
 			return getIndexBuffer().getHardwareMappingHint();
 		}
 
+        virtual E_HARDWARE_MAPPING getHardwareMappingHint_Instance() const
+        {
+            return MappingHintInstance;
+        }
+
 		//! set the hardware mapping hint, for driver
 		virtual void setHardwareMappingHint( E_HARDWARE_MAPPING NewMappingHint, E_BUFFER_TYPE Buffer=EBT_VERTEX_AND_INDEX )
 		{
@@ -84,7 +95,9 @@ namespace scene
 				getVertexBuffer().setHardwareMappingHint(NewMappingHint);
 			if (Buffer==EBT_VERTEX_AND_INDEX || Buffer==EBT_INDEX)
 				getIndexBuffer().setHardwareMappingHint(NewMappingHint);
-		}
+            if (Buffer == EBT_INSTANCE)
+                MappingHintInstance = NewMappingHint;
+        }
 
 		//! flags the mesh as changed, reloads hardware buffers
 		virtual void setDirty(E_BUFFER_TYPE Buffer=EBT_VERTEX_AND_INDEX)

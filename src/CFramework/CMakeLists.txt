@@ -14,7 +14,7 @@ IF (LibCFrameworkSharedLinkage)
        g3dlite
 	   libjpeg
 	   libpng	   
-       ${ZLIB_LIBRARIES}
+       ZLIB
        ${CURL_LIBRARY}
        ${OPENSSL_LIBRARIES}
      )

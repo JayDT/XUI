@@ -28,36 +28,13 @@
 #include "SVertexElement.h"
 #include "SVertexIndex.h"
 #include "SVertexManipulator.h"
+#include "RenderEngines/General/CIrrShader.h"
 
 #include "standard/client/DataSource_Standard.h"
 
 #ifdef _MSC_VER
 #pragma warning( disable: 4996)
 #endif
-
-// Attribute Index
-static const irr::video::S_GPU_SHADER_VARIABLE_DEFAULT_LINK sDefaultShaderVariableLink[irr::video::EGVAT_MAX_VALUE] = {
-    { "Position",           irr::video::EGVAT_POSITION, },
-    { "Normal",             irr::video::EGVAT_NORMAL, },
-    { "Color",              irr::video::EGVAT_COLOR, },
-    { "Color2",             irr::video::EGVAT_COLOR2, },
-    { "TexCoord",           irr::video::EGVAT_TCoord, },
-    { "TexCoord2",          irr::video::EGVAT_TCoord2, },
-    { "Tangent",            irr::video::EGVAT_Tangent, },
-    { "Binormal",           irr::video::EGVAT_Binormal, },
-    { "TextureCoordMod",    irr::video::EGVAT_TEXTURE_COORD_MOD, },
-    { "TextureCoordMod2",   irr::video::EGVAT_TEXTURE_COORD_MOD2, },
-    { "WVP",                irr::video::EGVAT_VIEW_MATRIX, },
-    { "MView",              irr::video::EGVAT_FUSTRUM_MATRIX, },
-    { "BoneIDs",            irr::video::EGVAT_BONE_IDS, },
-    { "Weights",            irr::video::EGVAT_WEIGHT, },
-    { "texture0",           irr::video::EGVAT_TEXTURE_UNIT_FIRST, },
-    { "texture1",           irr::video::E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE(irr::video::EGVAT_TEXTURE_UNIT_FIRST + 1), },
-    { "texture2",           irr::video::E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE(irr::video::EGVAT_TEXTURE_UNIT_FIRST + 2), },
-    { "texture3",           irr::video::E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE(irr::video::EGVAT_TEXTURE_UNIT_FIRST + 3), },
-    { "texture4",           irr::video::EGVAT_TEXTURE_UNIT_LAST, },
-    { "",                   irr::video::EGVAT_MAX_VALUE }
-};
 
 struct SSurface
 {
@@ -101,394 +78,6 @@ namespace video
     class IImageLoader;
     class IImageWriter;
 
-    enum E_ShaderTypes
-    {
-        EST_VERTEX_SHADER,
-        EST_FRAGMENT_SHADER,
-        EST_GEOMETRY_SHADER,
-        EST_HULL_SHADER,
-        EST_DOMAIN_SHADER,
-        EST_COMPUTE_SHADER,
-        EST_TESSELLATION_SHADER,
-        EST_HIGH_LEVEL_SHADER,
-    };
-
-    enum E_ShaderVersion
-    {
-        ESV_GLSL_ASM,
-        ESV_GLSL_HIGH_LEVEL,
-        ESV_HLSL_HIGH_LEVEL
-    };
-
-#define INVALID_UNIFORM_LOCATION 0xffffffff
-#define INVALID_OGL_VALUE 0xffffffff
-
-    enum E_ShaderVariableType
-    {
-        ESVT_UNKNOWN,
-        ESVT_ATTRIBUTE,
-        ESVT_UNIFORM,
-        ESVT_CONSTANT,
-        ESVT_INPUT_STREAM
-    };
-
-    struct ShaderVariableDescriptor
-    {
-        ShaderVariableDescriptor()
-        {
-            m_location = 0;
-            m_size = 0;
-            m_length = 0;
-            m_type = 0;
-            m_class = 0;
-            m_divisor = -1;
-            m_shaderIndex = 0;
-            m_variableType = 0;
-            m_basicVariableLocation = EGVAT_NONE;
-            m_name = "<unknow>";
-        }
-
-        s32 m_location;
-        u16 m_class;
-        u16 m_size;
-        u16 m_length;
-        u8 m_type;
-        u8 m_shaderIndex;
-        u32 m_variableType;
-        s32 m_divisor;
-        E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE m_basicVariableLocation : 8;
-        std::string m_name;
-    };
-
-    struct IShaderDataBufferElement
-    {
-        struct ShaderDataBufferElementExepction : public std::exception
-        {
-            ShaderDataBufferElementExepction(const char* message) : std::exception(message)
-            {
-
-            }
-        };
-
-        ShaderVariableDescriptor const* m_description;
-
-        explicit IShaderDataBufferElement(ShaderVariableDescriptor const* description) : m_description(description)
-        {
-        }
-
-        virtual ~IShaderDataBufferElement()
-        {
-
-        }
-
-        ShaderVariableDescriptor const* getDescription() const { return m_description; }
-        virtual u16 getShaderLocation() const { return m_description->m_location; }
-        virtual void* getShaderValues() const = 0;
-        virtual u32 getShaderValueCount() const = 0;
-        virtual size_t getValueSizeOf() const = 0;
-        virtual bool isChanged() const = 0;
-        virtual void setDirty() = 0;
-        virtual void setUpdated() = 0;
-    };
-
-    template<typename T>
-    struct ShaderDataBufferElementObject : public IShaderDataBufferElement
-    {
-        T   m_values;
-
-        bool m_changed : 1;
-
-        explicit ShaderDataBufferElementObject(ShaderVariableDescriptor const* description) : IShaderDataBufferElement(description), m_changed(true), m_values(T())
-        {
-        }
-
-        virtual bool isChanged() const { return m_changed; }
-        virtual void setDirty() { m_changed = true; }
-        virtual void setUpdated() { m_changed = false; }
-
-        void setShaderValues(T const& data) 
-        {
-            if (m_values != data)
-            {
-                m_values = data;
-                m_changed = true;
-            }
-        }
-
-        ShaderDataBufferElementObject<T>* operator=(T const& data)
-        {
-            setShaderValues(data);
-            return (ShaderDataBufferElementObject<T>*)this;
-        }
-
-        virtual void* getShaderValues() const { return (void*)&m_values; }
-        virtual u32 getShaderValueCount() const { return 1; }
-        virtual size_t getValueSizeOf() const { return sizeof(T); }
-    };
-
-    template<typename T>
-    struct ShaderDataBufferElementArray : public IShaderDataBufferElement
-    {
-        std::vector<T> m_values;
-        bool m_changed : 1;
-
-        explicit ShaderDataBufferElementArray(ShaderVariableDescriptor const* description) : IShaderDataBufferElement(description), m_changed(true)
-        {
-        }
-
-        // TODO: implement later or set manual
-        virtual bool isChanged() const { return m_changed; }
-        virtual void setDirty() { m_changed = true; }
-        virtual void setUpdated() { m_changed = false; }
-
-        void ReAllocBuffer(int size)
-        {
-            m_values.reserve(size);
-        }
-
-        void ResetShaderValues() 
-        {
-            m_changed = true;
-            m_values.resize(0);
-        }
-
-        void PushShaderValues(T const& data) 
-        {
-            m_changed = true;
-            m_values.push_back(data);
-        }
-
-        void MoveShaderValue(T const&& data)
-        {
-            m_changed = true;
-            m_values.push_back(data);
-        }
-
-        T& Emplace()
-        {
-            m_values.emplace_back();
-            return m_values.back();
-        }
-
-        ShaderDataBufferElementObject<T>* operator+=(T const& data)
-        {
-            PushShaderValues(data);
-            return (ShaderDataBufferElementObject<T>*)this;
-        }
-
-        virtual void* getShaderValues() const { return (void*)m_values.data(); }
-        virtual u32 getShaderValueCount() const { return m_values.size(); }
-        virtual size_t getValueSizeOf() const { return sizeof(T); }
-    };
-
-    struct  IRRLICHT_API  IShaderDataBuffer
-    {
-        enum E_UPDATE_TYPE
-        {
-            EUT_PER_FRAME,
-            EUT_PER_FRAME_PER_MESH,
-            EUT_PER_FRAME_PER_MATERIAL,
-            EUT_MAX_VALUE,
-        };
-
-        enum E_UPDATE_FLAGS
-        {
-            EUF_COMMIT_VALUES       = 0x0000001,
-            EUF_CUSTOM_INPUT_VALUES = 0x0000002,
-        };
-
-        typedef core::array<IShaderDataBufferElement*> BufferDataArray;
-        
-        BufferDataArray m_bufferDataArray;
-        u32 mChangedID;
-        E_UPDATE_TYPE m_updateType : 8;
-
-        explicit IShaderDataBuffer(IShaderDataBuffer::E_UPDATE_TYPE updateType) : mChangedID(1), m_updateType(updateType)
-        {
-
-        }
-
-        virtual ~IShaderDataBuffer()
-        {
-            Invalidate();
-        }
-
-        void Invalidate()
-        {
-            for (u32 i = 0; i != m_bufferDataArray.size(); ++i)
-                delete m_bufferDataArray[i];
-            m_bufferDataArray.clear();
-        }
-
-        void AddBufferElement(IShaderDataBufferElement* databuf)
-        {
-            m_bufferDataArray.push_back(databuf);
-        }
-
-        bool isChanged() const
-        {
-            for (u32 i = 0; i != m_bufferDataArray.size(); ++i)
-                if (m_bufferDataArray[i]->isChanged())
-                    return true;
-            return false;
-        }
-
-        virtual void Clear() {}
-        virtual bool AddDataFromSceneNode(scene::ISceneNode*) { return true; }
-
-        E_UPDATE_TYPE getUpdateType() const { return m_updateType; }
-
-        virtual void setDirty();
-
-        virtual void InitializeFormShader(IShader* gpuProgram, void* Descriptor) = 0;
-        virtual void CommitBuffer(IShader* gpuProgram, IHardwareBuffer* buffer = nullptr);
-        virtual void UpdateBuffer(IShader* gpuProgram, irr::scene::IMeshBuffer* meshBuffer, irr::scene::IMesh* mesh, irr::scene::ISceneNode* node, u32 updateFlags) = 0;
-        virtual u32 getInstanceCount() { return 0; }
-
-        //! Get the currently used ID for identification of changes.
-        /** This shouldn't be used for anything outside the VideoDriver. */
-        virtual u32 getChangedID() const { return mChangedID; }
-    };
-
-    struct  IRRLICHT_API  IShader
-    {
-        typedef core::array<ShaderVariableDescriptor> ShaderVariableDescArray;
-
-        core::array<IShaderDataBuffer*> mBuffers[IShaderDataBuffer::EUT_MAX_VALUE];
-        video::IVideoDriver* mContext;
-        u8 mContextType;
-        E_ShaderTypes mShaderType;
-        bool mBinded : 1;
-
-        ShaderVariableDescArray m_shaderVariableDescArray;
-        s16 m_shaderVariableIndexTable[EGVAT_MAX_VALUE];
-
-        explicit IShader(video::IVideoDriver* context, E_ShaderTypes type);
-        virtual ~IShader();
-
-        static bool readFile(const char* pFileName, std::string& outFile);
-        u8 getContextType() const;
-        E_ShaderTypes getShaderType() const { return mShaderType; }
-
-        video::IVideoDriver* getVideoDriver() { return mContext; }
-
-        void addDataBuffer(IShaderDataBuffer* buffer, void* Descriptor)
-        {
-            buffer->InitializeFormShader(this, Descriptor);
-            mBuffers[buffer->getUpdateType()].push_back(buffer);
-        }
-
-        void LinkShaderVariable(const char* name, E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE basicVariableLocation = EGVAT_NONE, u32* rid = nullptr);
-
-        virtual void AddShaderVariable(ShaderVariableDescriptor* ui)
-        {
-            m_shaderVariableDescArray.push_back(*ui);
-        }
-
-        virtual E_ShaderVersion getShaderVersion() const = 0;
-        virtual void bind() = 0;
-        virtual void unbind() = 0;
-        virtual void destroy() = 0;
-        virtual void Init() = 0;
-
-        virtual void CreateAttributeExtensions(video::IHardwareBuffer* hwBuff) {}
-        virtual void UpdateValues(IShaderDataBuffer::E_UPDATE_TYPE updateType, scene::IMeshBuffer* meshBuffer, scene::IMesh* mesh, scene::ISceneNode* node, u32 updateFlags)
-        {
-            if (mBuffers[updateType].empty())
-                return;
-
-            for (u32 i = 0; i != mBuffers[updateType].size(); ++i)
-                mBuffers[updateType][i]->UpdateBuffer(this, meshBuffer, mesh, node, updateFlags);
-
-            if (updateFlags & video::IShaderDataBuffer::EUF_COMMIT_VALUES)
-                CommitValues(updateType);
-        }
-
-        virtual void CommitValues(IShaderDataBuffer::E_UPDATE_TYPE updateType)
-        {
-            if (mBuffers[updateType].empty())
-                return;
-
-            for (u32 i = 0; i != mBuffers[updateType].size(); ++i)
-                mBuffers[updateType][i]->CommitBuffer(this);
-        }
-
-        virtual void setDirty()
-        {
-            for (u32 ib = 0; ib != IShaderDataBuffer::EUT_MAX_VALUE; ++ib)
-            {
-                if (mBuffers[ib].empty())
-                    return;
-
-                for (u32 i = 0; i != mBuffers[ib].size(); ++i)
-                    mBuffers[ib][i]->setDirty();
-            }
-        }
-
-        virtual short GetUniformLocationByCacheIdx(short id) { return -1; }
-        virtual ShaderVariableDescriptor const* GetGPUVariableDesc(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type) const;
-        virtual s32 getGPUProgramAttribLocation(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type) const;
-        virtual ShaderVariableDescriptor const* GetGPUVariableDesc(const char* name, u32* rid = nullptr) const;
-        virtual int getVariableLocation(const char* name);
-        virtual int getProgramParam(int param) { return -1; }
-    };
-
-    struct SOccQuery : public virtual IReferenceCounted
-    {
-        SOccQuery(scene::ISceneNode* node, const scene::IMesh* mesh = 0) : Node(node), Mesh(mesh), PID(0), Result(~0), Run(~0)
-        {
-            if (Node)
-                Node->grab();
-            if (Mesh)
-                Mesh->grab();
-        }
-
-        SOccQuery(const SOccQuery& other) : Node(other.Node), Mesh(other.Mesh), PID(other.PID), Result(other.Result), Run(other.Run)
-        {
-            if (Node)
-                Node->grab();
-            if (Mesh)
-                Mesh->grab();
-        }
-
-        ~SOccQuery()
-        {
-            if (Node)
-                Node->drop();
-            if (Mesh)
-                Mesh->drop();
-        }
-
-        SOccQuery& operator=(const SOccQuery& other)
-        {
-            Node = other.Node;
-            Mesh = other.Mesh;
-            PID = other.PID;
-            Result = other.Result;
-            Run = other.Run;
-            if (Node)
-                Node->grab();
-            if (Mesh)
-                Mesh->grab();
-            return *this;
-        }
-
-        bool operator==(const SOccQuery& other) const
-        {
-            return other.Node == Node;
-        }
-
-        scene::ISceneNode* Node;
-        const scene::IMesh* Mesh;
-        union
-        {
-            void* PID;
-            unsigned int UID;
-        };
-        u32 Result;
-        u32 Run;
-    };
-
     class  IRRLICHT_API  CNullDriver : public IVideoDriver, public IGPUProgrammingServices
     {
     public:
@@ -498,6 +87,7 @@ namespace video
         virtual void buildShaderVariableDescriptor(IShader*) {}
         virtual s32 getShaderVariableID(IShader*, const c8* name) { return -1; }
         virtual bool setShaderConstant(ShaderVariableDescriptor const* desc, const void* values, int count, IHardwareBuffer* buffer = nullptr) { return false; }
+        virtual bool setShaderMapping(ShaderVariableDescriptor const* desc, IShader* shader, scene::E_HARDWARE_MAPPING constantMapping) { return false; }
         virtual void useShader(IShader*) {}
         virtual void deleteShader(IShader*) {}
 
@@ -840,8 +430,24 @@ namespace video
         virtual void CreateHardwareBuffer(const scene::IMeshBuffer* mb);
 
         bool setActiveTexture(u32 stage, const video::ITexture* texture) { return false;  }
-        virtual bool setRenderStates3DMode(E_VERTEX_TYPE vType) { return false; }
+        virtual bool setRenderStates3DMode() { return false; }
+
+        template<typename TValue>
+        ShaderDataBufferElementObject<TValue> CreateShaderVariableObject(video::IShader* shader, const char* variable)
+        {
+            auto desc = shader->GetGPUVariableDesc(name);
+            if (!desc)
+                return nullptr;
+
+            return new ShaderDataBufferElementObject<TValue>(desc);
+        }
+
     protected:
+
+        virtual core::array<u8> GetShaderVariableMemoryBlock(ShaderVariableDescriptor const* desc, video::IShader* shader) { return core::array<u8>(); }
+
+        //! sets the needed renderstates
+        virtual void setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel) {}
 
         //! Gets hardware buffer link from a meshbuffer (may create or update buffer)
         virtual IHardwareBuffer *getBufferLink(const scene::IMeshBuffer* mb);
@@ -857,6 +463,9 @@ namespace video
 
         //! Create hardware buffer from mesh (only some drivers can)
         virtual IHardwareBuffer *createHardwareBuffer(const scene::IMeshBuffer* mb) {return 0;}
+
+        void ThrowIfNotCoreThread();
+        void ThrowIfCoreThread();
 
     public:
         //! Update all hardware buffers, remove unused ones
@@ -1079,8 +688,7 @@ namespace video
         virtual void enableMaterial2D(bool enable=true);
 
         //! Only used by the engine internally.
-        virtual void setAllowZWriteOnTransparent(bool flag)
-        { AllowZWriteOnTransparent=flag; }
+        virtual void setAllowZWriteOnTransparent(bool flag) { AllowZWriteOnTransparent = flag; }
 
         //! Returns the maximum texture size supported.
         virtual core::dimension2du getMaxTextureSize() const;
@@ -1111,11 +719,14 @@ namespace video
             return createDeviceDependentTexture(surface, name, mipmapData);
         }
 
-        bool blockgpuprogramchange;
-        virtual IShader* getActiveGPUProgram()
+        IShader* getActiveGPUProgram() override final
         {
             return ActiveGPUProgram;
         }
+
+        video::VertexDeclaration* GetVertexDeclaration(irr::u32 id) override final;
+
+        virtual video::VertexDeclaration* createVertexDeclaration() { return nullptr; }
 
         virtual bool activeGPUProgram(IShader* gpuProrgam)
         {
@@ -1148,7 +759,27 @@ namespace video
         //! THIS METHOD HAS TO BE OVERRIDDEN BY DERIVED DRIVERS WITH OWN TEXTURES
         virtual video::ITexture* createDeviceDependentTexture(IImage* surface, const io::path& name, void* mipmapData=0);
 
+        s32 AddRuntimeShader(IShader* shader, s32 id = -1) override
+        {
+            if (id == -1 || id > RuntimeShaders.size())
+            {
+                RuntimeShaders.push_back(shader);
+                return RuntimeShaders.size() - 1;
+            }
+
+            RuntimeShaders[id] = shader;
+            return id;
+        }
+
+        IShader* GetRuntimeShader(s32 id) const override
+        {
+            return RuntimeShaders[id];
+        }
+
     protected:
+
+        // Init Driver Globals
+        bool initDriver();
 
         //! deletes all textures
         void deleteAllTextures();
@@ -1205,6 +836,8 @@ namespace video
             virtual void regenerateMipMapLevels(void* mipmapData=0) {};
             core::dimension2d<u32> size;
         };
+
+        std::map<irr::u32, VertexDeclaration*> VertexDeclarations;
         std::unordered_map<std::string, irr::video::ITexture*> Textures;
 
         core::array<SOccQuery*> OcclusionQueries;
@@ -1213,8 +846,9 @@ namespace video
         core::array<video::IImageWriter*> SurfaceWriter;
         core::array<SLight> Lights;
         core::array<SMaterialRenderer> MaterialRenderers;
+        core::array<IShader*> RuntimeShaders;
 
-        core::map< const scene::IMeshBuffer* , IHardwareBuffer* > HWBufferMap;
+        //core::map< const scene::IMeshBuffer* , IHardwareBuffer* > HWBufferMap;
 
         io::IFileSystem* FileSystem;
 
@@ -1247,11 +881,13 @@ namespace video
         bool OverrideMaterial2DEnabled;
 
         E_FOG_TYPE FogType;
-        bool PixelFog;
-        bool RangeFog;
-        bool AllowZWriteOnTransparent;
+        bool PixelFog = false;
+        bool RangeFog = false;
+        bool AllowZWriteOnTransparent = false;
 
         bool FeatureEnabled[video::EVDF_COUNT];
+    public:
+        bool blockgpuprogramchange = false;
     };
 
 } // end namespace video

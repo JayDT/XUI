@@ -1,0 +1,170 @@
+#######################################################################
+# Merged From Ogre3D see http://www.ogre3d.org/
+#######################################################################
+
+#####################################################
+# Install dependencies 
+#####################################################
+if (NOT APPLE AND NOT WIN32)
+  return()
+endif()
+
+set(PROJECT_DEP_DIR ${PROJECTDEPS_PATH})
+
+option(PROJECT_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
+option(PROJECT_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
+
+macro(install_debug INPUT)
+  if (EXISTS ${PROJECT_DEP_DIR}/bin/debug/${INPUT})
+    if (IS_DIRECTORY ${PROJECT_DEP_DIR}/bin/debug/${INPUT})
+      install(DIRECTORY ${PROJECT_DEP_DIR}/bin/debug/${INPUT} DESTINATION bin/debug CONFIGURATIONS Debug)
+    else ()
+      install(FILES ${PROJECT_DEP_DIR}/bin/debug/${INPUT} DESTINATION bin/debug CONFIGURATIONS Debug)
+    endif ()
+  else()
+    message(send_error "${PROJECT_DEP_DIR}/bin/debug/${INPUT} did not exist, can't install!")
+  endif ()
+endmacro()
+
+macro(install_release INPUT)
+  if (EXISTS ${PROJECT_DEP_DIR}/bin/release/${INPUT})
+    if (IS_DIRECTORY ${PROJECT_DEP_DIR}/bin/release/${INPUT})
+      install(DIRECTORY ${PROJECT_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/release CONFIGURATIONS Release None "")
+      install(DIRECTORY ${PROJECT_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+      install(DIRECTORY ${PROJECT_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
+    else ()
+      install(FILES ${PROJECT_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/release CONFIGURATIONS Release None "")
+      install(FILES ${PROJECT_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+      install(FILES ${PROJECT_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
+    endif ()
+  else()
+    message(send_error "${PROJECT_DEP_DIR}/bin/release/${INPUT} did not exist, can't install!")
+  endif ()
+endmacro()
+
+macro(copy_debug INPUT)
+  if (EXISTS ${PROJECT_DEP_DIR}/lib/debug/${INPUT})
+    if (MINGW OR NMAKE)
+      configure_file(${PROJECT_DEP_DIR}/lib/debug/${INPUT} ${PROJECT_BINARY_DIR}/lib/${INPUT} COPYONLY)
+	else ()
+      if (IS_DIRECTORY ${PROJECT_DEP_DIR}/lib/debug/${INPUT})
+        install(DIRECTORY ${PROJECT_DEP_DIR}/lib/debug/${INPUT} DESTINATION lib/debug)
+      else ()
+        configure_file(${PROJECT_DEP_DIR}/lib/debug/${INPUT} ${PROJECT_BINARY_DIR}/lib/debug/${INPUT} COPYONLY)
+      endif ()
+	endif ()
+  endif ()
+endmacro()
+
+macro(copy_release INPUT)
+  if (EXISTS ${PROJECT_DEP_DIR}/lib/release/${INPUT})
+    if (MINGW OR NMAKE)
+      configure_file(${PROJECT_DEP_DIR}/lib/release/${INPUT} ${PROJECT_BINARY_DIR}/lib/${INPUT} COPYONLY)
+	else ()
+      if (IS_DIRECTORY ${PROJECT_DEP_DIR}/lib/release/${INPUT})
+        install(DIRECTORY ${PROJECT_DEP_DIR}/lib/release/${INPUT} DESTINATION lib/release CONFIGURATIONS Release None "")
+        install(DIRECTORY ${PROJECT_DEP_DIR}/lib/release/${INPUT} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+        install(DIRECTORY ${PROJECT_DEP_DIR}/lib/release/${INPUT} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+      else ()
+        configure_file(${PROJECT_DEP_DIR}/lib/release/${INPUT} ${PROJECT_BINARY_DIR}/lib/release/${INPUT} COPYONLY)
+        configure_file(${PROJECT_DEP_DIR}/lib/release/${INPUT} ${PROJECT_BINARY_DIR}/lib/relwithdebinfo/${INPUT} COPYONLY)
+        configure_file(${PROJECT_DEP_DIR}/lib/release/${INPUT} ${PROJECT_BINARY_DIR}/lib/minsizerel/${INPUT} COPYONLY)
+      endif ()
+	endif ()
+  endif ()
+endmacro ()
+
+if (PROJECT_INSTALL_DEPENDENCIES)
+  if (PROJECT_STATIC)
+    # for static builds, projects must link against all Ogre dependencies themselves, so copy full include and lib dir
+    if (EXISTS ${PROJECT_DEP_DIR}/include/)
+      install(DIRECTORY ${PROJECT_DEP_DIR}/include/ DESTINATION include)
+    endif ()
+    
+    if (EXISTS ${PROJECT_DEP_DIR}/lib/)
+        install(DIRECTORY ${PROJECT_DEP_DIR}/lib/ DESTINATION lib)
+    endif ()
+  else ()  
+	if(WIN32 AND MINGW)    
+		install(FILES DESTINATION lib/debug CONFIGURATIONS Debug)
+		install(FILES DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+		install(FILES DESTINATION lib/release CONFIGURATIONS Release)
+		install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+	endif () # WIN32
+
+    if (EXISTS ${PROJECT_DEP_DIR}/bin/)
+        install(DIRECTORY ${PROJECT_DEP_DIR}/bin/ DESTINATION bin)
+    endif ()
+  endif ()
+endif () # PROJECT_INSTALL_DEPENDENCIES
+    
+  if(WIN32)
+    if(PROJECT_BUILD_SAMPLES OR PROJECT_BUILD_TESTS)
+      if(EXISTS "${SDL2_BINARY}")
+	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+	  file(COPY ${SDL2_BINARY} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+      endif()
+    endif()
+
+    if (PROJECT_BUILD_PLUGIN_CG)
+      # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+      if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+          install_debug(cg.dll)
+        else ()
+          install_release(cg.dll)
+        endif ()
+      else ()
+        install_debug(cg.dll)
+        install_release(cg.dll)
+      endif ()
+    endif () # PROJECT_BUILD_PLUGIN_CG
+
+    # install GLES2 dlls
+    if (PROJECT_BUILD_RENDERSYSTEM_GLES2)
+      install_debug(libGLESv2.dll)
+      install_release(libEGL.dll)
+    endif ()
+  endif () # WIN32
+
+if (PROJECT_COPY_DEPENDENCIES)
+
+  if (WIN32)
+    # copy the required DLLs to the build directory
+    file(GLOB DLLS ${PROJECT_DEP_DIR}/bin/*.dll)
+    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+    file(COPY ${DLLS} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+
+    if (PROJECT_BUILD_PLUGIN_CG)
+      if (EXISTS ${Cg_BINARY_DBG} AND EXISTS ${Cg_BINARY_REL})
+        # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+        if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+          if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            file(COPY ${Cg_BINARY_DBG} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+          else ()
+            file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+      			file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+      			file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+          endif ()
+        else ()
+            file(COPY ${Cg_BINARY_DBG} DESTINATION ${PROJECT_BINARY_DIR}/bin/debug)
+      		file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/release)
+      		file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/relwithdebinfo)
+      		file(COPY ${Cg_BINARY_REL} DESTINATION ${PROJECT_BINARY_DIR}/bin/minsizerel)
+        endif ()
+      endif()
+    endif()
+    
+    if (PROJECT_BUILD_RENDERSYSTEM_GLES2)	
+      copy_debug(libEGL.dll)
+      copy_debug(libGLESv2.dll)
+      copy_release(libEGL.dll)
+      copy_release(libGLESv2.dll)
+    endif ()
+  endif ()
+
+endif ()

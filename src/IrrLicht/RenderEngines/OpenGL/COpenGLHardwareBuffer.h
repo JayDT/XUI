@@ -12,26 +12,22 @@
 #include "COpenGLExtensionHandler.h"
 #include "irrArray.h"
 
+#include <vector>
+
 namespace irr
 {
     namespace video
     {
+        struct CGlslBufferDesc;
         struct IShaderDataBuffer;
         class COpenGLDriver;
-
-        struct OpenGLVERTEXELEMENT
-        {
-            WORD    Stream;     // Stream index
-            WORD    Offset;     // Offset in the stream in bytes
-            GLint   Type;       // Data type
-            GLint   Size;       // Data size
-            GLint   Usage;      // Semantics
-            BYTE    Normalized; // Normal Value
-        };
+        class COpenGLVertexDeclaration;
 
         class COpenGLHardwareBuffer : public IHardwareBuffer
         {
-            COpenGLHardwareBuffer(COpenGLDriver* driver, scene::IMeshBuffer *meshBuffer, video::IShaderDataBuffer* instanceBuffer, E_HARDWARE_BUFFER_TYPE type, E_HARDWARE_BUFFER_ACCESS accessType, u32 flags, core::array<OpenGLVERTEXELEMENT>& Desc);
+        public:
+            COpenGLHardwareBuffer(COpenGLDriver* driver, scene::IMeshBuffer *meshBuffer, video::IShaderDataBuffer* instanceBuffer, E_HARDWARE_BUFFER_TYPE type, E_HARDWARE_BUFFER_ACCESS accessType, u32 flags, COpenGLVertexDeclaration* Desc);
+            COpenGLHardwareBuffer(COpenGLDriver* driver, E_HARDWARE_BUFFER_TYPE type, E_HARDWARE_BUFFER_ACCESS accessType, u32 flags, CGlslBufferDesc& Desc);
 
             virtual ~COpenGLHardwareBuffer();
 
@@ -82,8 +78,16 @@ namespace irr
             //! Get flags
             virtual u32 getFlags() const;
 
-            // Methods for Direct3D 9 implementation
-        public:
+            GLuint getBufferResource(E_HARDWARE_BUFFER_TYPE type) const
+            {
+                if (VertexBufferStreams.size() <= (u32)type)
+                    return 0;
+
+                return VertexBufferStreams[(u32)type].buffer;
+            }
+            
+            GLuint GetVAO() const { return vba_verticesID; }
+
             //! Get vertex buffer
             GLuint getVertexBuffer(E_HARDWARE_BUFFER_TYPE type) const;
 
@@ -94,6 +98,8 @@ namespace irr
             virtual void Unbind();
             virtual void Initialize();
             virtual void Finalize();
+
+            bool IsBinded() { return Binded; }
 
         private:
             friend class COpenGLDriver;
@@ -117,12 +123,14 @@ namespace irr
             };
 
             void* Device;
-            core::array<BufferDesc> VertexBufferStreams;
-            core::array<OpenGLVERTEXELEMENT>& VertexDescription;
+            std::vector<BufferDesc> VertexBufferStreams;
             GLuint vba_verticesID;
+            COpenGLVertexDeclaration* VertexDeclaration;
+            CGlslBufferDesc*       UniformDeclaration;
 
             COpenGLDriver* Driver;
             u32 Flags;
+            bool Binded;
 
             void notifyOnDeviceLost();
             void notifyOnDeviceReset(COpenGLDriver* device);
@@ -132,45 +140,5 @@ namespace irr
     }
 }
 
-
-//struct SHWBufferLink_opengl : public IHardwareBuffer
-//{
-//    SHWBufferLink_opengl(const scene::IMeshBuffer *_MeshBuffer, COpenGLDriver* context) :
-//        IHardwareBuffer(_MeshBuffer),
-//        vba_verticesID(0), vbo_verticesID(0), vbo_indicesID(0), vbo_BoxVerticesID(0), vbo_BoxIndicesID(0),
-//        mContext(context)
-//    {
-//        memset(vbo_IDs, 0, sizeof(vbo_IDs));
-//        std::fill_n(vbo_StorageMode, (u32)EGVAT_MAX_VALUE, 1);
-//    }
-//
-//    virtual void Bind();
-//    virtual void Unbind();
-//
-//    virtual void Initialize();
-//    virtual void Finalize();
-//    virtual u32& GetVBOIdByAttributeType(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type)
-//    {
-//        return vbo_IDs[type];
-//    }
-//
-//    virtual u8& GetVBOStoreModeByAttributeType(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type)
-//    {
-//        return vbo_StorageMode[type];
-//    }
-//
-//    GLuint vba_verticesID;
-//    GLuint vbo_verticesID;
-//    GLuint vbo_indicesID;
-//    GLuint vbo_IDs[EGVAT_MAX_VALUE];
-//    u8 vbo_StorageMode[EGVAT_MAX_VALUE];
-//
-//    GLuint vba_BoxVerticesID;
-//    GLuint vbo_BoxVerticesID;
-//    GLuint vbo_BoxIndicesID;
-//
-//
-//    COpenGLDriver* mContext;
-//};
 #endif
 #endif

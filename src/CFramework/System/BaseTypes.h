@@ -78,6 +78,8 @@ namespace System
             return value;
         }
 
+        static uint Parse(const std::string& value, std::locale const& loc = std::locale());
+        static bool TryParse(const std::string& value, uint& result, std::locale const& loc = std::locale());
         std::string ToString() const override
         {
             return std::to_string(value);

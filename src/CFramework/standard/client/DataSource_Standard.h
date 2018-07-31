@@ -101,6 +101,7 @@ namespace System
             virtual unsigned long Seek(size_t offset, bool relative) override
             {
                 _stream.seekg(offset, int(relative ? std::ios_base::cur : std::ios_base::beg));
+                ASSERT(!_stream.fail());
                 return Position();
             }
 
@@ -108,6 +109,7 @@ namespace System
             {
                 DWORD readBytes = 0;
                 _stream.read(lpBuffer, size);
+                ASSERT(!_stream.fail());
                 return size;
             }
 

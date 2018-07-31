@@ -5,6 +5,7 @@
 
 #include "CD3D11Driver.h"
 #include "CD3D11HardwareBuffer.h"
+#include "CD3D11Shader.h"
 #include "os.h"
 
 using namespace irr;
@@ -12,9 +13,10 @@ using namespace video;
 
 CD3D11HardwareBuffer::CD3D11HardwareBuffer(CD3D11Driver* driver, scene::IMeshBuffer *meshBuffer, video::IShaderDataBuffer* instanceBuffer, u32 flags, E_VERTEX_TYPE vtype)
     : IHardwareBuffer(meshBuffer, instanceBuffer)
-    , Device(0)
-    , ImmediateContext(0)
-    , Driver(driver)
+    , D3D11DeviceResource(driver)
+    , Device(nullptr)
+    , ImmediateContext(nullptr)
+    , InputLayout(nullptr)
     , Flags(flags)
     , vType(vtype)
 {
@@ -26,12 +28,40 @@ CD3D11HardwareBuffer::CD3D11HardwareBuffer(CD3D11Driver* driver, scene::IMeshBuf
     SAFE_ADDREF(Device);
 
     Device->GetImmediateContext(&ImmediateContext);
+
+    // If has dedicate gpu program cache input layout
+    if (GetBuffer()->GetGPUProgram() && meshBuffer->GetVertexDeclaration())
+    {
+        InputLayout = static_cast<CD3D11VertexDeclaration*>(meshBuffer->GetVertexDeclaration())->getInputLayout(static_cast<irr::video::D3D11HLSLProgram*>(GetBuffer()->GetGPUProgram()));
+        ASSERT(InputLayout);
+        InputLayout->AddRef();
+    }
+}
+
+irr::video::CD3D11HardwareBuffer::CD3D11HardwareBuffer(CD3D11Driver * driver, E_HARDWARE_BUFFER_TYPE type, E_HARDWARE_BUFFER_ACCESS accessType, u32 size, u32 flags, const void * initialData)
+    : IHardwareBuffer(nullptr, nullptr)
+    , D3D11DeviceResource(driver)
+    , Device(nullptr)
+    , ImmediateContext(nullptr)
+    , InputLayout(nullptr)
+    , Flags(flags)
+{
+    Device = driver->getExposedVideoData().D3D11.D3DDev11;
+    SAFE_ADDREF(Device);
+
+    Device->GetImmediateContext(&ImmediateContext);
+
+    UpdateBuffer(type, accessType, initialData, size, 0);
 }
 
 CD3D11HardwareBuffer::~CD3D11HardwareBuffer()
 {
     // Remove from driver cache
     //Driver->removeHardwareBuffer(this);
+
+    if (InputLayout)
+        InputLayout->Release();
+    InputLayout = nullptr;
 
     for (u32 i = 0; i != VertexBufferStreams.size(); ++i)
     {
@@ -152,6 +182,14 @@ void CD3D11HardwareBuffer::unlock(E_HARDWARE_BUFFER_TYPE type)
     ImmediateContext->Unmap(desc.buffer, 0);
 }
 
+// Remarks
+// For a shader-constant buffer; set pDstBox to NULL. It is not possible to use this method to partially update a shader-constant buffer.
+// 
+// A resource cannot be used as a destination if:
+// 
+// the resource is created with immutable or dynamic usage.
+// the resource is created as a depth-stencil resource.
+// the resource is created with multisampling capability (see DXGI_SAMPLE_DESC).
 //! Copy data from system memory
 void CD3D11HardwareBuffer::copyFromMemory(E_HARDWARE_BUFFER_TYPE type, const void* sysData, u32 offset, u32 length)
 {
@@ -165,12 +203,13 @@ void CD3D11HardwareBuffer::copyFromMemory(E_HARDWARE_BUFFER_TYPE type, const voi
     
     if (desc.buffer)
     {
+        // 1D resource
     	D3D11_BOX box;
     	box.left = offset;
-    	box.top = 0;
-    	box.front = 0;
     	box.right = length;
+    	box.front = 0;
     	box.bottom = 1;
+    	box.top = 0;
     	box.back = 1;
     	ImmediateContext->UpdateSubresource(desc.buffer, 0, &box, sysData, 0, 0);
 
@@ -328,19 +367,20 @@ void BuildBufferDesc(D3D11_BUFFER_DESC& desc, E_HARDWARE_BUFFER_TYPE Type, E_HAR
 
 }
 
-u32 CD3D11HardwareBuffer::getVertexDeclarationStride(u32 inputSlot) const
+u32 CD3D11HardwareBuffer::getVertexDeclarationStride(u8 inputSlot) const
 {
-    core::array<D3D11_INPUT_ELEMENT_DESC> const& vDecl = ((ShaderHLSLD11*)GetBuffer()->GetGPUProgram())->GetVertexDeclartion();
-    u32 stride = 0;
-    for ( u32 i = 0; i != vDecl.size(); ++i )
-    {
-        if ( vDecl[i].InputSlot == inputSlot )
-            stride += Driver->getBitsPerPixel(vDecl[i].Format) / 8;
-    }
-    return stride;
+    return static_cast<CD3D11VertexDeclaration*>(GetBuffer()->GetVertexDeclaration())->GetVertexPitch(inputSlot);
 }
 
-bool CD3D11HardwareBuffer::UpdateBuffer(E_HARDWARE_BUFFER_TYPE Type, E_HARDWARE_BUFFER_ACCESS AccessType, const void* initialData, u32 size)
+void irr::video::CD3D11HardwareBuffer::OnDeviceLost(CD3D11Driver * device)
+{
+}
+
+void irr::video::CD3D11HardwareBuffer::OnDeviceRestored(CD3D11Driver * device)
+{
+}
+
+bool CD3D11HardwareBuffer::UpdateBuffer(E_HARDWARE_BUFFER_TYPE Type, E_HARDWARE_BUFFER_ACCESS AccessType, const void* initialData, u32 size, u32 offset /*= 0*/, u32 endoffset /*= 0*/)
 {
     if ( !size )
         return false;
@@ -348,11 +388,7 @@ bool CD3D11HardwareBuffer::UpdateBuffer(E_HARDWARE_BUFFER_TYPE Type, E_HARDWARE_
     HRESULT hr = S_OK;
 
     if (VertexBufferStreams.size() <= (int)Type)
-    {
         VertexBufferStreams.resize(int(Type) + 1);
-        //for (s32 i = 0; i <= (((s32)Type - (s32)VertexBufferStreams.size()) + 1); ++i)
-        //    VertexBufferStreams.push_back(CD3D11HardwareBuffer::BufferDesc());
-    }
 
     CD3D11HardwareBuffer::BufferDesc& desc = VertexBufferStreams[(u32)Type];
 
@@ -380,14 +416,24 @@ bool CD3D11HardwareBuffer::UpdateBuffer(E_HARDWARE_BUFFER_TYPE Type, E_HARDWARE_
             desc.Type = Type;
         }
     }
+    else if (Type == E_HARDWARE_BUFFER_TYPE::EHBT_CONSTANTS)
+    {
+        if (!desc.initialize)
+        {
+            desc.Size = 0;
+            desc.Stride = size;
+            desc.initialize = true;
+            desc.Type = Type;
+        }
+    }
     else
     {
         os::Printer::log("Buffer type not supported", ELL_ERROR);
         return false;
     }
 
-    if ((AccessType != E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC && desc.AccessType == E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC) || (desc.AccessType != E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC && desc.Size && desc.buffer))
-        AccessType = E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC;
+    //if ((AccessType != E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC && desc.AccessType == E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC) || (desc.AccessType != E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC && desc.Size && desc.buffer))
+    //    AccessType = E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC;
 
     if ( desc.Size < size || desc.AccessType != AccessType )
     {
@@ -469,10 +515,33 @@ bool CD3D11HardwareBuffer::UpdateBuffer(E_HARDWARE_BUFFER_TYPE Type, E_HARDWARE_
     }
     else if ( initialData ) // Copy initial data to buffer
     {
-        void* ptr = this->lock(Type, size);
-        ::memcpy(ptr, initialData, size);
-        this->unlock(Type);
-        desc.Element = (size / desc.Stride);
+        if (AccessType == E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC || desc.UseTempStagingBuffer)
+        {
+            void* ptr = this->lock(Type, size);
+            ::CopyMemory(ptr, initialData, size);
+            this->unlock(Type);
+        }
+        else
+        {
+            CD3D11HardwareBuffer::BufferDesc& desc = VertexBufferStreams[(u32)Type];
+            if (endoffset != 0 && Type != E_HARDWARE_BUFFER_TYPE::EHBT_CONSTANTS)
+            {
+                D3D11_BOX box;
+                box.left = offset;
+                box.right = endoffset;
+                box.front = 0;
+                box.bottom = 1;
+                box.top = 0;
+                box.back = 1;
+
+                ImmediateContext->UpdateSubresource(desc.buffer, 0, &box, initialData, 0, 0);
+            }
+            else
+                ImmediateContext->UpdateSubresource(desc.buffer, 0, nullptr, initialData, 0, 0);
+        }
+
+        if (desc.Stride)
+            desc.Element = (size / desc.Stride);
     }
 
     return true;

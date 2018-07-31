@@ -47,12 +47,23 @@ namespace video
 		primitives. */
 		EDT_DIRECT3D9,
 
+        //! Direct3D 1[1,2] device, only available on Win32 platforms.
+        /** Performs hardware accelerated rendering of 3D and 2D
+        primitives. */
         EDT_DIRECT3D11,
 
 		//! OpenGL device, available on most platforms.
 		/** Performs hardware accelerated rendering of 3D and 2D
 		primitives. */
 		EDT_OPENGL,
+
+        //! Vulkan device, available on most platforms.
+        /** Performs hardware accelerated low overhead rendering of 3D and 2D
+        primitives. */
+        EDT_VULKAN,
+
+        // macos wonder not implement yet (i'll after has debug platform)
+        EDT_METAL,
 
 		//! No driver, just for counting the elements
 		EDT_COUNT

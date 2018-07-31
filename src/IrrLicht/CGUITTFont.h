@@ -155,7 +155,7 @@ namespace gui
 			{
                 if (!dirty) return;
 
-                void* ptr = texture->lock();
+                void* ptr = texture->lock(irr::video::E_TEXTURE_LOCK_MODE::ETLM_WRITE_ONLY);
                 video::ECOLOR_FORMAT format = texture->getColorFormat();
                 core::dimension2du size = texture->getOriginalSize();
                 video::IImage* pageholder = driver->createImageFromData(format, size, ptr, true, false);

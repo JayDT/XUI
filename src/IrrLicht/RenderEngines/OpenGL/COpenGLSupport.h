@@ -31,6 +31,7 @@ THE SOFTWARE.
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #include <string>
 
+#define GLEW_STATIC 1
 
 #if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 #define GL_GLEXT_LEGACY 1

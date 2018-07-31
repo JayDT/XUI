@@ -46,6 +46,7 @@ namespace System::Resource
         ResourceOptions _options;
         ResourceCompiler _compiler;
         ResourceTypes _resourceType = ResourceTypes::RAW;
+        std::list<ResourceBuilder*> _group;
 
         std::string _name;
 
@@ -57,6 +58,13 @@ namespace System::Resource
         void Compile();
         void GenerateFile();
         static void Generate();
+
+        void AddToGroup(ResourceBuilder* child)
+        {
+            _group.push_back(child);
+        }
+
+        std::list<ResourceBuilder*>& GetGroupElements() { return _group; }
     };
 }
 

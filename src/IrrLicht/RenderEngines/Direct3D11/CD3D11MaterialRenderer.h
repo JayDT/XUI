@@ -86,6 +86,8 @@ public:
 		return DirectX::XMVectorSet(r,g,b,a);
 	}
 
+    CD3D11Driver* GetDriver() { return Driver; }
+
 protected:
 	// DX 11 objects
 	ID3D11Device* Device;
@@ -95,7 +97,7 @@ protected:
 	CD3D11Driver* Driver;
 	CD3D11MaterialRenderer* BaseRenderer;
 
-	SMaterial CurrentMaterial;
+	//SMaterial CurrentMaterial;
 };
 
 }

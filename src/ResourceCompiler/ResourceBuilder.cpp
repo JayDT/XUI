@@ -30,6 +30,8 @@
 
 const char* kVersion = "0.0.1a";
 
+void ConvertFileName(std::string const& _filename, std::string& resourcefile);
+
 namespace MustacheExt
 {
     void FatalError(const std::string &error);
@@ -56,6 +58,7 @@ System::Resource::ResourceBuilder::ResourceBuilder(ResourceOptions options, std:
     : _options(options)
 {
     _options.inputSourceFile = sourcefile;
+    AddToGroup(this);
 }
 
 void System::Resource::ResourceBuilder::Parse(const boost::program_options::variables_map & cmdLine)
@@ -86,6 +89,7 @@ void System::Resource::ResourceBuilder::Parse(const boost::program_options::vari
 
     std::ifstream includesFile(cmdLine.at(kSwitchInputSource).as<std::string>());
 
+    std::map<std::string, ResourceBuilder*> GroupsResults;
     std::list<std::string> resource_files;
     std::string sourcefile;
     while (std::getline(includesFile, sourcefile))
@@ -93,15 +97,30 @@ void System::Resource::ResourceBuilder::Parse(const boost::program_options::vari
 
     for (std::string const& sourcefile : resource_files)
     {
-        ResourceBuilder* builder = new ResourceBuilder(options, sourcefile);
-        _activeTasks.push(builder);
+        //boost::filesystem::path srcfn(sourcefile.c_str());
+
+        std::string resultFile;
+        ConvertFileName(sourcefile, resultFile);
+
+        // ToDo: rewrite this. Implement resource types
+        ResourceBuilder*& groupParent = GroupsResults[resultFile];
+        if (!groupParent)
+        {
+            groupParent = new ResourceBuilder(options, sourcefile);
+            _activeTasks.push(groupParent);
+        }
+        else
+        {
+            groupParent->AddToGroup(new ResourceBuilder(options, sourcefile));
+        }
     }
 
     //NOTE: can be async after
     ResourceBuilder* builder;
     while (_activeTasks.pop(builder))
     {
-        builder->Compile();
+        for (ResourceBuilder* element : builder->GetGroupElements())
+            element->Compile();
         _resultTasks.push(builder);
     }
 
@@ -134,6 +153,16 @@ void System::Resource::ResourceBuilder::Compile()
     delete resourceFile;
 
     _compiler.Compile(_resourceType);
+}
+
+void ConvertFileName(std::string const& _filename, std::string& resourcefile)
+{
+    System::String normalizedFn = _filename;
+    boost::filesystem::path filePath(normalizedFn.Replace('/', '\\').ToLowerFirst().c_str());
+
+    auto fn = filePath.filename();
+    auto filename = std::wstring(L"Resource_") + fn.c_str();
+    resourcefile = MustacheExt::change_extension(boost::filesystem::path(filename), ".cpp").string();
 }
 
 void ConvertFileToResourceFile(boost::filesystem::path const& sourceRootDirectory, boost::filesystem::path const& outputFileDirectory, std::string const& _filename, std::string& resourcefile)
@@ -174,18 +203,18 @@ void System::Resource::ResourceBuilder::GenerateFile()
     sourceData["version"] = kVersion;
     sourceData["moduleFileName"] = _name;
 
-    // ToDo: store multiple resource on one module file
+    for (ResourceBuilder* element : _group)
     {
         Mustache::Data<std::string> resourceData{ Mustache::Data<std::string>::Type::Object };
         Mustache::Data<std::string> binaryData{ Mustache::Data<std::string>::Type::List };
 
-        resourceData["name"] = _options.inputSourceFile;
-        for (size_t id = 0; id < _compiler.m_output.size(); ++id)
+        resourceData["name"] = element->_options.inputSourceFile;
+        for (size_t id = 0; id < element->_compiler.m_output.size(); ++id)
         {
             std::string binary;
-            for (size_t bi = 0; bi < _compiler.m_output[id]->size(); ++bi)
+            for (size_t bi = 0; bi < element->_compiler.m_output[id]->size(); ++bi)
             {
-                binary += System::String::format("0x%X, ", _compiler.m_output[id]->at(bi));
+                binary += System::String::format("0x%X, ", element->_compiler.m_output[id]->at(bi));
             }
 
             if (binary.empty())
@@ -196,19 +225,19 @@ void System::Resource::ResourceBuilder::GenerateFile()
 
             Mustache::Data<std::string> rowData{ Mustache::Data<std::string>::Type::Object };
             rowData["id"] = std::to_string(id);
-            rowData["size"] = std::to_string(_compiler.m_output[id]->size());
-            rowData["total_size"] = std::to_string(_compiler.m_input[id]->size());
+            rowData["size"] = std::to_string(element->_compiler.m_output[id]->size());
+            rowData["total_size"] = std::to_string(element->_compiler.m_input[id]->size());
 
-            delete _compiler.m_output[id];
-            delete _compiler.m_input[id];
+            delete element->_compiler.m_output[id];
+            delete element->_compiler.m_input[id];
 
             rowData["binary"] = binary;
 
             binaryData << rowData;
         }
 
-        _compiler.m_output.clear();
-        _compiler.m_input.clear();
+        element->_compiler.m_output.clear();
+        element->_compiler.m_input.clear();
 
         resourceData["data"] = binaryData;
 
@@ -217,6 +246,7 @@ void System::Resource::ResourceBuilder::GenerateFile()
 
     sourceData["resource"] = resourceList;
 
+    /// -----------------------------------------
     std::string sourceFile;
     ConvertFileToResourceFile(sourceRootDirectory, outputFileDirectory, _options.sourceRoot + "/" + _options.inputSourceFile, sourceFile);
 

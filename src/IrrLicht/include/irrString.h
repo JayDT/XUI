@@ -1300,7 +1300,7 @@ public:
 		if (!c)
 			return 0;
 
-		const u32 oldSize=ret.size();
+		const u32 oldSize= (irr::u32)ret.size();
 		u32 lastpos = 0;
 		bool lastWasSeparator = false;
 		for (u32 i=0; i<used; ++i)
@@ -1322,7 +1322,7 @@ public:
 		}
 		if ((used - 1) > lastpos)
 			ret.push_back(string<T,TAlloc>(&array[lastpos], (used - 1) - lastpos));
-		return ret.size()-oldSize;
+		return u32(ret.size())-oldSize;
 	}
 
 private:

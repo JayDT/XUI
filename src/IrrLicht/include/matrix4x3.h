@@ -137,7 +137,12 @@ namespace irr
                 return m3;
             }
 
-
+            void setScale(const vector3df& scale)
+            {
+                elt[0][0] = scale.X;
+                elt[1][1] = scale.Y;
+                elt[2][2] = scale.Z;
+            }
 
             //! multiply by another matrix
             //inline matrix4x3 matrix4x3::operator*(matrix4x3 const& _m2) const

@@ -51,6 +51,19 @@ namespace video
 		EBO_MAX_ALPHA	//!< Choose maximum value of each color channel based on alpha value, not widely supported
 	};
 
+    /**	Types of action that can happen on the stencil buffer. */
+    enum E_STENCIL_OPERATION
+    {
+        ESO_KEEP,           //!< Leave the stencil buffer unchanged.
+        ESO_ZERO,           //!< Set the stencil value to zero.
+        ESO_REPLACE,        //!< Replace the stencil value with the reference value.
+        ESO_INCREMENT,      //!< Increase the stencil value by 1, clamping at the maximum value.
+        ESO_DECREMENT,      //!< Decrease the stencil value by 1, clamping at 0.
+        ESO_INCREMENT_WRAP, //!< Increase the stencil value by 1, wrapping back to 0 when incrementing past the maximum value.
+        ESO_DECREMENT_WRAP, //!< Decrease the stencil value by 1, wrapping when decrementing 0.
+        ESO_INVERT          //!< Invert the bits of the stencil buffer.
+    };
+
 	//! MaterialTypeParam: e.g. DirectX: D3DTOP_MODULATE, D3DTOP_MODULATE2X, D3DTOP_MODULATE4X
 	enum E_MODULATE_FUNC
 	{
@@ -114,20 +127,20 @@ namespace video
 
 	//! EMT_ONETEXTURE_BLEND: pack srcFact, dstFact, Modulate and alpha source to MaterialTypeParam
 	/** alpha source can be an OR'ed combination of E_ALPHA_SOURCE values. */
-	inline f32 pack_textureBlendFunc ( const E_BLEND_FACTOR srcFact, const E_BLEND_FACTOR dstFact, const E_MODULATE_FUNC modulate=EMFN_MODULATE_1X, const u32 alphaSource=EAS_TEXTURE, const E_BLEND_FACTOR srcFactAlpha = EBF_ZERO, const E_BLEND_FACTOR dstFactAlpha = EBF_ZERO, const E_BLEND_OPERATION blendOp = EBO_ADD, const E_BLEND_OPERATION blendOpAlpha = EBO_ADD)
+	inline u32 pack_textureBlendFunc ( const E_BLEND_FACTOR srcFact, const E_BLEND_FACTOR dstFact, const E_MODULATE_FUNC modulate=EMFN_MODULATE_1X, const u32 alphaSource=EAS_TEXTURE, const E_BLEND_FACTOR srcFactAlpha = EBF_ZERO, const E_BLEND_FACTOR dstFactAlpha = EBF_ZERO, const E_BLEND_OPERATION blendOp = EBO_ADD, const E_BLEND_OPERATION blendOpAlpha = EBO_ADD)
 	{
 		const u32 tmp = ((blendOpAlpha & 0xF) << 28) | ((blendOp & 0xF) << 24) | ((srcFactAlpha & 0xF) << 20) | (dstFactAlpha << 16) | (alphaSource << 12) | (modulate << 8) | (srcFact << 4) | dstFact;
-		return FR(tmp);
+		return tmp;
 	}
 
 	//! EMT_ONETEXTURE_BLEND: unpack srcFact & dstFact and Modulo to MaterialTypeParam
 	/** The fields don't use the full byte range, so we could pack even more... */
 	inline void unpack_textureBlendFunc ( E_BLEND_FACTOR &srcFact, E_BLEND_FACTOR &dstFact,
-			E_MODULATE_FUNC &modulo, u32& alphaSource, const f32 param, 
+			E_MODULATE_FUNC &modulo, u32& alphaSource, const u32 param, 
 		E_BLEND_FACTOR* srcFactAlpha = nullptr, E_BLEND_FACTOR* dstFactAlpha = nullptr,
 		E_BLEND_OPERATION* blendOp = nullptr, E_BLEND_OPERATION* blendOpAlpha = nullptr)
 	{
-		const u32 state = IR(param);
+		const u32 state = param;
 		if (blendOpAlpha)
 			*blendOpAlpha = E_BLEND_OPERATION((state & 0xF0000000) >> 28);
 		if (blendOp)
@@ -254,7 +267,7 @@ namespace video
             PolygonOffsetFactor(0), PolygonOffsetDirection(EPO_FRONT), BlendId(0),
 			Wireframe(false), PointCloud(false), GouraudShading(true),
 			Lighting(true), ZWriteEnable(true), BackfaceCulling(true), FrontfaceCulling(false),
-			FogEnable(false), NormalizeNormals(false), UseMipMaps(true)
+			FogEnable(false), NormalizeNormals(false), UseMipMaps(true), DepthClipEnable(true)
 		{ 
             VertexShaderId = -1;
             PixelShaderId = -1;
@@ -288,8 +301,8 @@ namespace video
 			EmissiveColor = other.EmissiveColor;
 			SpecularColor = other.SpecularColor;
 			Shininess = other.Shininess;
-			MaterialTypeParam = other.MaterialTypeParam;
-			MaterialTypeParam2 = other.MaterialTypeParam2;
+			uMaterialTypeParam = other.uMaterialTypeParam;
+			uMaterialTypeParam2 = other.uMaterialTypeParam2;
 			Thickness = other.Thickness;
 			for (u32 i=0; i<MATERIAL_MAX_TEXTURES; ++i)
 			{
@@ -313,6 +326,7 @@ namespace video
 			PolygonOffsetFactor = other.PolygonOffsetFactor;
 			PolygonOffsetDirection = other.PolygonOffsetDirection;
 			UseMipMaps = other.UseMipMaps;
+            DepthClipEnable = other.DepthClipEnable;
             VertexShaderId = other.VertexShaderId;
             PixelShaderId = other.PixelShaderId;
             AnimateColor = other.AnimateColor;
@@ -386,11 +400,19 @@ namespace video
 		//! Free parameter, dependent on the material type.
 		/** Mostly ignored, used for example in EMT_PARALLAX_MAP_SOLID
 		and EMT_TRANSPARENT_ALPHA_CHANNEL. */
-		f32 MaterialTypeParam;
+        union
+        {
+            u32 uMaterialTypeParam;
+            f32 MaterialTypeParam;
+        };
 
 		//! Second free parameter, dependent on the material type.
 		/** Mostly ignored. */
-		f32 MaterialTypeParam2;
+        union
+        {
+            u32 uMaterialTypeParam2;
+            f32 MaterialTypeParam2;
+        };
 
 		//! Thickness of non-3dimensional elements such as lines and points.
 		f32 Thickness;
@@ -471,6 +493,9 @@ namespace video
 		//! Shall mipmaps be used if available
 		/** Sometimes, disabling mipmap usage can be useful. Default: true */
 		bool UseMipMaps:1;
+
+        //Enable clipping based on distance.
+        bool DepthClipEnable : 1;
 
 		//! Gets the texture transformation matrix for level i
 		/** \param i The desired level. Must not be larger than MATERIAL_MAX_TEXTURES.
@@ -670,8 +695,8 @@ namespace video
 				EmissiveColor != b.EmissiveColor ||
 				SpecularColor != b.SpecularColor ||
 				Shininess != b.Shininess ||
-				MaterialTypeParam != b.MaterialTypeParam ||
-				MaterialTypeParam2 != b.MaterialTypeParam2 ||
+				uMaterialTypeParam != b.uMaterialTypeParam ||
+				uMaterialTypeParam2 != b.uMaterialTypeParam2 ||
 				Thickness != b.Thickness ||
 				Wireframe != b.Wireframe ||
 				PointCloud != b.PointCloud ||
@@ -708,7 +733,8 @@ namespace video
 			return MaterialType==EMT_TRANSPARENT_ADD_COLOR ||
 				MaterialType==EMT_TRANSPARENT_ALPHA_CHANNEL ||
 				MaterialType==EMT_TRANSPARENT_VERTEX_ALPHA ||
-				MaterialType==EMT_TRANSPARENT_REFLECTION_2_LAYER;
+				MaterialType==EMT_TRANSPARENT_REFLECTION_2_LAYER ||
+                (MaterialType ==EMT_ONETEXTURE_BLEND && BlendOperation!=E_BLEND_OPERATION::EBO_NONE);
 		}
 	};
 

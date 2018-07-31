@@ -112,9 +112,7 @@ void SceneNode::UpdateTransformation(Media::Matrix const& contextTransform, Core
 
     //if (m_isVisible && Opacity > 0)
     {
-        auto m = Core::Media::Matrix::CreateTranslation(m_owner->Bounds.x0(), m_owner->Bounds.y0(), 0.0f);
-
-        auto renderTransform = Core::Media::Matrix::Identity();
+        RelativeTransformation = Core::Media::Matrix::Identity();
 
         auto visualTransform = m_owner->RenderTransform;
         if (visualTransform != nullptr)
@@ -124,10 +122,12 @@ void SceneNode::UpdateTransformation(Media::Matrix const& contextTransform, Core
             auto transform = Core::Media::Matrix::ToMat3x2(visualTransform->GetTransform());
             auto offset2 = Core::Media::Matrix::CreateTranslation(-origin.x, -origin.y);
 
-            renderTransform = Core::Media::Matrix::From(offset2 * visualTransform->GetTransform() * offset);
+            RelativeTransformation = Core::Media::Matrix::From(offset2 * visualTransform->GetTransform() * offset);
         }
 
-        RelativeTransformation = renderTransform * m;
+        RelativeTransformation[3][0] += m_owner->Bounds.x0();
+        RelativeTransformation[3][1] += m_owner->Bounds.y0();
+
         AbsoluteTransformation = Core::Media::Matrix(contextTransform * RelativeTransformation);
 
         m_owner->_transformedBounds = ClipRect = availableSize.intersect(Bounds * AbsoluteTransformation);

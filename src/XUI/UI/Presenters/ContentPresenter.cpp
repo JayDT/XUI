@@ -307,7 +307,7 @@ XUI::UI::Controls::Control* XUI::UI::Presenters::ContentPresenter::CreateChild()
                 if (m_dataTemplateRoot)
                     newChild = m_dataTemplateRoot->Static_As<Controls::Control>();
             }
-            else
+            else if (content.toPointer())
             {
                 ApplyBuildInTemplate(content);
                 newChild = Child.get();

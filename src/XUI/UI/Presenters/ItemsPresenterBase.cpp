@@ -93,7 +93,7 @@ void ItemsPresenterBase::SetItems(System::Collection::Generic::IContainer* value
     if (_createdPanel)
     {
         System::Collection::NotifyCollectionChangedEventArgs e;
-        e.Action = System::Collection::NotifyCollectionChangedAction::Reset;
+        e.Action = System::Collection::NotifyCollectionChangedAction::Init;
         ItemsChanged(e);
     }
 }
@@ -244,7 +244,7 @@ void ItemsPresenterBase::CreatePanel()
     PanelCreated(Panel.get());
 
     System::Collection::NotifyCollectionChangedEventArgs e;
-    e.Action = System::Collection::NotifyCollectionChangedAction::Reset;
+    e.Action = System::Collection::NotifyCollectionChangedAction::Init;
     ItemsChanged(e);
 }
 

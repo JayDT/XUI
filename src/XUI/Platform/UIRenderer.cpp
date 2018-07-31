@@ -187,7 +187,7 @@ bool XUI::Platform::UIRender::ExecuteScenePass()
 
 void XUI::Platform::UIRender::ExecuteLayoutPass()
 {
-    while (true)
+    for (int i = 0; i < 10; ++i)
     {
         if (ExecuteMeasurePass())
             if (ExecuteArrangePass())

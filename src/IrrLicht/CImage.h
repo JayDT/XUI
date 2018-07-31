@@ -32,78 +32,90 @@ public:
 	//! destructor
 	virtual ~CImage();
 
+    virtual void initializeMipLevels(u8 levelCount, core::dimension2d<u32>* sizes) override;
+    virtual void initializeMipLevels(u8 levelCount, core::dimension2d<u32>* sizes, u32* dataSizes) override;
+
 	//! Lock function.
-	virtual void* lock()
+	virtual void* lock(u8 miplevel = 0) override
 	{
-		return Data;
+        u8* pData = miplevel ? Levels && miplevel <= LevelCount ? Levels[miplevel - 1].Data : nullptr : Data;
+        return pData;
 	}
 
 	//! Unlock function.
-	virtual void unlock() {}
+	virtual void unlock() override {}
 
 	//! Returns width and height of image data.
-	virtual const core::dimension2d<u32>& getDimension() const;
+	virtual const core::dimension2d<u32>& getDimension() const override;
 
 	//! Returns bits per pixel.
-	virtual f32 getBitsPerPixel() const;
+	virtual f32 getBitsPerPixel() const override;
 
 	//! Returns bytes per pixel
-	virtual f32 getBytesPerPixel() const;
+	virtual f32 getBytesPerPixel() const override;
 
 	//! Returns image data size in bytes
-	virtual u32 getImageDataSizeInBytes() const;
+	virtual u32 getImageDataSizeInBytes(u8 miplevel = 0) const override;
+
+    virtual u32 getMemorySize() const override;
 
 	//! Returns image data size in pixels
-	virtual u32 getImageDataSizeInPixels() const;
+	virtual u32 getImageDataSizeInPixels() const override;
 
 	//! returns mask for red value of a pixel
-	virtual u32 getRedMask() const;
+	virtual u32 getRedMask() const override;
 
 	//! returns mask for green value of a pixel
-	virtual u32 getGreenMask() const;
+	virtual u32 getGreenMask() const override;
 
 	//! returns mask for blue value of a pixel
-	virtual u32 getBlueMask() const;
+	virtual u32 getBlueMask() const override;
 
 	//! returns mask for alpha value of a pixel
-	virtual u32 getAlphaMask() const;
+	virtual u32 getAlphaMask() const override;
 
 	//! returns a pixel
-	virtual SColor getPixel(u32 x, u32 y) const;
+	virtual SColor getPixel(u32 x, u32 y, u8 miplevel = 0) const override;
 
 	//! sets a pixel
-	virtual void setPixel(u32 x, u32 y, const SColor &color, bool blend = false );
+	virtual void setPixel(u32 x, u32 y, const SColor &color, bool blend = false, u8 miplevel = 0) override;
 
 	//! returns the color format
-	virtual ECOLOR_FORMAT getColorFormat() const;
+	virtual ECOLOR_FORMAT getColorFormat() const override;
 
 	//! returns pitch of image
-	virtual u32 getPitch() const { return Pitch; }
+	virtual u32 getPitch() const override { return Pitch; }
 
 	//! copies this surface into another, scaling it to fit.
-	virtual void copyToScaling(void* target, u32 width, u32 height, ECOLOR_FORMAT format, u32 pitch=0);
+	virtual void copyToScaling(void* target, u32 width, u32 height, ECOLOR_FORMAT format, u32 pitch=0) override;
 
 	//! copies this surface into another, scaling it to fit.
-	virtual void copyToScaling(IImage* target);
+	virtual void copyToScaling(IImage* target) override;
 
 	//! copies this surface into another
-	virtual void copyTo(IImage* target, const core::position2d<s32>& pos=core::position2d<s32>(0,0));
+	virtual void copyTo(IImage* target, const core::position2d<s32>& pos=core::position2d<s32>(0,0)) override;
 
 	//! copies this surface into another
-	virtual void copyTo(IImage* target, const core::position2d<s32>& pos, const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect=0);
+	virtual void copyTo(IImage* target, const core::position2d<s32>& pos, const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect=0) override;
 
 	//! copies this surface into another, using the alpha mask, an cliprect and a color to add with
 	virtual void copyToWithAlpha(IImage* target, const core::position2d<s32>& pos,
 			const core::rect<s32>& sourceRect, const SColor &color,
-			const core::rect<s32>* clipRect = 0);
+			const core::rect<s32>* clipRect = 0) override;
 
 	//! copies this surface into another, scaling it to fit, appyling a box filter
-	virtual void copyToScalingBoxFilter(IImage* target, s32 bias = 0, bool blend = false);
+	virtual void copyToScalingBoxFilter(IImage* target, s32 bias = 0, bool blend = false) override;
          
 	//! fills the surface with given color
-	virtual void fill(const SColor &color);
+	virtual void fill(const SColor &color) override;
 
-    virtual u8* GetData() { return Data; }
+    virtual u8* GetData(u8 miplevel = 0) override
+    {
+        u8* pData = miplevel ? Levels && miplevel <= LevelCount ? Levels[miplevel - 1].Data : nullptr : Data;
+        return pData;
+    }
+
+    virtual u8 GetMipLevelCount() const override { return LevelCount; }
 
 private:
 
@@ -112,11 +124,20 @@ private:
 
 	inline SColor getPixelBox ( s32 x, s32 y, s32 fx, s32 fy, s32 bias ) const;
 
+    struct MipLevel
+    {
+        u8* Data;
+        u32 DataSize;
+        core::dimension2d<u32> Size;
+    };
+
 	u8* Data;
 	core::dimension2d<u32> Size;
 	f32 BytesPerPixel;
 	u32 Pitch;
 	ECOLOR_FORMAT Format;
+    MipLevel* Levels;
+    u32 LevelCount;
 
 	bool DeleteMemory;
 };

@@ -50,7 +50,7 @@ void LayoutAnchorableFloatingWindowControl::OnSingleContentLayoutItemChanged(Cor
 
 void LayoutAnchorableFloatingWindowControl::OnWindowInitialized()
 {
-    LayoutFloatingWindowControl::OnInitialized();
+    LayoutFloatingWindowControl::OnWindowInitialized();
 
     auto manager = Model->Root->GetManager();
 

@@ -30,7 +30,7 @@ list(APPEND MODUL_LINK_LIBS
    boost
    MetaRuntime
    ${LIBCLANG_LIBRARY}
-   ${ZLIB_LIBRARIES}
+   ZLIB
  )
 
 # disable security warnings

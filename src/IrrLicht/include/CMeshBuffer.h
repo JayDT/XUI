@@ -18,7 +18,7 @@ namespace scene
 	{
 	public:
 		//! Default constructor for empty meshbuffer
-		CMeshBuffer():ChangedID_Vertex(1),ChangedID_Index(1),MappingHint_Vertex(EHM_NEVER), MappingHint_Index(EHM_NEVER)
+		CMeshBuffer():ChangedID_Vertex(1),ChangedID_Index(1),MappingHint_Vertex(EHM_NEVER), MappingHint_Index(EHM_NEVER), MappingHint_Instance(EHM_NEVER)
 		{
 			#ifdef _DEBUG
 			setDebugName("SMeshBuffer");
@@ -251,6 +251,12 @@ namespace scene
 			return MappingHint_Index;
 		}
 
+        //! get the current hardware mapping hint
+        virtual E_HARDWARE_MAPPING getHardwareMappingHint_Instance() const
+        {
+            return MappingHint_Instance;
+        }
+
 		//! set the hardware mapping hint, for driver
 		virtual void setHardwareMappingHint( E_HARDWARE_MAPPING NewMappingHint, E_BUFFER_TYPE Buffer=EBT_VERTEX_AND_INDEX )
 		{
@@ -258,7 +264,9 @@ namespace scene
 				MappingHint_Vertex=NewMappingHint;
 			if (Buffer==EBT_VERTEX_AND_INDEX || Buffer==EBT_INDEX)
 				MappingHint_Index=NewMappingHint;
-		}
+            if (Buffer == EBT_INSTANCE)
+                MappingHint_Instance = NewMappingHint;
+        }
 
 
 		//! flags the mesh as changed, reloads hardware buffers
@@ -282,8 +290,9 @@ namespace scene
 		u32 ChangedID_Index;
 
 		//! hardware mapping hint
-		E_HARDWARE_MAPPING MappingHint_Vertex;
-		E_HARDWARE_MAPPING MappingHint_Index;
+		E_HARDWARE_MAPPING MappingHint_Vertex : 4;
+		E_HARDWARE_MAPPING MappingHint_Index : 4;
+        E_HARDWARE_MAPPING MappingHint_Instance : 4;
 
 		//! Material for this meshbuffer.
 		video::SMaterial Material;

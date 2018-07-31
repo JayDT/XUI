@@ -9,6 +9,7 @@ IF (LibXamlCPPSharedLinkage)
     SET(MODUL_LINKAGE "SHARED")
 
     list(APPEND MODUL_LINK_LIBS
+    PRIVATE
        boost
      )
     

@@ -24,7 +24,7 @@ namespace irr
 
     namespace video
     {
-        enum E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE;
+        enum E_VERTEX_ELEMENT_SEMANTIC : irr::u8;
         struct IShaderDataBuffer;
 
         enum class E_HARDWARE_BUFFER_TYPE : u32
@@ -155,13 +155,13 @@ namespace irr
             virtual void Initialize() {}
             virtual void Finalize() {}
 
-            virtual u32& GetVBOIdByAttributeType(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type)
+            virtual u32& GetVBOIdByAttributeType(E_VERTEX_ELEMENT_SEMANTIC type)
             {
                 static u32 empty = 0;
                 return empty;
             }
             
-            virtual u8& GetVBOStoreModeByAttributeType(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type)
+            virtual u8& GetVBOStoreModeByAttributeType(E_VERTEX_ELEMENT_SEMANTIC type)
             {
                 static u8 empty = 1;
                 return empty;
@@ -185,87 +185,5 @@ namespace irr
 
     }
 }
-
-
-//struct IRRLICHT_API SHWBufferLink
-//{
-//    SHWBufferLink(const scene::IMeshBuffer *_MeshBuffer)
-//        :MeshBuffer(_MeshBuffer), m_instanceBuffer(nullptr), ChangedID_Vertex(0), ChangedID_Index(0), m_manualBind(false), m_binded(false)
-//    {
-//        if (MeshBuffer)
-//            MeshBuffer->grab();
-//    }
-//
-//    virtual ~SHWBufferLink()
-//    {
-//        if (MeshBuffer)
-//            MeshBuffer->drop();
-//    }
-//
-//    virtual void Bind()
-//    {
-//        m_binded = true;
-//    }
-//
-//    virtual void Unbind()
-//    {
-//        m_binded = false;
-//    }
-//
-//    virtual void Initialize() {}
-//    virtual void Finalize() {}
-//    virtual u32& GetVBOIdByAttributeType(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type)
-//    {
-//        static u32 empty = 0;
-//        return empty;
-//    }
-//
-//    virtual u8& GetVBOStoreModeByAttributeType(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type)
-//    {
-//        static u8 empty = 1;
-//        return empty;
-//    }
-//
-//    const scene::IMeshBuffer * GetBuffer() const { return MeshBuffer; }
-//    scene::IMeshBuffer * GetBuffer() { return (scene::IMeshBuffer *)MeshBuffer; }
-//    const scene::IMeshBuffer *MeshBuffer;
-//
-//    void SetManualBind(bool on)
-//    {
-//        m_manualBind = on;
-//    }
-//
-//    bool IsManualBind()
-//    {
-//        return m_manualBind;
-//    }
-//
-//    bool IsBinded()
-//    {
-//        return m_binded;
-//    }
-//
-//    void AddInstanceBuffer(IShaderDataBuffer* buf, void* descriptor)
-//    {
-//        if (!GetBuffer()->GetGPUProgram())
-//            throw std::runtime_error("invalid instance init");
-//
-//        m_instanceBuffer = buf;
-//        //m_instanceBuffer->InitializeFormShader(GetBuffer()->GetGPUProgram(), descriptor);
-//    }
-//
-//    IShaderDataBuffer* GetInstanceBuffer() { return m_instanceBuffer; }
-//
-//    u32 GetInstanceNum()
-//    {
-//        return m_instanceBuffer ? m_instanceBuffer->getInstanceCount() : 0;
-//    }
-//
-//    IShaderDataBuffer* m_instanceBuffer;
-//    u32 ChangedID_Vertex;
-//    u32 ChangedID_Index;
-//    bool m_manualBind : 1;
-//    bool m_binded : 1;
-//};
 
 #endif

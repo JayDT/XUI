@@ -102,7 +102,11 @@ void ItemVirtualizerNone::ItemsChanged(System::Collection::Generic::IContainer *
     
         case System::Collection::NotifyCollectionChangedAction::Reset:
             RemoveContainers(generator->Clear());
-    
+            break;
+
+        case System::Collection::NotifyCollectionChangedAction::Init:
+            RemoveContainers(generator->Clear());
+
             if (Items != nullptr)
             {
                 AddContainers(0, Items);

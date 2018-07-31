@@ -391,7 +391,7 @@ public:
 	/** \return True if the array is empty false if not. */
 	bool empty() const
 	{
-		return used == 0;
+		return used == 0 ? true : false;
 	}
 
 

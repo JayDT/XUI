@@ -189,7 +189,6 @@ namespace irr
 
         //! Constructor.
         IReferenceCountedMT()
-            : DebugName(0)
         {
             ReferenceCounter = 1;
         }
@@ -287,7 +286,7 @@ namespace irr
         \return Returns a string, previously set by setDebugName(); */
         const c8* getDebugName() const
         {
-            return DebugName;
+            return "";
         }
 
     protected:
@@ -298,13 +297,9 @@ namespace irr
         \param newName: New debug name to set. */
         void setDebugName(const c8* newName)
         {
-            DebugName = newName;
         }
 
     private:
-
-        //! The debug name.
-        const c8* DebugName;
 
         //! The reference counter. Mutable to do reference counting on const objects.
         mutable std::atomic_int ReferenceCounter;

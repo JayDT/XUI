@@ -16,7 +16,7 @@ namespace scene
 	struct SSharedMeshBuffer : public IMeshBuffer
 	{
 		//! constructor
-		SSharedMeshBuffer() : IMeshBuffer(), Vertices(0), ChangedID_Vertex(1), ChangedID_Index(1), MappingHintVertex(EHM_NEVER), MappingHintIndex(EHM_NEVER)
+		SSharedMeshBuffer() : IMeshBuffer(), Vertices(0), ChangedID_Vertex(1), ChangedID_Index(1), MappingHintVertex(EHM_NEVER), MappingHintIndex(EHM_NEVER), MappingHintInstance(EHM_DYNAMIC)
 		{
 			#ifdef _DEBUG
 			setDebugName("SSharedMeshBuffer");
@@ -190,6 +190,11 @@ namespace scene
 			return MappingHintIndex;
 		}
 
+        virtual E_HARDWARE_MAPPING getHardwareMappingHint_Instance() const
+        {
+            return MappingHintInstance;
+        }
+
 		//! set the hardware mapping hint, for driver
 		virtual void setHardwareMappingHint( E_HARDWARE_MAPPING NewMappingHint, E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX )
 		{
@@ -235,9 +240,10 @@ namespace scene
 		core::aabbox3df BoundingBox;
 
 		//! hardware mapping hint
-		E_HARDWARE_MAPPING MappingHintVertex;
-		E_HARDWARE_MAPPING MappingHintIndex;
-	};
+		E_HARDWARE_MAPPING MappingHintVertex : 8;
+		E_HARDWARE_MAPPING MappingHintIndex : 8;
+        E_HARDWARE_MAPPING MappingHintInstance : 8;
+    };
 
 
 } // end namespace scene

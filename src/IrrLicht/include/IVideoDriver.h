@@ -46,6 +46,7 @@ namespace video
 	struct S3DVertex2TCoords;
 	struct S3DVertexTangents;
 	struct SLight;
+    struct VertexDeclaration;
 	class IImageLoader;
 	class IImageWriter;
 	class IMaterialRenderer;
@@ -1495,11 +1496,16 @@ namespace video
         virtual IShader* createShader(System::IO::IFileReader* vertexShader, System::IO::IFileReader* fragmentShader, System::IO::IFileReader* geometryShader, System::IO::IFileReader* tesselationShader) = 0;
         virtual s32 getShaderVariableID(IShader*, const c8* name) = 0;
         virtual bool setShaderConstant(ShaderVariableDescriptor const* desc, const void* values, int count, IHardwareBuffer* buffer = nullptr) = 0;
+        virtual bool setShaderMapping(ShaderVariableDescriptor const* desc, IShader* shader, scene::E_HARDWARE_MAPPING constantMapping) = 0;
         virtual bool FinalizeShaderConstant() { return true; }
         virtual void useShader(IShader*) = 0;
         virtual void deleteShader(IShader*) = 0;
         virtual bool setActiveTexture(u32 stage, const video::ITexture* texture) = 0;
-        virtual bool setRenderStates3DMode(E_VERTEX_TYPE vType) = 0;
+        virtual bool setRenderStates3DMode() = 0;
+        virtual video::VertexDeclaration* GetVertexDeclaration(irr::u32 id) = 0;
+        virtual IShader* GetRuntimeShader(s32 id) const = 0;
+        virtual s32 AddRuntimeShader(IShader* shader, s32 id = -1) = 0;
+
 	};
 
 } // end namespace video

@@ -11,8 +11,6 @@ endif(_IRR_DYNAMIC_)
 include_directories(
 ${CMAKE_CURRENT_SOURCE_DIR}
 ${DirectX11_INCLUDE}
-${CMAKE_SOURCE_DIR}/dep/WInclude/zlib
-${CMAKE_SOURCE_DIR}/dep/WInclude
 ${CMAKE_SOURCE_DIR}/dep/include
 ${CMAKE_SOURCE_DIR}/contrib/IrrLicht
 ${CMAKE_SOURCE_DIR}/contrib/IrrLicht/include
@@ -39,7 +37,7 @@ LIST(APPEND Direct3D11_Source ${RESOURCE_GENERATED_FILES})
 
 CreateLibrary("Direct3D11" "${Direct3D11_Source}" "${LIBTYPE}" "" "")
 
-add_dependencies(Direct3D11 zlib)
+add_dependencies(Direct3D11 ZLIB)
 
 resource_build(
     TARGET "Direct3D11"
@@ -58,7 +56,7 @@ if(_IRR_DYNAMIC_)
         CFramework
         irrlicht
         Winmm 
-        zlib
+        ZLIB
     )
     install(TARGETS Direct3D11 DESTINATION ${CMAKE_INSTALL_PREFIX})
 else()

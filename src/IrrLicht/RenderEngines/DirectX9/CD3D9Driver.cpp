@@ -486,7 +486,7 @@ bool CD3D9Driver::initDriver(HWND hwnd, bool pureSoftware)
 	DriverAttributes->setAttribute("AntiAlias", Params.AntiAlias);
 
 	// set the renderstates
-	setRenderStates3DMode(EVT_STANDARD);
+	setRenderStates3DMode();
 
 	// store the screen's depth buffer
 	DepthBuffers.push_back(new SDepthSurface());
@@ -523,44 +523,44 @@ bool CD3D9Driver::initDriver(HWND hwnd, bool pureSoftware)
 	#endif
 
     // register vertex types
-    for (u32 i = 0; i != EVT_MAX_VERTEX_TYPE; ++i)
-    {
-        VertexDeclarationMap[i].clear();
-        {
-            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::Pos),     D3DDECLTYPE_FLOAT3,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 });
-            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::Normal),  D3DDECLTYPE_FLOAT3,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 });
-            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::Color),   D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 });
-            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::TCoords), D3DDECLTYPE_FLOAT2,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 });
-
-            if (i == EVT_2TCOORDS || i == EVT_TERRAIN || i == EVT_SKINNING)
-                VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::TCoords2), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 });
-
-            if (i == EVT_TANGENTS)
-            {
-                VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertexTangents, S3DVertexTangents::Binormal), D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 });
-                VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertexTangents, S3DVertexTangents::Tangent),  D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,  0 });
-                //throw std::runtime_error("not implement yet!");
-            }
-
-            if (i == EVT_TERRAIN)
-                VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DChunkVertex, S3DChunkVertex::VertexShading),   D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1 });
-
-            if (i == EVT_SKINNING)
-            {
-                VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DSkinningVertex, S3DSkinningVertex::Bones),     D3DDECLTYPE_UBYTE4,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0 });
-                VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DSkinningVertex, S3DSkinningVertex::Weights),   D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 });
-            }
-        }
-
-        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 0,   D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2 });
-        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 16,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3 });
-        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 32,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 4 });
-        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 48,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 5 });
-
-        VertexDeclarationMap[i].push_back(D3DDECL_END());
-
-        pID3DDevice->CreateVertexDeclaration(VertexDeclarationMap[i].pointer(), &VertexDeclaration[i]);
-    }
+    //for (u32 i = 0; i != EVT_MAX_VERTEX_TYPE; ++i)
+    //{
+    //    VertexDeclarationMap[i].clear();
+    //    {
+    //        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::Pos),     D3DDECLTYPE_FLOAT3,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 });
+    //        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::Normal),  D3DDECLTYPE_FLOAT3,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 });
+    //        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::Color),   D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 });
+    //        VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex, S3DVertex::TCoords), D3DDECLTYPE_FLOAT2,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 });
+    //
+    //        if (i == EVT_2TCOORDS || i == EVT_TERRAIN || i == EVT_SKINNING)
+    //            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::TCoords2), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 });
+    //
+    //        if (i == EVT_TANGENTS)
+    //        {
+    //            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertexTangents, S3DVertexTangents::Binormal), D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 });
+    //            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DVertexTangents, S3DVertexTangents::Tangent),  D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,  0 });
+    //            //throw std::runtime_error("not implement yet!");
+    //        }
+    //
+    //        if (i == EVT_TERRAIN)
+    //            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DChunkVertex, S3DChunkVertex::VertexShading),   D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1 });
+    //
+    //        if (i == EVT_SKINNING)
+    //        {
+    //            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DSkinningVertex, S3DSkinningVertex::Bones),     D3DDECLTYPE_UBYTE4,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0 });
+    //            VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 0, offsetof(S3DSkinningVertex, S3DSkinningVertex::Weights),   D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 });
+    //        }
+    //    }
+    //
+    //    VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 0,   D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2 });
+    //    VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 16,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3 });
+    //    VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 32,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 4 });
+    //    VertexDeclarationMap[i].push_back(D3DVERTEXELEMENT9() = { 1, 48,  D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 5 });
+    //
+    //    VertexDeclarationMap[i].push_back(D3DDECL_END());
+    //
+    //    pID3DDevice->CreateVertexDeclaration(VertexDeclarationMap[i].pointer(), &VertexDeclaration[i]);
+    //}
 	// so far so good.
 	return true;
 }
@@ -1126,7 +1126,7 @@ const core::rect<s32>& CD3D9Driver::getViewPort() const
 //}
 
 
-IShader* CD3D9Driver::createShader(const char* vertexShader, const char* fragmentShader, const char* geometryShader, const char* tesselationShader)
+IShader* CD3D9Driver::createShader(System::IO::IFileReader* vertexShader, System::IO::IFileReader* fragmentShader, System::IO::IFileReader* geometryShader, System::IO::IFileReader* tesselationShader)
 {
     // Global Data's
     DWORD dwShaderFlags         = 0;
@@ -1147,21 +1147,12 @@ IShader* CD3D9Driver::createShader(const char* vertexShader, const char* fragmen
         const char* ShaderModel = "vs_3_0";     // DirectX 9c
         const char* ShaderEntryPoint = "vs_main";
 
-//#if defined( DEBUG ) || defined( _DEBUG ) || 1
-//        dwShaderFlags |= D3DCOMPILE_FORCE_VS_SOFTWARE_NO_OPT;
-//#endif
-
-        std::string path(vertexShader);
-        int pos = path.find_last_of('/');
-        std::string shaderPath;
-        shaderPath += path.substr(0, pos);
-        shaderPath += "/HLSL/";
-        shaderPath += ShaderModel;
-        shaderPath += path.substr(pos, path.size() - pos);
-        shaderPath += ".hlsl";
+        std::string source;
+        source.resize(vertexShader->Size());
+        vertexShader->Read((byte*)source.data(), vertexShader->Size());
 
         // Assemble the vertex shader from the file
-        hr = D3DXCompileShaderFromFile(shaderPath.c_str(), NULL, NULL, ShaderEntryPoint, ShaderModel, dwShaderFlags, &pCode, &pBufferErrors, &gpuProgram->m_pConstantTableVS);
+        hr = D3DXCompileShader(source.c_str(), source.size(), NULL, NULL, ShaderEntryPoint, ShaderModel, dwShaderFlags, &pCode, &pBufferErrors, &gpuProgram->m_pConstantTableVS);
 
         if (FAILED(hr))
         {
@@ -1200,21 +1191,12 @@ IShader* CD3D9Driver::createShader(const char* vertexShader, const char* fragmen
         const char* ShaderModel = "ps_3_0";
         const char* ShaderEntryPoint = "ps_main";
 
-//#if defined( DEBUG ) || defined( _DEBUG ) || 1
-//        dwShaderFlags |= D3DCOMPILE_FORCE_PS_SOFTWARE_NO_OPT;
-//#endif
-
-        std::string path(fragmentShader);
-        int pos = path.find_last_of('/');
-        std::string shaderPath;
-        shaderPath += path.substr(0, pos);
-        shaderPath += "/HLSL/";
-        shaderPath += ShaderModel;
-        shaderPath += path.substr(pos, path.size() - pos);
-        shaderPath += ".hlsl";
+        std::string source;
+        source.resize(fragmentShader->Size());
+        fragmentShader->Read((byte*)source.data(), fragmentShader->Size());
 
         // Assemble the vertex shader from the file
-        hr = D3DXCompileShaderFromFile(shaderPath.c_str(), NULL, NULL, ShaderEntryPoint, ShaderModel, dwShaderFlags, &pCode, &pBufferErrors, &gpuProgram->m_pConstantTablePS);
+        hr = D3DXCompileShader(source.c_str(), source.size(), NULL, NULL, ShaderEntryPoint, ShaderModel, dwShaderFlags, &pCode, &pBufferErrors, &gpuProgram->m_pConstantTablePS);
 
         if (FAILED(hr))
         {
@@ -1459,11 +1441,11 @@ void CD3D9Driver::buildShaderVariableDescriptor(IShader* _gpuProgram)
         }
     }
 
-    S_GPU_SHADER_VARIABLE_DEFAULT_LINK const* mLinkPtr = sDefaultShaderVariableLink;
-    do
-    {
-        gpuProgram->LinkShaderVariable(mLinkPtr->name, mLinkPtr->id);
-    } while ((++mLinkPtr)->id != EGVAT_MAX_VALUE);
+    //S_GPU_SHADER_VARIABLE_DEFAULT_LINK const* mLinkPtr = sDefaultShaderVariableLink;
+    //do
+    //{
+    //    gpuProgram->LinkShaderVariable(mLinkPtr->name, mLinkPtr->id);
+    //} while ((++mLinkPtr)->id != EGVAT_MAX_VALUE);
 }
 
 bool CD3D9Driver::updateVertexHardwareBuffer(CD3D9HardwareBuffer *hwBuffer, E_HARDWARE_BUFFER_TYPE Type)
@@ -1491,8 +1473,8 @@ bool CD3D9Driver::updateVertexHardwareBuffer(CD3D9HardwareBuffer *hwBuffer, E_HA
     {
         IShaderDataBufferElement* variable = hwBuffer->GetInstanceBuffer()->m_bufferDataArray[0];
         //TODO: Optimalization workaround Terrain or Liquid (need correct way)
-        if (vType != EVT_TERRAIN && vType != EVT_STANDARD)
-            MemoryAccess = E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC;
+        //if (vType != EVT_TERRAIN && vType != EVT_STANDARD)
+        //    MemoryAccess = E_HARDWARE_BUFFER_ACCESS::EHBA_DYNAMIC;
         hwBuffer->UpdateBuffer(Type, MemoryAccess, variable->getShaderValues(), variable->getValueSizeOf() * variable->getShaderValueCount());
     }
 	return true;
@@ -1622,8 +1604,8 @@ void CD3D9Driver::drawHardwareBuffer(IHardwareBuffer *_HWBuffer, scene::IMesh* m
     }
 
     //TODO: WorkAround 2D 3D switch (crash driver)
-    setVertexShader(EVT_TERRAIN); // mb->getVertexType());
-    setRenderStates3DMode(mb->getVertexType());
+    //setVertexShader(EVT_TERRAIN); // mb->getVertexType());
+    setRenderStates3DMode();
 
     _IRR_DEBUG_BREAK_IF(mb->getRenderPrimitive() != scene::EPT_TRIANGLES);
 
@@ -1654,23 +1636,23 @@ void CD3D9Driver::drawHardwareBuffer(IHardwareBuffer *_HWBuffer, scene::IMesh* m
 void CD3D9Driver::addOcclusionQuery(scene::ISceneNode* node,
 		const scene::IMesh* mesh)
 {
-	if (!queryFeature(EVDF_OCCLUSION_QUERY))
-		return;
-	CNullDriver::addOcclusionQuery(node, mesh);
-	if (node->getOcculisionQuery() && (node->getOcculisionQuery()->PID == 0))
-		pID3DDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, reinterpret_cast<IDirect3DQuery9**>(&node->getOcculisionQuery()->PID));
+	//if (!queryFeature(EVDF_OCCLUSION_QUERY))
+	//	return;
+	//CNullDriver::addOcclusionQuery(node, mesh);
+	//if (node->getOcculisionQuery() && (node->getOcculisionQuery()->PID == 0))
+	//	pID3DDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, reinterpret_cast<IDirect3DQuery9**>(&node->getOcculisionQuery()->PID));
 }
 
 
 //! Remove occlusion query.
 void CD3D9Driver::removeOcclusionQuery(scene::ISceneNode* node)
 {
-	if (node->getOcculisionQuery())
-	{
-		if (node->getOcculisionQuery()->PID != 0)
-			reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->Release();
-		CNullDriver::removeOcclusionQuery(node);
-	}
+	//if (node->getOcculisionQuery())
+	//{
+	//	if (node->getOcculisionQuery()->PID != 0)
+	//		reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->Release();
+	//	CNullDriver::removeOcclusionQuery(node);
+	//}
 }
 
 
@@ -1682,14 +1664,14 @@ void CD3D9Driver::runOcclusionQuery(scene::ISceneNode* node, bool visible)
 	if (!node)
 		return;
 
-	if (node->getOcculisionQuery())
-	{
-		if (node->getOcculisionQuery()->PID)
-			reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->Issue(D3DISSUE_BEGIN);
-		CNullDriver::runOcclusionQuery(node,visible);
-		if (node->getOcculisionQuery()->PID)
-			reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->Issue(D3DISSUE_END);
-	}
+	//if (node->getOcculisionQuery())
+	//{
+	//	if (node->getOcculisionQuery()->PID)
+	//		reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->Issue(D3DISSUE_BEGIN);
+	//	CNullDriver::runOcclusionQuery(node,visible);
+	//	if (node->getOcculisionQuery()->PID)
+	//		reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->Issue(D3DISSUE_END);
+	//}
 }
 
 
@@ -1698,28 +1680,28 @@ void CD3D9Driver::runOcclusionQuery(scene::ISceneNode* node, bool visible)
 Update might not occur in this case, though */
 void CD3D9Driver::updateOcclusionQuery(scene::ISceneNode* node, bool block)
 {
-	if (node->getOcculisionQuery())
-	{
-		// not yet started
-		if (node->getOcculisionQuery()->Run==u32(~0))
-			return;
-		bool available = block?true:false;
-		int tmp=0;
-		if (!block)
-			available=(reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->GetData(&tmp, sizeof(DWORD), 0)==S_OK);
-		else
-		{
-			do
-			{
-				HRESULT hr = reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->GetData(&tmp, sizeof(DWORD), D3DGETDATA_FLUSH);
-				available = (hr == S_OK);
-				if (hr!=S_FALSE)
-					break;
-			} while (!available);
-		}
-		if (available)
-			node->getOcculisionQuery()->Result = tmp;
-	}
+	//if (node->getOcculisionQuery())
+	//{
+	//	// not yet started
+	//	if (node->getOcculisionQuery()->Run==u32(~0))
+	//		return;
+	//	bool available = block?true:false;
+	//	int tmp=0;
+	//	if (!block)
+	//		available=(reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->GetData(&tmp, sizeof(DWORD), 0)==S_OK);
+	//	else
+	//	{
+	//		do
+	//		{
+	//			HRESULT hr = reinterpret_cast<IDirect3DQuery9*>(node->getOcculisionQuery()->PID)->GetData(&tmp, sizeof(DWORD), D3DGETDATA_FLUSH);
+	//			available = (hr == S_OK);
+	//			if (hr!=S_FALSE)
+	//				break;
+	//		} while (!available);
+	//	}
+	//	if (available)
+	//		node->getOcculisionQuery()->Result = tmp;
+	//}
 }
 
 
@@ -1729,9 +1711,9 @@ The value is a safe approximation, i.e. can be larger than the
 actual value of pixels. */
 u32 CD3D9Driver::getOcclusionQueryResult(scene::ISceneNode* node) const
 {
-	if (node->getOcculisionQuery())
-		return node->getOcculisionQuery()->Result;
-	else
+	//if (node->getOcculisionQuery())
+	//	return node->getOcculisionQuery()->Result;
+	//else
 		return ~0;
 }
 
@@ -1800,7 +1782,7 @@ void CD3D9Driver::draw2D3DVertexPrimitiveList(const void* vertices,
 
 	if (is3D)
 	{
-	       	if (!setRenderStates3DMode(vType))
+	       	if (!setRenderStates3DMode())
 			return;
 	}
 	else
@@ -2356,43 +2338,43 @@ void CD3D9Driver::drawPixel(u32 x, u32 y, const SColor & color)
 //! sets right vertex shader
 void CD3D9Driver::setVertexShader(E_VERTEX_TYPE newType)
 {
-	if (newType != LastVertexType)
-	{
-		LastVertexType = newType;
-		HRESULT hr = 0;
-
-		switch(newType)
-		{
-        case EVT_STANDARD:
-			hr = pID3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-			break;
-        case EVT_2TCOORDS:
-			hr = pID3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX2);
-			break;
-        case EVT_SKINNING:
-        case EVT_TERRAIN:
-            hr = pID3DDevice->SetFVF(0); // D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX2);
-            break;
-        case EVT_TANGENTS:
-			hr = pID3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX3 |
-				D3DFVF_TEXCOORDSIZE2(0) | // real texture coord
-				D3DFVF_TEXCOORDSIZE3(1) | // misuse texture coord 2 for tangent
-				D3DFVF_TEXCOORDSIZE3(2) // misuse texture coord 3 for binormal
-				);
-			break;
-		}
-
-		if (FAILED(hr))
-		{
-			os::Printer::log("Could not set vertex Shader.", ELL_ERROR);
-			return;
-		}
-	}
+	//if (newType != LastVertexType)
+	//{
+	//	LastVertexType = newType;
+	//	HRESULT hr = 0;
+    //
+	//	switch(newType)
+	//	{
+    //    case EVT_STANDARD:
+	//		hr = pID3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+	//		break;
+    //    case EVT_2TCOORDS:
+	//		hr = pID3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX2);
+	//		break;
+    //    case EVT_SKINNING:
+    //    case EVT_TERRAIN:
+    //        hr = pID3DDevice->SetFVF(0); // D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX2);
+    //        break;
+    //    case EVT_TANGENTS:
+	//		hr = pID3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX3 |
+	//			D3DFVF_TEXCOORDSIZE2(0) | // real texture coord
+	//			D3DFVF_TEXCOORDSIZE3(1) | // misuse texture coord 2 for tangent
+	//			D3DFVF_TEXCOORDSIZE3(2) // misuse texture coord 3 for binormal
+	//			);
+	//		break;
+	//	}
+    //
+	//	if (FAILED(hr))
+	//	{
+	//		os::Printer::log("Could not set vertex Shader.", ELL_ERROR);
+	//		return;
+	//	}
+	//}
 }
 
 
 //! sets the needed renderstates
-bool CD3D9Driver::setRenderStates3DMode(video::E_VERTEX_TYPE newType)
+bool CD3D9Driver::setRenderStates3DMode()
 {
 	if (!pID3DDevice)
 		return false;
@@ -2926,109 +2908,109 @@ void CD3D9Driver::enableMaterial2D(bool enable)
 //! sets the needed renderstates
 void CD3D9Driver::setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel)
 {
-	if (!pID3DDevice)
-		return;
-
-	if (CurrentRenderMode != ERM_2D || Transformation3DChanged)
-	{
-		// unset last 3d material
-		if (CurrentRenderMode == ERM_3D)
-		{
-           setVertexShader(EVT_TERRAIN);
-
-			if (static_cast<u32>(LastMaterial.MaterialType) < MaterialRenderers.size())
-				MaterialRenderers[LastMaterial.MaterialType].Renderer->OnUnsetMaterial();
-		}
-		if (!OverrideMaterial2DEnabled)
-		{
-			setBasicRenderStates(InitMaterial2D, LastMaterial, true);
-			LastMaterial=InitMaterial2D;
-
-			// fix everything that is wrongly set by InitMaterial2D default
-			pID3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-
-			pID3DDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-		}
-		core::matrix4 m;
-// this fixes some problems with pixel exact rendering, but also breaks nice texturing
-// moreover, it would have to be tested in each call, as the texture flag can change each time
-//		if (!texture)
-//			m.setTranslation(core::vector3df(0.5f,0.5f,0));
-		pID3DDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)((void*)m.pointer()));
-
-		// adjust the view such that pixel center aligns with texels
-		// Otherwise, subpixel artifacts will occur
-		m.setTranslation(core::vector3df(-0.5f,-0.5f,0));
-		pID3DDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)((void*)m.pointer()));
-
-		const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
-		m.buildProjectionMatrixOrthoLH(f32(renderTargetSize.Width), f32(-(s32)(renderTargetSize.Height)), -1.0, 1.0);
-		m.setTranslation(core::vector3df(-1,1,0));
-		pID3DDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)((void*)m.pointer()));
-
-		// 2d elements are clipped in software
-		pID3DDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
-
-		Transformation3DChanged = false;
-	}
-	if (OverrideMaterial2DEnabled)
-	{
-		OverrideMaterial2D.Lighting=false;
-		setBasicRenderStates(OverrideMaterial2D, LastMaterial, false);
-		LastMaterial = OverrideMaterial2D;
-	}
-
-	// no alphaChannel without texture
-	alphaChannel &= texture;
-
-	if (alpha || alphaChannel)
-	{
-		pID3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		pID3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		pID3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	}
-	else
-		pID3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-
-	pID3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-	pID3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	pID3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-	if (texture)
-	{
-		setTransform(ETS_TEXTURE_0, core::IdentityMatrix);
-		// Due to the transformation change, the previous line would call a reset each frame
-		// but we can safely reset the variable as it was false before
-		Transformation3DChanged=false;
-	}
-	if (alphaChannel)
-	{
-		pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-
-		if (alpha)
-		{
-			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-		}
-		else
-		{
-			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-		}
-	}
-	else
-	{
-		pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-		if (alpha)
-		{
-			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
-		}
-		else
-		{
-			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-		}
-	}
-
-	CurrentRenderMode = ERM_2D;
+//	if (!pID3DDevice)
+//		return;
+//
+//	if (CurrentRenderMode != ERM_2D || Transformation3DChanged)
+//	{
+//		// unset last 3d material
+//		if (CurrentRenderMode == ERM_3D)
+//		{
+//           setVertexShader(EVT_TERRAIN);
+//
+//			if (static_cast<u32>(LastMaterial.MaterialType) < MaterialRenderers.size())
+//				MaterialRenderers[LastMaterial.MaterialType].Renderer->OnUnsetMaterial();
+//		}
+//		if (!OverrideMaterial2DEnabled)
+//		{
+//			setBasicRenderStates(InitMaterial2D, LastMaterial, true);
+//			LastMaterial=InitMaterial2D;
+//
+//			// fix everything that is wrongly set by InitMaterial2D default
+//			pID3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+//
+//			pID3DDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+//		}
+//		core::matrix4 m;
+//// this fixes some problems with pixel exact rendering, but also breaks nice texturing
+//// moreover, it would have to be tested in each call, as the texture flag can change each time
+////		if (!texture)
+////			m.setTranslation(core::vector3df(0.5f,0.5f,0));
+//		pID3DDevice->SetTransform(D3DTS_WORLD, (D3DMATRIX*)((void*)m.pointer()));
+//
+//		// adjust the view such that pixel center aligns with texels
+//		// Otherwise, subpixel artifacts will occur
+//		m.setTranslation(core::vector3df(-0.5f,-0.5f,0));
+//		pID3DDevice->SetTransform(D3DTS_VIEW, (D3DMATRIX*)((void*)m.pointer()));
+//
+//		const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+//		m.buildProjectionMatrixOrthoLH(f32(renderTargetSize.Width), f32(-(s32)(renderTargetSize.Height)), -1.0, 1.0);
+//		m.setTranslation(core::vector3df(-1,1,0));
+//		pID3DDevice->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)((void*)m.pointer()));
+//
+//		// 2d elements are clipped in software
+//		pID3DDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
+//
+//		Transformation3DChanged = false;
+//	}
+//	if (OverrideMaterial2DEnabled)
+//	{
+//		OverrideMaterial2D.Lighting=false;
+//		setBasicRenderStates(OverrideMaterial2D, LastMaterial, false);
+//		LastMaterial = OverrideMaterial2D;
+//	}
+//
+//	// no alphaChannel without texture
+//	alphaChannel &= texture;
+//
+//	if (alpha || alphaChannel)
+//	{
+//		pID3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+//		pID3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+//		pID3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+//	}
+//	else
+//		pID3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+//
+//	pID3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+//	pID3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+//	pID3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+//	if (texture)
+//	{
+//		setTransform(ETS_TEXTURE_0, core::IdentityMatrix);
+//		// Due to the transformation change, the previous line would call a reset each frame
+//		// but we can safely reset the variable as it was false before
+//		Transformation3DChanged=false;
+//	}
+//	if (alphaChannel)
+//	{
+//		pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+//
+//		if (alpha)
+//		{
+//			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+//			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+//		}
+//		else
+//		{
+//			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+//		}
+//	}
+//	else
+//	{
+//		pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+//		if (alpha)
+//		{
+//			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
+//		}
+//		else
+//		{
+//			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+//			pID3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+//		}
+//	}
+//
+//	CurrentRenderMode = ERM_2D;
 }
 
 
@@ -3256,7 +3238,7 @@ void CD3D9Driver::draw3DLine(const core::vector3df& start,
 	const core::vector3df& end, SColor color)
 {
 	setVertexShader(EVT_STANDARD);
-	setRenderStates3DMode(EVT_STANDARD);
+	setRenderStates3DMode();
 	video::S3DVertex v[2];
 	v[0].Color = color;
 	v[1].Color = color;
@@ -3287,14 +3269,14 @@ bool CD3D9Driver::reset()
 		if (DepthBuffers[i]->Surface)
 			DepthBuffers[i]->Surface->Release();
 	}
-	for (i=0; i<OcclusionQueries.size(); ++i)
-	{
-		if (OcclusionQueries[i]->PID)
-		{
-			reinterpret_cast<IDirect3DQuery9*>(OcclusionQueries[i]->PID)->Release();
-			OcclusionQueries[i]->PID=0;
-		}
-	}
+	//for (i=0; i<OcclusionQueries.size(); ++i)
+	//{
+	//	if (OcclusionQueries[i]->PID)
+	//	{
+	//		reinterpret_cast<IDirect3DQuery9*>(OcclusionQueries[i]->PID)->Release();
+	//		OcclusionQueries[i]->PID=0;
+	//	}
+	//}
 	// this does not require a restore in the reset method, it's updated
 	// automatically in the next render cycle.
 	removeAllHardwareBuffers();
@@ -3340,10 +3322,10 @@ bool CD3D9Driver::reset()
 				&(DepthBuffers[i]->Surface),
 				NULL);
 	}
-	for (i=0; i<OcclusionQueries.size(); ++i)
-	{
-		pID3DDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, reinterpret_cast<IDirect3DQuery9**>(&OcclusionQueries[i]->PID));
-	}
+	//for (i=0; i<OcclusionQueries.size(); ++i)
+	//{
+	//	pID3DDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, reinterpret_cast<IDirect3DQuery9**>(&OcclusionQueries[i]->PID));
+	//}
 
 	if (FAILED(hr))
 	{
@@ -3389,7 +3371,7 @@ bool CD3D9Driver::reset()
 		CurrentTexture[i] = 0;
 
 	setVertexShader(EVT_STANDARD);
-	setRenderStates3DMode(EVT_STANDARD);
+	setRenderStates3DMode();
 	setFog(FogColor, FogType, FogStart, FogEnd, FogDensity, PixelFog, RangeFog);
 	setAmbientLight(AmbientLight);
 
@@ -3825,12 +3807,12 @@ ECOLOR_FORMAT CD3D9Driver::getColorFormatFromD3DFormat(D3DFORMAT format) const
 {
 	switch(format)
 	{
-        case D3DFMT_DXT1:
-            return ECF_RGBA_S3TC_DXT1;
-        case D3DFMT_DXT3:
-            return ECF_RGBA_S3TC_DXT3;
-        case D3DFMT_DXT5:
-            return ECF_RGBA_S3TC_DXT5;
+        //case D3DFMT_DXT1:
+        //    return ECF_RGBA_S3TC_DXT1;
+        //case D3DFMT_DXT3:
+        //    return ECF_RGBA_S3TC_DXT3;
+        //case D3DFMT_DXT5:
+        //    return ECF_RGBA_S3TC_DXT5;
         case D3DFMT_X1R5G5B5:
 		case D3DFMT_A1R5G5B5:
 			return ECF_A1R5G5B5;

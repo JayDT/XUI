@@ -59,15 +59,15 @@ CD3D9Texture::CD3D9Texture(IImage* image, CD3D9Driver* driver,
 	setDebugName("CD3D9Texture");
 	#endif
 
-    switch (image->getColorFormat())
-    {
-        case ECF_RGBA8:
-        case ECF_RGBA_S3TC_DXT1:
-        case ECF_RGBA_S3TC_DXT3:
-        case ECF_RGBA_S3TC_DXT5:
-            ColorFormat = image->getColorFormat();
-            break;
-    }
+    //switch (image->getColorFormat())
+    //{
+    //    case ECF_RGBA8:
+    //    case ECF_RGBA_S3TC_DXT1:
+    //    case ECF_RGBA_S3TC_DXT3:
+    //    case ECF_RGBA_S3TC_DXT5:
+    //        ColorFormat = image->getColorFormat();
+    //        break;
+    //}
 
 	HasMipMaps = Driver->getTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS);
 
@@ -285,15 +285,15 @@ bool CD3D9Texture::createTexture(u32 flags, IImage * image)
 
     switch (image->getColorFormat())
     {
-        case ECF_RGBA_S3TC_DXT1:
-            format = D3DFMT_DXT1;
-            break;
-        case ECF_RGBA_S3TC_DXT3:
-            format = D3DFMT_DXT3;
-            break;
-        case ECF_RGBA_S3TC_DXT5:
-            format = D3DFMT_DXT5;
-            break;
+        //case ECF_RGBA_S3TC_DXT1:
+        //    format = D3DFMT_DXT1;
+        //    break;
+        //case ECF_RGBA_S3TC_DXT3:
+        //    format = D3DFMT_DXT3;
+        //    break;
+        //case ECF_RGBA_S3TC_DXT5:
+        //    format = D3DFMT_DXT5;
+        //    break;
         default:
         {
             switch (getTextureFormatFromFlags(flags))
@@ -385,18 +385,18 @@ bool CD3D9Texture::createTexture(u32 flags, IImage * image)
 
 s32 NormalizePitch(ECOLOR_FORMAT ColorFormat, s32 Pitch)
 {
-    switch (ColorFormat)
-    {
-        case ECF_RGBA_S3TC_DXT1:
-            Pitch *= (4.0/8.0);
-            break;
-        case ECF_RGBA_S3TC_DXT3:
-            Pitch *= (4.0 / 16.0);
-            break;
-        case ECF_RGBA_S3TC_DXT5:
-            Pitch *= (4.0 / 16.0);
-            break;
-    }
+    //switch (ColorFormat)
+    //{
+    //    case ECF_RGBA_S3TC_DXT1:
+    //        Pitch *= (4.0/8.0);
+    //        break;
+    //    case ECF_RGBA_S3TC_DXT3:
+    //        Pitch *= (4.0 / 16.0);
+    //        break;
+    //    case ECF_RGBA_S3TC_DXT5:
+    //        Pitch *= (4.0 / 16.0);
+    //        break;
+    //}
     return Pitch;
 }
 
@@ -419,17 +419,17 @@ bool CD3D9Texture::copyTexture(IImage * image)
 			return false;
 		}
 
-        switch (ColorFormat)
-        {
-            case ECF_RGBA_S3TC_DXT1:
-            case ECF_RGBA_S3TC_DXT3:
-            case ECF_RGBA_S3TC_DXT5:
-                Pitch = image->getPitch();
-                break;
-            default:
-                Pitch = rect.Pitch;
-                break;
-        }
+        //switch (ColorFormat)
+        //{
+        //    case ECF_RGBA_S3TC_DXT1:
+        //    case ECF_RGBA_S3TC_DXT3:
+        //    case ECF_RGBA_S3TC_DXT5:
+        //        Pitch = image->getPitch();
+        //        break;
+        //    default:
+        //        Pitch = rect.Pitch;
+        //        break;
+        //}
 		image->copyToScaling(rect.pBits, TextureSize.Width, TextureSize.Height, ColorFormat, Pitch);
 
 		hr = Texture->UnlockRect(0);

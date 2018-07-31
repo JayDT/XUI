@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef __C_DIRECTX_DEFINES_H_INCLUDED__
 #define __C_DIRECTX_DEFINES_H_INCLUDED__
 

@@ -9,9 +9,10 @@ IF (LibXUISharedLinkage)
     SET(MODUL_LINKAGE "SHARED")
 
     list(APPEND MODUL_LINK_LIBS
+    PRIVATE
        boost
        glm
-       ${ZLIB_LIBRARIES}
+       ZLIB
      )
    
     list(APPEND MODUL_LINK_LIBS

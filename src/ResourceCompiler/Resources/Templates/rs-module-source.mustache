@@ -10,7 +10,7 @@
 
 namespace m = System::Resource;
 
-m::ResourceDatabase* __CurrentResource = nullptr;
+m::ResourceDatabase* __CurrentResource{{targetName}} = nullptr;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Module Initialize and Declare
@@ -47,20 +47,20 @@ namespace System::Resource
 
 bool InitializeModulResource{{targetName}}()
 {
-    if (!__CurrentResource)
+    if (!__CurrentResource{{targetName}})
     {
-        __CurrentResource = m::ResourceManager::Instance()->Register<System::Resource::ResourceModul{{targetName}}>();
-        m::ResourceManager::Instance()->InitResourceModule.push(__CurrentResource);
+        __CurrentResource{{targetName}} = m::ResourceManager::Instance()->Register<System::Resource::ResourceModul{{targetName}}>();
+        m::ResourceManager::Instance()->InitResourceModule.push(__CurrentResource{{targetName}});
     }
     return true;
 }
 
 static bool Initalized{{targetName}} = InitializeModulResource{{targetName}}();
 
-namespace System::Resource::meta
-{
-    ResourceDatabase* __GetCurrent_RunTime__ResourceModule()
-    {
-        return __CurrentResource;
-    }
-}
+//namespace System::Resource::meta
+//{
+//    ResourceDatabase* __GetCurrent_RunTime__ResourceModule()
+//    {
+//        return __CurrentResource{{targetName}};
+//    }
+//}

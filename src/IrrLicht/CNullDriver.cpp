@@ -26,129 +26,6 @@ namespace irr
 {
 namespace video
 {
-
-void IShaderDataBuffer::setDirty()
-{
-    for (u32 i = 0; i != m_bufferDataArray.size(); ++i)
-        m_bufferDataArray[i]->setDirty();
-    ++mChangedID;
-}
-
-void IShaderDataBuffer::CommitBuffer(IShader* gpuProgram, IHardwareBuffer* buffer /*= nullptr*/)
-{
-    for (u32 i = 0; i != m_bufferDataArray.size(); ++i)
-    {
-        auto bufferData = m_bufferDataArray[i];
-        if (bufferData->isChanged() && bufferData->getDescription())
-        {
-            gpuProgram->getVideoDriver()->setShaderConstant(bufferData->getDescription(), bufferData->getShaderValues(), bufferData->getShaderValueCount(), buffer);
-            bufferData->setUpdated();
-        }
-    }
-}
-
-
-u8 IShader::getContextType() const
-{
-    return mContext->getDriverType();
-}
-
-IShader::IShader(video::IVideoDriver* context, E_ShaderTypes type) : mContext(context), mShaderType(type), mBinded(false)
-{
-    mContextType = getContextType();
-
-    std::fill_n(m_shaderVariableIndexTable, (s32)EGVAT_MAX_VALUE, -1);
-
-}
-
-IShader::~IShader()
-{
-    for (u32 bi = 0; bi != IShaderDataBuffer::EUT_MAX_VALUE; ++bi)
-    {
-        for (u32 i = 0; i != mBuffers[bi].size(); ++i)
-            delete mBuffers[bi][i];
-        mBuffers[bi].clear();
-    }
-}
-
-bool IShader::readFile(const char* pFileName, std::string& outFile)
-{
-    if (!pFileName || !strlen(pFileName))
-        return false;
-
-    const char *progtext;
-    char *buf = 0;
-    FILE *f = fopen(pFileName, "rb");
-    if (!f)
-        return false;
-
-    fseek(f, 0, SEEK_END);
-    size_t len = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    outFile.resize(len);
-    progtext = buf;
-    fread(&outFile[0], len, 1, f);
-    fclose(f);
-
-    return true;
-}
-
-ShaderVariableDescriptor const* IShader::GetGPUVariableDesc(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type) const
-{
-    if (m_shaderVariableIndexTable[type] != -1)
-        return &m_shaderVariableDescArray[m_shaderVariableIndexTable[type]];
-
-    return nullptr;
-}
-
-void IShader::LinkShaderVariable(const char* name, E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE basicVariableLocation /*= EGVAT_NONE*/, u32* rid /*= nullptr*/)
-{
-    u32 pos;
-    ShaderVariableDescriptor* desc = (ShaderVariableDescriptor*)GetGPUVariableDesc(name, &pos);
-    if (desc)
-    {
-        if (rid)
-            *rid = pos;
-
-        if (basicVariableLocation != EGVAT_NONE && (u32)basicVariableLocation < EGVAT_MAX_VALUE)
-        {
-            desc->m_basicVariableLocation = basicVariableLocation;
-            m_shaderVariableIndexTable[(u32)basicVariableLocation] = (s16)pos;
-        }
-    }
-}
-
-ShaderVariableDescriptor const* IShader::GetGPUVariableDesc(const char* name, u32* rid /*= nullptr*/) const
-{
-    for (u32 i = 0; i != m_shaderVariableDescArray.size(); ++i)
-    {
-        if (m_shaderVariableDescArray[i].m_name == name)
-        {
-            if (rid)
-                *rid = i;
-
-            return &m_shaderVariableDescArray[i];
-        }
-    }
-
-    return nullptr;
-}
-
-s32 IShader::getGPUProgramAttribLocation(E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE type) const
-{
-    if (ShaderVariableDescriptor const* desc = GetGPUVariableDesc(type))
-        return desc->m_location;
-    return -1;
-}
-
-int IShader::getVariableLocation(const char* name)
-{
-    u32 pos = -1;
-    /*ShaderVariableDescriptor const* desc = */ GetGPUVariableDesc(name, &pos);
-    return pos;
-}
-
 //! creates a loader which is able to load windows bitmaps
 IImageLoader* createImageLoaderBMP();
 
@@ -209,36 +86,36 @@ IImageWriter* createImageWriterPPM();
 
 //! constructor
 CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& screenSize)
-: FileSystem(io), ActiveGPUProgram(0), MeshManipulator(0), ViewPort(0,0,0,0), ScreenSize(screenSize),
+    : FileSystem(io), ActiveGPUProgram(0), MeshManipulator(0), ViewPort(0, 0, 0, 0), ScreenSize(screenSize),
     PrimitivesDrawn(0), MinVertexCountForVBO(500), TextureCreationFlags(0),
     OverrideMaterial2DEnabled(false), AllowZWriteOnTransparent(true)
 {
-    #ifdef _DEBUG
+#ifdef _DEBUG
     setDebugName("CNullDriver");
-    #endif
+#endif
 
     DriverAttributes = new io::CAttributes();
     DriverAttributes->addInt("MaxTextures", _IRR_MATERIAL_MAX_TEXTURES_);
     DriverAttributes->addInt("MaxSupportedTextures", _IRR_MATERIAL_MAX_TEXTURES_);
     DriverAttributes->addInt("MaxLights", getMaximalDynamicLightAmount());
     DriverAttributes->addInt("MaxAnisotropy", 1);
-//	DriverAttributes->addInt("MaxUserClipPlanes", 0);
-//	DriverAttributes->addInt("MaxAuxBuffers", 0);
+    //	DriverAttributes->addInt("MaxUserClipPlanes", 0);
+    //	DriverAttributes->addInt("MaxAuxBuffers", 0);
     DriverAttributes->addInt("MaxMultipleRenderTargets", 1);
     DriverAttributes->addInt("MaxIndices", -1);
     DriverAttributes->addInt("MaxTextureSize", -1);
-//	DriverAttributes->addInt("MaxGeometryVerticesOut", 0);
-//	DriverAttributes->addFloat("MaxTextureLODBias", 0.f);
+    //	DriverAttributes->addInt("MaxGeometryVerticesOut", 0);
+    //	DriverAttributes->addFloat("MaxTextureLODBias", 0.f);
     DriverAttributes->addInt("Version", 1);
-//	DriverAttributes->addInt("ShaderLanguageVersion", 0);
-//	DriverAttributes->addInt("AntiAlias", 0);
+    //	DriverAttributes->addInt("ShaderLanguageVersion", 0);
+    //	DriverAttributes->addInt("AntiAlias", 0);
 
     setFog();
 
     setTextureCreationFlag(ETCF_ALWAYS_32_BIT, true);
     setTextureCreationFlag(ETCF_CREATE_MIP_MAPS, true);
 
-    ViewPort = core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(screenSize));
+    ViewPort = core::rect<s32>(core::position2d<s32>(0, 0), core::dimension2di(screenSize));
 
     // create manipulator
     MeshManipulator = new scene::CMeshManipulator();
@@ -311,23 +188,22 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 
     // set ExposedData to 0
     memset(&ExposedData, 0, sizeof(ExposedData));
-    for (u32 i=0; i<video::EVDF_COUNT; ++i)
-        FeatureEnabled[i]=true;
+    for (u32 i = 0; i < video::EVDF_COUNT; ++i)
+        FeatureEnabled[i] = true;
 
-    InitMaterial2D.AntiAliasing=video::EAAM_OFF;
-    InitMaterial2D.Lighting=false;
-    InitMaterial2D.ZWriteEnable=false;
-    InitMaterial2D.ZBuffer=video::ECFN_NEVER;
-    InitMaterial2D.UseMipMaps=false;
-    for (u32 i=0; i<video::MATERIAL_MAX_TEXTURES; ++i)
+    InitMaterial2D.AntiAliasing = video::EAAM_OFF;
+    InitMaterial2D.Lighting = false;
+    InitMaterial2D.ZWriteEnable = false;
+    InitMaterial2D.ZBuffer = video::ECFN_NEVER;
+    InitMaterial2D.UseMipMaps = false;
+    for (u32 i = 0; i < video::MATERIAL_MAX_TEXTURES; ++i)
     {
-        InitMaterial2D.TextureLayer[i].BilinearFilter=false;
-        InitMaterial2D.TextureLayer[i].TextureWrapU=video::ETC_REPEAT;
-        InitMaterial2D.TextureLayer[i].TextureWrapV=video::ETC_REPEAT;
+        InitMaterial2D.TextureLayer[i].BilinearFilter = false;
+        InitMaterial2D.TextureLayer[i].TextureWrapU = video::ETC_REPEAT;
+        InitMaterial2D.TextureLayer[i].TextureWrapV = video::ETC_REPEAT;
     }
-    OverrideMaterial2D=InitMaterial2D;
+    OverrideMaterial2D = InitMaterial2D;
 }
-
 
 //! destructor
 CNullDriver::~CNullDriver()
@@ -356,6 +232,50 @@ CNullDriver::~CNullDriver()
     removeAllHardwareBuffers();
 }
 
+bool CNullDriver::initDriver()
+{
+    //Note: Predefine irrlicht default vertex declarations
+    {
+        irr::video::VertexDeclaration* vertDecl = GetVertexDeclaration(E_VERTEX_TYPE::EVT_STANDARD);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_POSITION,      E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertex, S3DVertex::Pos), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_NORMAL,        E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertex, S3DVertex::Normal), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_COLOR,         E_VERTEX_ELEMENT_TYPE::EVET_COLOUR, offsetof(S3DVertex, S3DVertex::Color), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TEXTURE_COORD, E_VERTEX_ELEMENT_TYPE::EVET_FLOAT2, offsetof(S3DVertex, S3DVertex::TCoords), 0);
+    }
+
+    {
+        irr::video::VertexDeclaration* vertDecl = GetVertexDeclaration(E_VERTEX_TYPE::EVT_2TCOORDS);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_POSITION,      E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::Pos), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_NORMAL,        E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::Normal), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_COLOR,         E_VERTEX_ELEMENT_TYPE::EVET_COLOUR, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::Color), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TEXTURE_COORD, E_VERTEX_ELEMENT_TYPE::EVET_FLOAT2, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::TCoords), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TEXTURE_COORD, E_VERTEX_ELEMENT_TYPE::EVET_FLOAT2, offsetof(S3DVertex2TCoords, S3DVertex2TCoords::TCoords2), 1);
+    }
+
+    {
+        irr::video::VertexDeclaration* vertDecl = GetVertexDeclaration(E_VERTEX_TYPE::EVT_TANGENTS);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_POSITION,      E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertexTangents, S3DVertexTangents::Pos), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_NORMAL,        E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertexTangents, S3DVertexTangents::Normal), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_COLOR,         E_VERTEX_ELEMENT_TYPE::EVET_COLOUR, offsetof(S3DVertexTangents, S3DVertexTangents::Color), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TEXTURE_COORD, E_VERTEX_ELEMENT_TYPE::EVET_FLOAT2, offsetof(S3DVertexTangents, S3DVertexTangents::TCoords), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_BINORMAL,      E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertexTangents, S3DVertexTangents::Binormal), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TANGENT,       E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3, offsetof(S3DVertexTangents, S3DVertexTangents::Tangent), 0);
+    }
+
+    {
+        irr::video::VertexDeclaration* vertDecl = GetVertexDeclaration(E_VERTEX_TYPE::EVT_SKINNING);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_POSITION,      E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3,      offsetof(S3DSkinningVertex, S3DSkinningVertex::Pos), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_NORMAL,        E_VERTEX_ELEMENT_TYPE::EVET_FLOAT3,      offsetof(S3DSkinningVertex, S3DSkinningVertex::Normal), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_COLOR,         E_VERTEX_ELEMENT_TYPE::EVET_COLOUR,      offsetof(S3DSkinningVertex, S3DSkinningVertex::Color), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TEXTURE_COORD, E_VERTEX_ELEMENT_TYPE::EVET_FLOAT2,      offsetof(S3DSkinningVertex, S3DSkinningVertex::TCoords), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_TEXTURE_COORD, E_VERTEX_ELEMENT_TYPE::EVET_FLOAT2,      offsetof(S3DSkinningVertex, S3DSkinningVertex::TCoords2), 1);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_BLEND_INDICES, E_VERTEX_ELEMENT_TYPE::EVET_UBYTE4,      offsetof(S3DSkinningVertex, S3DSkinningVertex::Bones), 0);
+        vertDecl->addElement(E_VERTEX_ELEMENT_SEMANTIC::EVES_BLEND_WEIGHTS, E_VERTEX_ELEMENT_TYPE::EVET_UBYTE4_NORM, offsetof(S3DSkinningVertex, S3DSkinningVertex::Weights), 0);
+        
+    }
+
+    return true;
+}
 
 //! Adds an external surface loader to the engine.
 void CNullDriver::addExternalImageLoader(IImageLoader* loader)
@@ -653,6 +573,13 @@ ITexture* CNullDriver::getTexture(io::IReadFile* file)
     return texture;
 }
 
+video::VertexDeclaration * CNullDriver::GetVertexDeclaration(irr::u32 id)
+{
+    auto& iVertDecl = VertexDeclarations[id];
+    if (!iVertDecl)
+        iVertDecl = createVertexDeclaration();
+    return iVertDecl;
+}
 
 //! opens the file and loads it into the surface
 video::ITexture* CNullDriver::loadTextureFromFile(io::IReadFile* file, const io::path& hashName )
@@ -833,6 +760,16 @@ void CNullDriver::draw2DVertexPrimitiveList(const void* vertices, u32 vertexCoun
 void CNullDriver::draw3DLine(const core::vector3df& start,
                 const core::vector3df& end, SColor color)
 {
+    setRenderStates3DMode();
+    video::S3DVertex v[2];
+    v[0].Color = color;
+    v[1].Color = color;
+    v[0].Pos = start;
+    v[1].Pos = end;
+
+    static const u16 indices[2] = { 0, 1 };
+
+    drawVertexPrimitiveList(v, 2, indices, 1, video::EVT_STANDARD, scene::EPT_LINES, video::EIT_16BIT);
 }
 
 
@@ -875,7 +812,7 @@ void CNullDriver::draw3DBox(const core::aabbox3d<f32>& box, SColor color)
     }
 
     // draw everything
-    setRenderStates3DMode(E_VERTEX_TYPE::EVT_STANDARD);
+    setRenderStates3DMode();
     drawVertexPrimitiveList(vertex, 8, indicies, indiciesSize / 2, EVT_STANDARD, scene::EPT_LINES, EIT_16BIT);
 }
 
@@ -926,13 +863,137 @@ void CNullDriver::draw2DImageBatch(const video::ITexture* texture,
                 SColor color,
                 bool useAlphaChannelOfTexture)
 {
-    const irr::u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
+    if (!texture)
+        return;
 
-    for (u32 i=0; i<drawCount; ++i)
+    SMaterial m;
+    m.setTexture(0, const_cast<video::ITexture*>(texture));
+    setMaterial(m);
+
+    setRenderStates2DMode(color.getAlpha()<255, true, useAlphaChannelOfTexture);
+
+    const irr::u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
+    const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+
+    core::array<S3DVertex> vtx(drawCount * 4);
+    core::array<u16> indices(drawCount * 6);
+
+    for (u32 i = 0; i < drawCount; ++i)
     {
-        draw2DImage(texture, positions[i], sourceRects[i],
-                clipRect, color, useAlphaChannelOfTexture);
+        core::position2d<s32> targetPos = positions[i];
+        core::position2d<s32> sourcePos = sourceRects[i].UpperLeftCorner;
+        // This needs to be signed as it may go negative.
+        core::dimension2d<s32> sourceSize(sourceRects[i].getSize());
+
+        if (clipRect)
+        {
+            if (targetPos.X < clipRect->UpperLeftCorner.X)
+            {
+                sourceSize.Width += targetPos.X - clipRect->UpperLeftCorner.X;
+                if (sourceSize.Width <= 0)
+                    continue;
+
+                sourcePos.X -= targetPos.X - clipRect->UpperLeftCorner.X;
+                targetPos.X = clipRect->UpperLeftCorner.X;
+            }
+
+            if (targetPos.X + (s32)sourceSize.Width > clipRect->LowerRightCorner.X)
+            {
+                sourceSize.Width -= (targetPos.X + sourceSize.Width) - clipRect->LowerRightCorner.X;
+                if (sourceSize.Width <= 0)
+                    continue;
+            }
+
+            if (targetPos.Y < clipRect->UpperLeftCorner.Y)
+            {
+                sourceSize.Height += targetPos.Y - clipRect->UpperLeftCorner.Y;
+                if (sourceSize.Height <= 0)
+                    continue;
+
+                sourcePos.Y -= targetPos.Y - clipRect->UpperLeftCorner.Y;
+                targetPos.Y = clipRect->UpperLeftCorner.Y;
+            }
+
+            if (targetPos.Y + (s32)sourceSize.Height > clipRect->LowerRightCorner.Y)
+            {
+                sourceSize.Height -= (targetPos.Y + sourceSize.Height) - clipRect->LowerRightCorner.Y;
+                if (sourceSize.Height <= 0)
+                    continue;
+            }
+        }
+
+        // clip these coordinates
+
+        if (targetPos.X<0)
+        {
+            sourceSize.Width += targetPos.X;
+            if (sourceSize.Width <= 0)
+                continue;
+
+            sourcePos.X -= targetPos.X;
+            targetPos.X = 0;
+        }
+
+        if (targetPos.X + sourceSize.Width >(s32)renderTargetSize.Width)
+        {
+            sourceSize.Width -= (targetPos.X + sourceSize.Width) - renderTargetSize.Width;
+            if (sourceSize.Width <= 0)
+                continue;
+        }
+
+        if (targetPos.Y<0)
+        {
+            sourceSize.Height += targetPos.Y;
+            if (sourceSize.Height <= 0)
+                continue;
+
+            sourcePos.Y -= targetPos.Y;
+            targetPos.Y = 0;
+        }
+
+        if (targetPos.Y + sourceSize.Height >(s32)renderTargetSize.Height)
+        {
+            sourceSize.Height -= (targetPos.Y + sourceSize.Height) - renderTargetSize.Height;
+            if (sourceSize.Height <= 0)
+                continue;
+        }
+
+        // ok, we've clipped everything.
+        // now draw it.
+
+        core::rect<f32> tcoords;
+        tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getOriginalSize().Width;
+        tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getOriginalSize().Height;
+        tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getOriginalSize().Width);
+        tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getOriginalSize().Height);
+
+        const core::rect<s32> poss(targetPos, sourceSize);
+
+        vtx.push_back(S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y));
+        vtx.push_back(S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y));
+        vtx.push_back(S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y));
+        vtx.push_back(S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y));
+
+        const u32 curPos = vtx.size() - 4;
+        indices.push_back(0 + curPos);
+        indices.push_back(1 + curPos);
+        indices.push_back(2 + curPos);
+
+        indices.push_back(0 + curPos);
+        indices.push_back(2 + curPos);
+        indices.push_back(3 + curPos);
     }
+
+    if (!vtx.empty())
+        draw2DVertexPrimitiveList(vtx.pointer(), vtx.size(), indices.pointer(), indices.size() / 3, video::EVT_STANDARD, scene::EPT_TRIANGLES, video::EIT_16BIT);
 }
 
 
@@ -941,10 +1002,56 @@ void CNullDriver::draw2DImage(const video::ITexture* texture, const core::rect<s
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
     const video::SColor* const colors, bool useAlphaChannelOfTexture)
 {
-    if (destRect.isValid())
-        draw2DImage(texture, core::position2d<s32>(destRect.UpperLeftCorner),
-                sourceRect, clipRect, colors?colors[0]:video::SColor(0xffffffff),
-                useAlphaChannelOfTexture);
+    if (!texture)
+        return;
+
+    const core::dimension2d<u32>& ss = texture->getOriginalSize();
+
+    // clip source and destination rects to prevent draw pixels outside draw area.
+    core::rect<f32> tcoords;
+    tcoords.UpperLeftCorner.X = (f32)sourceRect.UpperLeftCorner.X / (f32)ss.Width;
+    tcoords.UpperLeftCorner.Y = (f32)sourceRect.UpperLeftCorner.Y / (f32)ss.Height;
+    tcoords.LowerRightCorner.X = (f32)sourceRect.LowerRightCorner.X / (f32)ss.Width;
+    tcoords.LowerRightCorner.Y = (f32)sourceRect.LowerRightCorner.Y / (f32)ss.Height;
+
+    const video::SColor temp[4] =
+    {
+        0xFFFFFFFF,
+        0xFFFFFFFF,
+        0xFFFFFFFF,
+        0xFFFFFFFF
+    };
+
+    const video::SColor* const useColor = colors ? colors : temp;
+
+    S3DVertex vtx[4]; // clock wise
+    vtx[0] = S3DVertex((f32)destRect.UpperLeftCorner.X, (f32)destRect.UpperLeftCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, useColor[0],
+        tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[1] = S3DVertex((f32)destRect.LowerRightCorner.X, (f32)destRect.UpperLeftCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, useColor[3],
+        tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[2] = S3DVertex((f32)destRect.LowerRightCorner.X, (f32)destRect.LowerRightCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, useColor[2],
+        tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y);
+    vtx[3] = S3DVertex((f32)destRect.UpperLeftCorner.X, (f32)destRect.LowerRightCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, useColor[1],
+        tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y);
+
+    s32 verticesSize = sizeof(vtx) / sizeof(vtx[0]);
+
+    s16 indices[6] = { 0,1,2,0,2,3 };
+    s32 indicesSize = 4;
+
+    SMaterial m;
+    m.setTexture(0, const_cast<video::ITexture*>(texture));
+    setMaterial(m);
+
+    setRenderStates2DMode(useColor[0].getAlpha()<255 || useColor[1].getAlpha()<255 ||
+        useColor[2].getAlpha()<255 || useColor[3].getAlpha()<255,
+        true, useAlphaChannelOfTexture);
+
+    draw2DVertexPrimitiveList(vtx, verticesSize, indices, 2, video::EVT_STANDARD, scene::EPT_TRIANGLES, video::EIT_16BIT);
 }
 
 
@@ -954,6 +1061,129 @@ void CNullDriver::draw2DImage(const video::ITexture* texture, const core::positi
                 const core::rect<s32>* clipRect, SColor color,
                 bool useAlphaChannelOfTexture)
 {
+    if (!texture)
+        return;
+
+    if (!sourceRect.isValid())
+        return;
+
+    SMaterial m;
+    m.setTexture(0, const_cast<video::ITexture*>(texture));
+    setMaterial(m);
+
+    core::position2d<s32> targetPos = destPos;
+    core::position2d<s32> sourcePos = sourceRect.UpperLeftCorner;
+    // This needs to be signed as it may go negative.
+    core::dimension2d<s32> sourceSize(sourceRect.getSize());
+
+    if (clipRect)
+    {
+        if (targetPos.X < clipRect->UpperLeftCorner.X)
+        {
+            sourceSize.Width += targetPos.X - clipRect->UpperLeftCorner.X;
+            if (sourceSize.Width <= 0)
+                return;
+
+            sourcePos.X -= targetPos.X - clipRect->UpperLeftCorner.X;
+            targetPos.X = clipRect->UpperLeftCorner.X;
+        }
+
+        if (targetPos.X + (s32)sourceSize.Width > clipRect->LowerRightCorner.X)
+        {
+            sourceSize.Width -= (targetPos.X + sourceSize.Width) - clipRect->LowerRightCorner.X;
+            if (sourceSize.Width <= 0)
+                return;
+        }
+
+        if (targetPos.Y < clipRect->UpperLeftCorner.Y)
+        {
+            sourceSize.Height += targetPos.Y - clipRect->UpperLeftCorner.Y;
+            if (sourceSize.Height <= 0)
+                return;
+
+            sourcePos.Y -= targetPos.Y - clipRect->UpperLeftCorner.Y;
+            targetPos.Y = clipRect->UpperLeftCorner.Y;
+        }
+
+        if (targetPos.Y + (s32)sourceSize.Height > clipRect->LowerRightCorner.Y)
+        {
+            sourceSize.Height -= (targetPos.Y + sourceSize.Height) - clipRect->LowerRightCorner.Y;
+            if (sourceSize.Height <= 0)
+                return;
+        }
+    }
+
+    // clip these coordinates
+
+    //if (targetPos.X<0)
+    //{
+    //    sourceSize.Width += targetPos.X;
+    //    if (sourceSize.Width <= 0)
+    //        return;
+    //
+    //    sourcePos.X -= targetPos.X;
+    //    targetPos.X = 0;
+    //}
+
+    //const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+    //
+    //if (targetPos.X + sourceSize.Width > (s32)renderTargetSize.Width)
+    //{
+    //    sourceSize.Width -= (targetPos.X + sourceSize.Width) - renderTargetSize.Width;
+    //    if (sourceSize.Width <= 0)
+    //        return;
+    //}
+
+    //if (targetPos.Y<0)
+    //{
+    //    sourceSize.Height += targetPos.Y;
+    //    if (sourceSize.Height <= 0)
+    //        return;
+    //
+    //    sourcePos.Y -= targetPos.Y;
+    //    targetPos.Y = 0;
+    //}
+
+    //if (targetPos.Y + sourceSize.Height > (s32)renderTargetSize.Height)
+    //{
+    //    sourceSize.Height -= (targetPos.Y + sourceSize.Height) - renderTargetSize.Height;
+    //    if (sourceSize.Height <= 0)
+    //        return;
+    //}
+
+    // ok, we've clipped everything.
+    // now draw it.
+
+    core::rect<f32> tcoords;
+    tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getOriginalSize().Width;
+    tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getOriginalSize().Height;
+    tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getOriginalSize().Width);
+    tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getOriginalSize().Height);
+
+    const core::rect<s32> poss(targetPos, sourceSize);
+
+    setRenderStates2DMode(color.getAlpha()<255, true, useAlphaChannelOfTexture);
+
+    S3DVertex vtx[4];
+    vtx[0] = S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[1] = S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[2] = S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y);
+    vtx[3] = S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y);
+
+    s32 verticesSize = 4;
+
+    s16 indices[6] = { 0,1,2,0,2,3 };
+    s32 indicesSize = sizeof(indices) / sizeof(indices[0]);
+
+    draw2DVertexPrimitiveList(vtx, verticesSize, indices, indicesSize / 3, video::EVT_STANDARD, scene::EPT_TRIANGLES, video::EIT_16BIT);
 }
 
 
@@ -973,13 +1203,58 @@ void CNullDriver::draw2DRectangle(SColor color, const core::rect<s32>& pos, cons
     draw2DRectangle(pos, color, color, color, color, clip, filled);
 }
 
-
-
 //! Draws a 2d rectangle with a gradient.
-void CNullDriver::draw2DRectangle(const core::rect<s32>& pos,
+void CNullDriver::draw2DRectangle(const core::rect<s32>& position,
     SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
     const core::rect<s32>* clip, bool filled /*= true*/)
 {
+    core::rect<s32> pos(position);
+    const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+
+    if (clip)
+        pos.clipAgainst(*clip);
+
+    if (!pos.isValid())
+        return;
+
+    S3DVertex vtx[4];
+    vtx[0] = S3DVertex((f32)pos.UpperLeftCorner.X + 0.375f, (f32)pos.UpperLeftCorner.Y + 0.375f, 0.0f,
+        0.0f, 0.0f, 0.0f, colorLeftUp, 0.0f, 0.0f);
+    vtx[1] = S3DVertex((f32)pos.LowerRightCorner.X + 0.375f, (f32)pos.UpperLeftCorner.Y + 0.375f, 0.0f,
+        0.0f, 0.0f, 0.0f, colorRightUp, 0.0f, 1.0f);
+    vtx[2] = S3DVertex((f32)pos.LowerRightCorner.X + 0.375f, (f32)pos.LowerRightCorner.Y + 0.375f, 0.0f,
+        0.0f, 0.0f, 0.0f, colorRightDown, 1.0f, 0.0f);
+    vtx[3] = S3DVertex((f32)pos.UpperLeftCorner.X + 0.375f, (f32)pos.LowerRightCorner.Y + 0.375f, 0.0f,
+        0.0f, 0.0f, 0.0f, colorLeftDown, 1.0f, 1.0f);
+
+    //if (!filled)
+    //{
+    //    vtx[0].Pos.X += 0.375f;
+    //    vtx[0].Pos.Y += 0.375f;
+    //    vtx[1].Pos.X += 0.375f;
+    //    vtx[1].Pos.Y += 0.375f;
+    //    vtx[2].Pos.X += 0.375f;
+    //    vtx[2].Pos.Y += 0.375f;
+    //    vtx[3].Pos.X += 0.375f;
+    //    vtx[3].Pos.Y += 0.375f;
+    //}
+
+    static s16 fillIndices[6] = { 0,1,2,0,2,3 };
+    static s16 unfillIndices[8] = { 0,1,1,2,2,3,3,0 };
+
+    static SMaterial _m;
+    setMaterial(_m);
+
+    setRenderStates2DMode(
+        colorLeftUp.getAlpha() < 255 ||
+        colorRightUp.getAlpha() < 255 ||
+        colorLeftDown.getAlpha() < 255 ||
+        colorRightDown.getAlpha() < 255, false, false);
+
+    if (filled)
+        draw2DVertexPrimitiveList(vtx, 4, fillIndices, 2, video::EVT_STANDARD, scene::EPT_TRIANGLES, video::EIT_16BIT);
+    else
+        draw2DVertexPrimitiveList(vtx, 4, unfillIndices, 4, video::EVT_STANDARD, scene::EPT_LINES, video::EIT_16BIT);
 }
 
 
@@ -988,6 +1263,29 @@ void CNullDriver::draw2DRectangle(const core::rect<s32>& pos,
 void CNullDriver::draw2DLine(const core::position2d<s32>& start,
                 const core::position2d<s32>& end, SColor color)
 {
+    if (start == end)
+        drawPixel(start.X, start.Y, color);
+    else
+    {
+        // thanks to Vash TheStampede who sent in his implementation
+        S3DVertex vtx[2];
+        vtx[0] = S3DVertex((f32)start.X + 0.375f, (f32)start.Y + 0.375f, 0.0f,
+            0.0f, 0.0f, 0.0f, color, 0.0f, 0.0f);
+        vtx[1] = S3DVertex((f32)end.X + 0.375f, (f32)end.Y + 0.375f, 0.0f,
+            0.0f, 0.0f, 0.0f, color, 0.0f, 1.0f);
+
+        static const u16 indices[2] = { 0, 1 };
+
+        static SMaterial _m;
+        setMaterial(_m);
+
+        setRenderStates2DMode(color.getAlpha() < 255, false, false);
+
+        //setRenderStates2DMode(color.getAlpha() < 255, false, false);
+        //setActiveTexture(0, 0);
+
+        draw2DVertexPrimitiveList(vtx, 2, indices, 1, video::EVT_STANDARD, scene::EPT_LINES, video::EIT_16BIT);
+    }
 }
 
 //! Draws a pixel
@@ -1696,7 +1994,7 @@ void CNullDriver::CreateHardwareBuffer(const scene::IMeshBuffer* mb)
 //! Draws a mesh buffer
 void CNullDriver::drawMeshBuffer(const scene::IMeshBuffer* mb, scene::IMesh* mesh/* = nullptr*/, scene::ISceneNode* node/* = nullptr*/)
 {
-    if (!mb || !((scene::IMeshBuffer*)mb)->getIndexCount())
+    if (!mb || !mb->getIndexCount())
         return;
 
     IHardwareBuffer *HWBuffer = mb->GetHWBuffer();
@@ -1706,7 +2004,12 @@ void CNullDriver::drawMeshBuffer(const scene::IMeshBuffer* mb, scene::IMesh* mes
     if (HWBuffer)
         drawHardwareBuffer(HWBuffer, mesh, node);
     else
+    {
+        if (getActiveGPUProgram())
+            getActiveGPUProgram()->UpdateValues(video::IShaderDataBuffer::EUT_PER_FRAME_PER_MATERIAL, (scene::IMeshBuffer*)mb, mesh, node, video::IShaderDataBuffer::EUF_COMMIT_VALUES);
+
         drawVertexPrimitiveList(mb->getVertices(), mb->getVertexCount(), mb->getIndices(), mb->getRenderPrimitive() == scene::EPT_QUADS ? mb->getIndexCount() / 4 : mb->getIndexCount() / 3, mb->getVertexType(), /*scene::EPT_TRIANGLES*/ mb->getRenderPrimitive(), mb->getIndexType());
+    }
 }
 
 
@@ -1782,6 +2085,13 @@ void CNullDriver::removeHardwareBuffer(const scene::IMeshBuffer* mb)
     }
 }
 
+void ThrowIfNotCoreThread()
+{
+}
+
+void ThrowIfCoreThread()
+{
+}
 
 //! Remove all hardware buffers
 void CNullDriver::removeAllHardwareBuffers()
@@ -1808,64 +2118,64 @@ bool CNullDriver::isHardwareBufferRecommend(const scene::IMeshBuffer* mb)
 /** Use node for identification and mesh for occlusion test. */
 void CNullDriver::addOcclusionQuery(scene::ISceneNode* node, const scene::IMesh* mesh)
 {
-    if (!node)
-        return;
-
-    if (!mesh)
-        return;
-
-    //search for query
-    if (node->getOcculisionQuery())
-    {
-        if (mesh && node->getOcculisionQuery()->Mesh != mesh)
-        {
-            if (node->getOcculisionQuery()->Mesh)
-                node->getOcculisionQuery()->Mesh->drop();
-            node->getOcculisionQuery()->Mesh = mesh;
-            mesh->grab();
-        }
-    }
-    else
-    {
-        SOccQuery* occQuery = new SOccQuery(node);
-        occQuery->grab();
-        node->setOcculisionQuery(occQuery);
-        if (mesh)
-        {
-            node->getOcculisionQuery()->Mesh = mesh;
-            mesh->grab();
-        }
-
-        OcclusionQueries.push_back(occQuery);
-        node->setAutomaticCulling(node->getAutomaticCulling() | scene::EAC_OCC_QUERY);
-    }
+    //if (!node)
+    //    return;
+    //
+    //if (!mesh)
+    //    return;
+    //
+    ////search for query
+    //if (node->getOcculisionQuery())
+    //{
+    //    if (mesh && node->getOcculisionQuery()->Mesh != mesh)
+    //    {
+    //        if (node->getOcculisionQuery()->Mesh)
+    //            node->getOcculisionQuery()->Mesh->drop();
+    //        node->getOcculisionQuery()->Mesh = mesh;
+    //        mesh->grab();
+    //    }
+    //}
+    //else
+    //{
+    //    SOccQuery* occQuery = new SOccQuery(node);
+    //    occQuery->grab();
+    //    node->setOcculisionQuery(occQuery);
+    //    if (mesh)
+    //    {
+    //        node->getOcculisionQuery()->Mesh = mesh;
+    //        mesh->grab();
+    //    }
+    //
+    //    OcclusionQueries.push_back(occQuery);
+    //    node->setAutomaticCulling(node->getAutomaticCulling() | scene::EAC_OCC_QUERY);
+    //}
 }
 
 
 //! Remove occlusion query.
 void CNullDriver::removeOcclusionQuery(scene::ISceneNode* node)
 {
-    //search for query
-    s32 index = OcclusionQueries.linear_search(node->getOcculisionQuery());
-    if (index != -1)
-    {
-        SOccQuery* mQuery = node->getOcculisionQuery();
-        mQuery->drop();
-        node->setOcculisionQuery(nullptr);
-        node->setAutomaticCulling(node->getAutomaticCulling() & ~scene::EAC_OCC_QUERY);
-        OcclusionQueries.erase(index);
-        mQuery->drop();
-    }
+    ////search for query
+    //s32 index = OcclusionQueries.linear_search(node->getOcculisionQuery());
+    //if (index != -1)
+    //{
+    //    SOccQuery* mQuery = node->getOcculisionQuery();
+    //    mQuery->drop();
+    //    node->setOcculisionQuery(nullptr);
+    //    node->setAutomaticCulling(node->getAutomaticCulling() & ~scene::EAC_OCC_QUERY);
+    //    OcclusionQueries.erase(index);
+    //    mQuery->drop();
+    //}
 }
 
 
 //! Remove all occlusion queries.
 void CNullDriver::removeAllOcclusionQueries()
 {
-    for (s32 i = OcclusionQueries.size() - 1; i >= 0; --i)
-    {
-        removeOcclusionQuery(OcclusionQueries[i]->Node);
-    }
+    //for (s32 i = OcclusionQueries.size() - 1; i >= 0; --i)
+    //{
+    //    removeOcclusionQuery(OcclusionQueries[i]->Node);
+    //}
 }
 
 
@@ -1874,92 +2184,92 @@ void CNullDriver::removeAllOcclusionQueries()
 flag to enable the proper material setting. */
 void CNullDriver::runOcclusionQuery(scene::ISceneNode* node, bool visible)
 {
-    if (!node)
-        return;
-
-    if (!node->getOcculisionQuery())
-        return;
-
-    node->getOcculisionQuery()->Run=0;
-
-    if (!visible)
-    {
-        SMaterial mat;
-        mat.Lighting=false;
-        mat.AntiAliasing=0;
-        mat.ColorMask=ECP_NONE;
-        mat.GouraudShading=false;
-        mat.ZWriteEnable=false;
-        mat.FrontfaceCulling=false;
-        mat.BackfaceCulling=false;
-        mat.BlendOperation= EBO_NONE;
-        mat.FogEnable=false;
-        mat.ZBuffer = ECFN_LESSEQUAL;
-        setMaterial(mat);
-    }
-
-    setTransform(video::ETS_WORLD, node->getAbsoluteTransformation());
-
-    //if (node->getOcculisionQuery()->Mesh)
+    //if (!node)
+    //    return;
+    //
+    //if (!node->getOcculisionQuery())
+    //    return;
+    //
+    //node->getOcculisionQuery()->Run=0;
+    //
+    //if (!visible)
     //{
-    //    for (u32 i = 0; i != node->getOcculisionQuery()->Mesh->getMeshBufferCount(); ++i)
-    //    {
-    //        scene::IMeshBuffer* mb = node->getOcculisionQuery()->Mesh->getMeshBuffer(i);
-    //        if (visible)
-    //            setMaterial(mb->getMaterial());
-    //        drawVertexPrimitiveList(mb->getVertices(), mb->getVertexCount(), mb->getIndices(), mb->getRenderPrimitive() == scene::EPT_QUADS ? mb->getIndexCount() / 4 : mb->getIndexCount() / 3, mb->getVertexType(), /*scene::EPT_TRIANGLES*/ mb->getRenderPrimitive(), mb->getIndexType());
-    //        //drawMeshBuffer(mb);
-    //    }
+    //    SMaterial mat;
+    //    mat.Lighting=false;
+    //    mat.AntiAliasing=0;
+    //    mat.ColorMask=ECP_NONE;
+    //    mat.GouraudShading=false;
+    //    mat.ZWriteEnable=false;
+    //    mat.FrontfaceCulling=false;
+    //    mat.BackfaceCulling=false;
+    //    mat.BlendOperation= EBO_NONE;
+    //    mat.FogEnable=false;
+    //    mat.ZBuffer = ECFN_LESSEQUAL;
+    //    setMaterial(mat);
     //}
-
-    u16* indicies;
-    u16 indiciesSize;
-    core::vector3df edges[8];
-    
-    node->getBoundingBox().getEdges(edges);
-    //box.getEdgesIndcies(indicies, indiciesSize);
-    
-    static u16 sIndicies[] =
-    {
-        0, 1, 5, 0, 5, 4, 
-		2, 6, 4, 2, 4, 0,
-		0, 1, 3, 0, 3, 2,
-		2, 6, 7, 2, 7, 3,
-		3, 1, 5, 3, 5, 7, 
-		6, 4, 5, 6, 5, 7
-    };
-    
-    indicies = sIndicies;
-    indiciesSize = sizeof(sIndicies) / sizeof(u16);
-    
-    S3DVertex vertex[8];
-    for (u8 i = 0; i != 8; ++i)
-    {
-        vertex[i].Pos = edges[i];
-        //vertex[i].Color = SColor(255, 255, 255, 255);
-    }
-    
-    // draw everything
-    setRenderStates3DMode(E_VERTEX_TYPE::EVT_STANDARD);
-    drawVertexPrimitiveList(vertex, 8, indicies, indiciesSize / 3, EVT_OCCLUSION, scene::EPT_TRIANGLES, EIT_16BIT);
-
-    //draw3DBox(node->getBoundingBox());
-
-    //const scene::IMesh* mesh = OcclusionQueries[index].Mesh;
-    //for (u32 i=0; i<mesh->getMeshBufferCount(); ++i)
+    //
+    //setTransform(video::ETS_WORLD, node->getAbsoluteTransformation());
+    //
+    ////if (node->getOcculisionQuery()->Mesh)
+    ////{
+    ////    for (u32 i = 0; i != node->getOcculisionQuery()->Mesh->getMeshBufferCount(); ++i)
+    ////    {
+    ////        scene::IMeshBuffer* mb = node->getOcculisionQuery()->Mesh->getMeshBuffer(i);
+    ////        if (visible)
+    ////            setMaterial(mb->getMaterial());
+    ////        drawVertexPrimitiveList(mb->getVertices(), mb->getVertexCount(), mb->getIndices(), mb->getRenderPrimitive() == scene::EPT_QUADS ? mb->getIndexCount() / 4 : mb->getIndexCount() / 3, mb->getVertexType(), /*scene::EPT_TRIANGLES*/ mb->getRenderPrimitive(), mb->getIndexType());
+    ////        //drawMeshBuffer(mb);
+    ////    }
+    ////}
+    //
+    //u16* indicies;
+    //u16 indiciesSize;
+    //core::vector3df edges[8];
+    //
+    //node->getBoundingBox().getEdges(edges);
+    ////box.getEdgesIndcies(indicies, indiciesSize);
+    //
+    //static u16 sIndicies[] =
     //{
-    //    scene::IMeshBuffer* mb = mesh->getMeshBuffer(i);
-    //    if (mb)
-    //    {
-    //        if (mb->GetHWBuffer())
-    //            mb->GetHWBuffer()->Bind();
-    //        if (visible)
-    //            setMaterial(mb->getMaterial());
-    //        drawMeshBuffer(mb);
-    //        if (mb->GetHWBuffer())
-    //            mb->GetHWBuffer()->Unbind();
-    //    }
+    //    0, 1, 5, 0, 5, 4, 
+	//	2, 6, 4, 2, 4, 0,
+	//	0, 1, 3, 0, 3, 2,
+	//	2, 6, 7, 2, 7, 3,
+	//	3, 1, 5, 3, 5, 7, 
+	//	6, 4, 5, 6, 5, 7
+    //};
+    //
+    //indicies = sIndicies;
+    //indiciesSize = sizeof(sIndicies) / sizeof(u16);
+    //
+    //S3DVertex vertex[8];
+    //for (u8 i = 0; i != 8; ++i)
+    //{
+    //    vertex[i].Pos = edges[i];
+    //    //vertex[i].Color = SColor(255, 255, 255, 255);
     //}
+    //
+    //// draw everything
+    //setRenderStates3DMode(E_VERTEX_TYPE::EVT_STANDARD);
+    //drawVertexPrimitiveList(vertex, 8, indicies, indiciesSize / 3, EVT_OCCLUSION, scene::EPT_TRIANGLES, EIT_16BIT);
+    //
+    ////draw3DBox(node->getBoundingBox());
+    //
+    ////const scene::IMesh* mesh = OcclusionQueries[index].Mesh;
+    ////for (u32 i=0; i<mesh->getMeshBufferCount(); ++i)
+    ////{
+    ////    scene::IMeshBuffer* mb = mesh->getMeshBuffer(i);
+    ////    if (mb)
+    ////    {
+    ////        if (mb->GetHWBuffer())
+    ////            mb->GetHWBuffer()->Bind();
+    ////        if (visible)
+    ////            setMaterial(mb->getMaterial());
+    ////        drawMeshBuffer(mb);
+    ////        if (mb->GetHWBuffer())
+    ////            mb->GetHWBuffer()->Unbind();
+    ////    }
+    ////}
 }
 
 
@@ -1968,8 +2278,8 @@ void CNullDriver::runOcclusionQuery(scene::ISceneNode* node, bool visible)
 overrideMaterial to disable the color and depth buffer. */
 void CNullDriver::runAllOcclusionQueries(bool visible)
 {
-    for (u32 i=0; i<OcclusionQueries.size(); ++i)
-        runOcclusionQuery(OcclusionQueries[i]->Node, visible);
+    //for (u32 i=0; i<OcclusionQueries.size(); ++i)
+    //    runOcclusionQuery(OcclusionQueries[i]->Node, visible);
 }
 
 
@@ -1986,15 +2296,15 @@ void CNullDriver::updateOcclusionQuery(scene::ISceneNode* node, bool block)
 Update might not occur in this case, though */
 void CNullDriver::updateAllOcclusionQueries(bool block)
 {
-    for (u32 i=0; i<OcclusionQueries.size(); ++i)
-    {
-        if (OcclusionQueries[i]->Run==u32(~0))
-            continue;
-        updateOcclusionQuery(OcclusionQueries[i]->Node, block);
-        ++OcclusionQueries[i]->Run;
-        if (OcclusionQueries[i]->Run>10000)
-            removeOcclusionQuery(OcclusionQueries[i]->Node);
-    }
+    //for (u32 i=0; i<OcclusionQueries.size(); ++i)
+    //{
+    //    if (OcclusionQueries[i]->Run==u32(~0))
+    //        continue;
+    //    updateOcclusionQuery(OcclusionQueries[i]->Node, block);
+    //    ++OcclusionQueries[i]->Run;
+    //    if (OcclusionQueries[i]->Run>10000)
+    //        removeOcclusionQuery(OcclusionQueries[i]->Node);
+    //}
 }
 
 

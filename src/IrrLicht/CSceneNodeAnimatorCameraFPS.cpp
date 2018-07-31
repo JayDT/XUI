@@ -229,7 +229,7 @@ void CSceneNodeAnimatorCameraFPS::animateNode(ISceneNode* node, u32 timeMs)
         }
     }
 
-    if (!camera->isFirstPerson())
+    if (!camera->isFirstPerson() && getMoveSceneNode())
     {
         core::vector3df cameraPos;
 

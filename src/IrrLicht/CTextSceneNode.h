@@ -41,6 +41,7 @@ namespace scene
 
 		//! sets the text string
 		virtual void setText(const wchar_t* text);
+        virtual const wchar_t* getText() const override { return Text.c_str(); }
 
 		//! sets the color of the text
 		virtual void setTextColor(video::SColor color);

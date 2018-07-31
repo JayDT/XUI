@@ -16,7 +16,7 @@ namespace irr
 namespace video
 {
 
-class CImageWriterBMP : public IImageWriter
+class IRRLICHT_API CImageWriterBMP : public IImageWriter
 {
 public:
 	//! constructor

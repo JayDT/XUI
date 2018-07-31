@@ -10,7 +10,7 @@ IF (LibMetaRuntimeSharedLinkage)
        boost
        sparsehash
        libCallStack
-       ${ZLIB_LIBRARIES}
+       ZLIB
      )
 
     IF(WIN32)

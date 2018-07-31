@@ -30,15 +30,11 @@ enum E_VERTEX_TYPE
     /** Usually used for tangent space normal mapping. */
     EVT_TANGENTS,
 
-    EVT_TERRAIN,
-
     EVT_SKINNING,
 
-    EVT_PARTICLE,
+    EVT_OCCLUSION,
 
     EVT_MAX_VERTEX_TYPE,
-
-    EVT_OCCLUSION,
 };
 
 //! Array holding the built in vertex type names
@@ -47,25 +43,8 @@ const char* const sBuiltInVertexTypeNames[] =
     "standard",
     "2tcoords",
     "tangents",
-    "terrain",
     "skinning",
     0
-};
-
-//! standard vertex used by the Irrlicht engine.
-struct IRRLICHT_API S3DInstance
-{
-    //core::matrix4 WorldView;
-    irr::core::matrix4x3 WorldView;
-    irr::core::vector3df InstaceFloatData;
-    irr::core::vector3d<irr::u32> InstaceUIntData;
-};
-
-//! standard vertex used by the Irrlicht engine.
-struct IRRLICHT_API S3DTextureInstance : public S3DInstance
-{
-    video::SColor Color;
-    core::vector2df UVposMod;
 };
 
 //! standard vertex used by the Irrlicht engine.
@@ -127,15 +106,6 @@ struct IRRLICHT_API S3DVertex
                 Normal.getInterpolated(other.Normal, d),
                 Color.getInterpolated(other.Color, d),
                 TCoords.getInterpolated(other.TCoords, d));
-    }
-};
-
-//! standard vertex used by the Irrlicht engine.
-struct IRRLICHT_API S3DParticleVertex : public S3DVertex
-{
-    E_VERTEX_TYPE getType() const
-    {
-        return EVT_PARTICLE;
     }
 };
 
@@ -289,27 +259,6 @@ struct IRRLICHT_API S3DVertexTangents : public S3DVertex
     }
 };
 
-struct S3DChunkVertex : public S3DVertex2TCoords
-{
-    S3DChunkVertex() : S3DVertex2TCoords()
-    {
-    }
-
-    //! constructor with all values
-    S3DChunkVertex(const core::vector3df& pos, const core::vector3df& normal, const video::SColor& color,
-        const core::vector2d<f32>& tcoords, const core::vector2d<f32>& tcoords2, const video::SColor& vertexShading)
-        : video::S3DVertex2TCoords(pos, normal, color, tcoords, tcoords2), VertexShading(vertexShading)
-    {
-    }
-
-    E_VERTEX_TYPE getType() const
-    {
-        return EVT_TERRAIN;
-    }
-
-    video::SColor VertexShading;
-};
-
 struct S3DSkinningVertex : public S3DVertex2TCoords
 {
     S3DSkinningVertex() : S3DVertex2TCoords()
@@ -341,8 +290,6 @@ inline u32 getVertexPitchFromType(E_VERTEX_TYPE vertexType)
 {
     switch (vertexType)
     {
-        case video::EVT_TERRAIN:
-            return sizeof(video::S3DChunkVertex);
         case video::EVT_SKINNING:
             return sizeof(video::S3DSkinningVertex);
         case video::EVT_2TCOORDS:

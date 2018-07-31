@@ -51,17 +51,61 @@ namespace video
         //! 128 bit floating point format. 32 bits are used for the red, green, blue and alpha channels.
         ECF_A32B32G32R32F,
 
+        /** Compressed image formats. **/
+
+        //! DXT1 color format.
+        ECF_DXT1,
+
+        //! DXT2 color format.
+        ECF_DXT2,
+
+        //! DXT3 color format.
+        ECF_DXT3,
+
+        //! DXT4 color format.
+        ECF_DXT4,
+
+        //! DXT5 color format.
+        ECF_DXT5,
+
+        //! PVRTC RGB 2bpp.
+        ECF_PVRTC_RGB2,
+
+        //! PVRTC ARGB 2bpp.
+        ECF_PVRTC_ARGB2,
+
+        //! PVRTC RGB 4bpp.
+        ECF_PVRTC_RGB4,
+
+        //! PVRTC ARGB 4bpp.
+        ECF_PVRTC_ARGB4,
+
+        //! PVRTC2 ARGB 2bpp.
+        ECF_PVRTC2_ARGB2,
+
+        //! PVRTC2 ARGB 4bpp.
+        ECF_PVRTC2_ARGB4,
+
+        //! ETC1 RGB.
+        ECF_ETC1,
+
+        //! ETC2 RGB.
+        ECF_ETC2_RGB,
+
+        //! ETC2 ARGB.
+        ECF_ETC2_ARGB,
+        
+        /** New image formats. **/
+
+        ECF_D32_S8X24,
+
         //! WoW Formats
         ECF_RGBA8,
         ECF_ALPHA,
-        ECF_RGBA_S3TC_DXT1,
-        ECF_RGBA_S3TC_DXT3,
-        ECF_RGBA_S3TC_DXT5,
-        
+
         //! Unknown color format:
         ECF_UNKNOWN
     };
-
 
     //! Creates a 16 bit A1R5G5B5 color
     inline u16 RGBA16(u32 r, u32 g, u32 b, u32 a=0xFF)

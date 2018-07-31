@@ -215,7 +215,7 @@ template <typename T> inline T* ASSERT_NOTNULL(T* pointer)
 
 #ifndef _WIN32
 #   define DEBUG_ASM_BREAK asm("int $3")
-#   define DEBUG_BREAK raise(SIGINT)
+#   define DEBUG_BREAK raise(SIGTRAP)
 #else
 #   define DEBUG_ASM_BREAK __asm { int 3 }
 #   define DEBUG_BREAK ((IsDebuggerPresent() ? __debugbreak() : raise(SIGINT)), 0)

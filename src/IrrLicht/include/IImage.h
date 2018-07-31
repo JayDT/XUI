@@ -23,13 +23,16 @@ class IRRLICHT_API IImage : public virtual IReferenceCounted
 {
 public:
 
+    virtual void initializeMipLevels(u8 levelCount, core::dimension2d<u32>* sizes) = 0;
+    virtual void initializeMipLevels(u8 levelCount, core::dimension2d<u32>* sizes, u32* dataSizes) = 0;
+
 	//! Lock function. Use this to get a pointer to the image data.
 	/** After you don't need the pointer anymore, you must call unlock().
 	\return Pointer to the image data. What type of data is pointed to
 	depends on the color format of the image. For example if the color
 	format is ECF_A8R8G8B8, it is of u32. Be sure to call unlock() after
 	you don't need the pointer any more. */
-	virtual void* lock() = 0;
+	virtual void* lock(u8 miplevel = 0) = 0;
 
 	//! Unlock function.
 	/** Should be called after the pointer received by lock() is not
@@ -46,16 +49,18 @@ public:
 	virtual f32 getBytesPerPixel() const = 0;
 
 	//! Returns image data size in bytes
-	virtual u32 getImageDataSizeInBytes() const = 0;
+	virtual u32 getImageDataSizeInBytes(u8 miplevel = 0) const = 0;
+
+    virtual u32 getMemorySize() const = 0;
 
 	//! Returns image data size in pixels
 	virtual u32 getImageDataSizeInPixels() const = 0;
 
 	//! Returns a pixel
-	virtual SColor getPixel(u32 x, u32 y) const = 0;
+	virtual SColor getPixel(u32 x, u32 y, u8 miplevel = 0) const = 0;
 
 	//! Sets a pixel
-	virtual void setPixel(u32 x, u32 y, const SColor &color, bool blend = false ) = 0;
+	virtual void setPixel(u32 x, u32 y, const SColor &color, bool blend = false, u8 miplevel = 0) = 0;
 
 	//! Returns the color format
 	virtual ECOLOR_FORMAT getColorFormat() const = 0;
@@ -98,16 +103,17 @@ public:
 	//! fills the surface with given color
 	virtual void fill(const SColor &color) =0;
 
+    virtual u8 GetMipLevelCount() const = 0;
+
 	//! get the amount of Bits per Pixel of the given color format
-	static f32 getBitsPerPixelFromFormat(const ECOLOR_FORMAT format)
+    inline static f32 getBitsPerPixelFromFormat(const ECOLOR_FORMAT format)
 	{
 		switch(format)
 		{
-        case ECF_RGBA_S3TC_DXT1:
-            return 4;
-        case ECF_RGBA_S3TC_DXT3:
-            return 8;
-        case ECF_RGBA_S3TC_DXT5:
+        case ECF_DXT1:
+            return 4; // 3?
+        case ECF_DXT3:
+        case ECF_DXT5:
             return 8;
         case ECF_ALPHA:
             return 8;
@@ -137,11 +143,47 @@ public:
 		}
 	}
 
+    //! check if this is compressed color format
+    inline static bool isCompressedFormat(const ECOLOR_FORMAT format)
+    {
+        switch (format)
+        {
+            case ECF_DXT1:
+            case ECF_DXT2:
+            case ECF_DXT3:
+            case ECF_DXT4:
+            case ECF_DXT5:
+            case ECF_PVRTC_RGB2:
+            case ECF_PVRTC_ARGB2:
+            case ECF_PVRTC2_ARGB2:
+            case ECF_PVRTC_RGB4:
+            case ECF_PVRTC_ARGB4:
+            case ECF_PVRTC2_ARGB4:
+            case ECF_ETC1:
+            case ECF_ETC2_RGB:
+            case ECF_ETC2_ARGB:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    inline static bool isDepthOnlyFormat(const ECOLOR_FORMAT format)
+    {
+        switch (format)
+        {
+            case ECF_D32_S8X24:
+                return true;
+            default:
+                return false;
+        }
+    }
+
 	//! test if the color format is only viable for RenderTarget textures
 	/** Since we don't have support for e.g. floating point IImage formats
 	one should test if the color format can be used for arbitrary usage, or
 	if it is restricted to RTTs. */
-	static bool isRenderTargetOnlyFormat(const ECOLOR_FORMAT format)
+    inline static bool isRenderTargetOnlyFormat(const ECOLOR_FORMAT format)
 	{
 		switch(format)
 		{
@@ -157,7 +199,59 @@ public:
 		}
 	}
 
-    virtual u8* GetData() { return nullptr; }
+    inline static void getPitch(u32 width, u32 height, u32 depth, ECOLOR_FORMAT format, u32& rowPitch, u32& depthPitch, u8 miplevel = 0)
+    {
+        if (isCompressedFormat(format))
+        {
+            switch (format)
+            {
+                // BC formats work by dividing the image into 4x4 blocks, then encoding each
+                // 4x4 block with a certain number of bytes.
+                case ECF_DXT1:
+                case ECF_DXT2:
+                case ECF_DXT3:
+                case ECF_DXT4:
+                case ECF_DXT5:
+                    rowPitch = div(width + 3, 4).quot * 4;
+                    depthPitch = div(height + 3, 4).quot * 4 * rowPitch;
+                    return;
+
+                default:
+                    throw ("Invalid compressed pixel format");
+            }
+        }
+
+        rowPitch = width;
+        depthPitch = width * height;
+    }
+
+    inline static u32 getMemorySize(u32 width, u32 height, u32 depth, ECOLOR_FORMAT format)
+    {
+        if (isCompressedFormat(format))
+        {
+            switch (format)
+            {
+                // BC formats work by dividing the image into 4x4 blocks, then encoding each
+                // 4x4 block with a certain number of bytes.
+                case ECF_DXT1:
+                case ECF_DXT4:
+                    return ((width + 3) / 4)*((height + 3) / 4) * 8 * depth;
+                case ECF_DXT2:
+                case ECF_DXT3:
+                case ECF_DXT5:
+                    return ((width + 3) / 4)*((height + 3) / 4) * 16 * depth;
+
+                default:
+                    throw ("Invalid compressed pixel format");
+                    return 0;
+            }
+        }
+
+        return width * height*depth*(getBitsPerPixelFromFormat(format) / 8.0);
+    }
+
+    virtual u8* GetData(u8 miplevel = 0) { return nullptr; }
+
 };
 
 } // end namespace video

@@ -98,15 +98,24 @@ protected:
 	\param mipLevel If set to non-zero, only that specific miplevel is updated, using the MipImage member. */
 	void uploadTexture(bool newTexture=false, void* mipmapData=0, u32 mipLevel=0);
 
+    bool createTextureBuffer();
+
 	core::dimension2d<u32> ImageSize;
 	core::dimension2d<u32> TextureSize;
 	ECOLOR_FORMAT ColorFormat;
 	COpenGLDriver* Driver;
+    s32 Pitch;
+    u32 NumberOfMipLevels;
+    u32 NumberOfArraySlices;
+    E_TEXTURE_LOCK_MODE LastMapDirection;
+    u32 MipLevelLocked;
+    u32 ArraySliceLocked;
+
 	IImage* Image;
-	IImage* MipImage;
 
 	GLuint TextureName;
-	GLint InternalFormat;
+    GLuint TextureBuffer;
+    GLint InternalFormat;
 	GLenum PixelFormat;
 	GLenum PixelType;
 

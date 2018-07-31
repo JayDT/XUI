@@ -53,14 +53,14 @@ void ItemsControl::StaticClassInitializer()
 
     ItemTemplateProperty->Changed.get_observable().subscribe([](XamlCPP::Core::Dependency::DependencyPropertyChangedEventArgs const & e)
     {
-        ItemsControl* control = e.Sender->Dynamic_As<ItemsControl>();
+        ItemsControl* control = e.Sender->Static_As<ItemsControl>();
         if (control)
             control->ItemTemplateChanged((XamlCPP::Core::Dependency::DependencyPropertyChangedEventArgs&)e);
     });
 
     ItemsProperty->Changed.get_observable().subscribe([](XamlCPP::Core::Dependency::DependencyPropertyChangedEventArgs const & e)
     {
-        ItemsControl* control = e.Sender->Dynamic_As<ItemsControl>();
+        ItemsControl* control = e.Sender->Static_As<ItemsControl>();
         if (control)
             control->ItemsChanged((XamlCPP::Core::Dependency::DependencyPropertyChangedEventArgs&)e);
     });

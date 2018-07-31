@@ -24,10 +24,15 @@ namespace irr
 // also includes the OpenGL stuff
 #include "COpenGLExtensionHandler.h"
 #include "COpenGLHardwareBuffer.h"
+#include "COpenGLShader.h"
+#include "COpenGLStateCacheManager.h"
+#include "IContextManager.h"
 
 #ifdef _IRR_COMPILE_WITH_CG_
 #include "Cg/cg.h"
 #endif
+
+#include <vector>
 
 namespace irr
 {
@@ -42,77 +47,20 @@ namespace video
 	class COpenGLTexture;
     class COpenGLHardwareBuffer;
 
-    class ShaderAssembly : public IShader
-    {
-        GLenum glShaderType;
-    public:
-        explicit ShaderAssembly(video::IVideoDriver* context, E_ShaderTypes type, u32 _programId);
-        virtual ~ShaderAssembly()
-        {
-            destroy();
-        }
-
-        virtual void addShaderFile(u32 _glShaderType, const char* pFilename);
-
-        virtual E_ShaderVersion getShaderVersion() const { return ESV_GLSL_ASM; }
-        virtual void compile() {}
-        virtual void bind();
-        virtual void unbind();
-        virtual void destroy();
-        virtual void Init() {}
-        virtual void AddShaderVariable(ShaderVariableDescriptor*) {}
-    };
-
-    class ShaderProgram : public IShader
-    {
-        u32 programId;
-    public:
-        explicit ShaderProgram(video::IVideoDriver* context, E_ShaderTypes type, u32 _programId);
-        virtual ~ShaderProgram();
-
-        virtual E_ShaderVersion getShaderVersion() const { return ESV_GLSL_HIGH_LEVEL; }
-        virtual void bind();
-        virtual void unbind();
-        virtual void destroy();
-        virtual void Init() {}
-
-        u32 getProgramId() const { return programId; }
-        //svirtual void CommitValues(IShaderDataBuffer::E_UPDATE_TYPE updateType);
-        //int getProgramParam(int param);
-
-        //virtual void setUniformMatrix4fv(int loc, int count, bool transpose, float const* data);
-    };
-
-
     class COpenGLDriver : public CNullDriver, public IMaterialRendererServices, public COpenGLExtensionHandler
 	{
 		friend class COpenGLTexture;
 	public:
 
-		#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-		COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceWin32* device);
-		//! inits the windows specific parts of the open gl driver
-		bool initDriver(CIrrDeviceWin32* device);
-		bool changeRenderContext(const SExposedVideoData& videoData, CIrrDeviceWin32* device);
-		#endif
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
+        COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, IContextManager* contextManager);
+#endif
 
-		#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-		COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceLinux* device);
-		//! inits the GLX specific parts of the open gl driver
-		bool initDriver(CIrrDeviceLinux* device);
-		bool changeRenderContext(const SExposedVideoData& videoData, CIrrDeviceLinux* device);
-		#endif
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+        COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceSDL* device);
+#endif
 
-		#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
-		COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceSDL* device);
-		#endif
-
-		#ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
-		COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceMacOSX *device);
-		#endif
-
-		//! generic version which overloads the unimplemented versions
-		bool changeRenderContext(const SExposedVideoData& videoData, void* device) {return false;}
+        bool initDriver();
 
 		//! destructor
 		virtual ~COpenGLDriver();
@@ -137,6 +85,12 @@ namespace video
 
 		//! Delete hardware buffer (only some drivers can)
 		virtual void deleteHardwareBuffer(IHardwareBuffer *HWBuffer);
+
+        //! is vbo recommended on this mesh? for Modern OpenGL ALWAYS YES!!!!!!!!!!!
+        virtual bool isHardwareBufferRecommend(const scene::IMeshBuffer* mb) { return true; }
+
+        void drawMeshBuffer(const scene::IMeshBuffer* mb, scene::IMesh* mesh/* = nullptr*/, scene::ISceneNode* node/* = nullptr*/) override;
+        void InitDrawStates(const scene::IMeshBuffer * mb);
 
 		//! Draw hardware buffer
 		virtual void drawHardwareBuffer(IHardwareBuffer *HWBuffer, scene::IMesh* mesh = nullptr, scene::ISceneNode* node = nullptr);
@@ -188,19 +142,22 @@ namespace video
 		//! \param material: Material to be used from now on.
 		virtual void setMaterial(const SMaterial& material);
 
+        SMaterial& GetMaterial() { return Material; }
+        SMaterial& GetLastMaterial() { return LastMaterial; }
+
 		//! draws a set of 2d images, using a color and the alpha channel of the
 		//! texture if desired.
-		void draw2DImageBatch(const video::ITexture* texture,
-				const core::array<core::position2d<s32> >& positions,
-				const core::array<core::rect<s32> >& sourceRects,
-				const core::rect<s32>* clipRect,
-				SColor color,
-				bool useAlphaChannelOfTexture);
+		//void draw2DImageBatch(const video::ITexture* texture,
+		//		const core::array<core::position2d<s32> >& positions,
+		//		const core::array<core::rect<s32> >& sourceRects,
+		//		const core::rect<s32>* clipRect,
+		//		SColor color,
+		//		bool useAlphaChannelOfTexture);
 
 		//! draws an 2d image, using a color (if color is other then Color(255,255,255,255)) and the alpha channel of the texture if wanted.
-		virtual void draw2DImage(const video::ITexture* texture, const core::position2d<s32>& destPos,
-			const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
-			SColor color=SColor(255,255,255,255), bool useAlphaChannelOfTexture=false);
+		//virtual void draw2DImage(const video::ITexture* texture, const core::position2d<s32>& destPos,
+		//	const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
+		//	SColor color=SColor(255,255,255,255), bool useAlphaChannelOfTexture=false);
 
 		//! draws a set of 2d images, using a color and the alpha
 		/** channel of the texture if desired. The images are drawn
@@ -218,41 +175,41 @@ namespace video
 		Note that the alpha component is used: If alpha is other than 255, the image will be transparent.
 		\param useAlphaChannelOfTexture: If true, the alpha channel of the texture is
 		used to draw the image. */
-		virtual void draw2DImageBatch(const video::ITexture* texture,
-				const core::position2d<s32>& pos,
-				const core::array<core::rect<s32> >& sourceRects,
-				const core::array<s32>& indices,
-                s32 kerningWidth = 0,
-				const core::rect<s32>* clipRect=0,
-				SColor color=SColor(255,255,255,255),
-				bool useAlphaChannelOfTexture=false);
+		//virtual void draw2DImageBatch(const video::ITexture* texture,
+		//		const core::position2d<s32>& pos,
+		//		const core::array<core::rect<s32> >& sourceRects,
+		//		const core::array<s32>& indices,
+        //        s32 kerningWidth = 0,
+		//		const core::rect<s32>* clipRect=0,
+		//		SColor color=SColor(255,255,255,255),
+		//		bool useAlphaChannelOfTexture=false);
 
-		//! Draws a part of the texture into the rectangle.
-		virtual void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
-			const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
-			const video::SColor* const colors=0, bool useAlphaChannelOfTexture=false);
+		////! Draws a part of the texture into the rectangle.
+		//virtual void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+		//	const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
+		//	const video::SColor* const colors=0, bool useAlphaChannelOfTexture=false);
 
 		//! draw an 2d rectangle
-		virtual void draw2DRectangle(SColor color, const core::rect<s32>& pos,
-			const core::rect<s32>* clip = 0, bool filled = true);
+		//virtual void draw2DRectangle(SColor color, const core::rect<s32>& pos,
+		//	const core::rect<s32>* clip = 0, bool filled = true);
 
-		//!Draws an 2d rectangle with a gradient.
-		virtual void draw2DRectangle(const core::rect<s32>& pos,
-			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
-			const core::rect<s32>* clip = 0, bool filled = true);
+		////!Draws an 2d rectangle with a gradient.
+		//virtual void draw2DRectangle(const core::rect<s32>& pos,
+		//	SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
+		//	const core::rect<s32>* clip = 0, bool filled = true);
 
-		//! Draws a 2d line.
-		virtual void draw2DLine(const core::position2d<s32>& start,
-					const core::position2d<s32>& end,
-					SColor color=SColor(255,255,255,255));
+		////! Draws a 2d line.
+		//virtual void draw2DLine(const core::position2d<s32>& start,
+		//			const core::position2d<s32>& end,
+		//			SColor color=SColor(255,255,255,255));
 
 		//! Draws a single pixel
 		virtual void drawPixel(u32 x, u32 y, const SColor & color);
 
-		//! Draws a 3d line.
-		virtual void draw3DLine(const core::vector3df& start,
-					const core::vector3df& end,
-					SColor color = SColor(255,255,255,255));
+		////! Draws a 3d line.
+		//virtual void draw3DLine(const core::vector3df& start,
+		//			const core::vector3df& end,
+		//			SColor color = SColor(255,255,255,255));
 
 		//! \return Returns the name of the video driver. Example: In case of the Direct3D8
 		//! driver, it would return "Direct3D8.1".
@@ -344,6 +301,7 @@ namespace video
 		//! sets the current Texture
 		//! Returns whether setting was a success or not.
 		bool setActiveTexture(u32 stage, const video::ITexture* texture);
+        const ITexture* getCurrentTexture(irr::u8 idx) { return CurrentTexture[idx]; }
 
 		//! disables all textures beginning with the optional fromStage parameter. Otherwise all texture stages are disabled.
 		//! Returns whether disabling was successful or not.
@@ -441,6 +399,10 @@ namespace video
 
 		//! Convert E_BLEND_FACTOR to OpenGL equivalent
 		GLenum getGLBlend(E_BLEND_FACTOR factor) const;
+        GLenum getDepthFunction(E_COMPARISON_FUNC func);
+        GLenum getOGLBlendOp(E_BLEND_OPERATION operation);
+        u32 getIndexAmount(scene::E_PRIMITIVE_TYPE primType, u32 primitiveCount);
+
 
 		//! Get ZBuffer bits.
 		GLenum getZBufferBits() const;
@@ -451,20 +413,23 @@ namespace video
 		#endif
 
         //! sets the needed renderstates
-        bool setRenderStates3DMode(E_VERTEX_TYPE vType);
+        bool setRenderStates3DMode();
 
         void SetResetRenderStates() { ResetRenderStates = true; }
 
         virtual IShader* createShader(System::IO::IFileReader* vertexShader, System::IO::IFileReader* fragmentShader, System::IO::IFileReader* geometryShader, System::IO::IFileReader* tesselationShader);
-        virtual void buildShaderVariableDescriptor(IShader*);
         virtual s32 getShaderVariableID(IShader*, const c8* name);
         virtual bool setShaderConstant(ShaderVariableDescriptor const* desc, const void* values, int count, IHardwareBuffer* buffer = nullptr);
+        core::array<u8> GetShaderVariableMemoryBlock(ShaderVariableDescriptor const* desc, video::IShader* shader) override final;
+        bool SyncShaderConstant();
         virtual void useShader(IShader*);
         virtual void deleteShader(IShader*);
 
-        void addShaderFile(ShaderProgram*, u32 shaderType, System::IO::IFileReader* pFilename, std::list<u32>& ShaderObjList);
-        void compile(ShaderProgram*, std::list<u32>& ShaderObjList);
+        u32 GetBindedProgramId() const { return mBindedProgram; }
 
+        video::VertexDeclaration* createVertexDeclaration() override final;
+        COpenGLStateCacheManager* GetStateCache() { return &m_stateCache; }
+        GLSLGpuShader* GetDefaultGPU() { return m_defaultShader; }
     private:
 
 		//! clears the zbuffer and color buffer
@@ -484,14 +449,11 @@ namespace video
 		inline void getGLMatrix(GLfloat gl_matrix[16], const core::matrix4& m);
 		inline void getGLTextureMatrix(GLfloat gl_matrix[16], const core::matrix4& m);
 
-		//! Set GL pipeline to desired texture wrap modes of the material
-		void setWrapMode(const SMaterial& material);
-
 		//! get native wrap mode value
 		GLint getTextureWrapMode(const u8 clamp);
 
 		//! sets the needed renderstates
-		void setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel);
+		void setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel) override;
 
 		// returns the current size of the screen or rendertarget
 		virtual const core::dimension2d<u32>& getCurrentRenderTargetSize() const;
@@ -504,11 +466,17 @@ namespace video
 		void assignHardwareLight(u32 lightIndex);
 
 		//! helper function for render setup.
-		void getColorBuffer(const void* vertices, u32 vertexCount, E_VERTEX_TYPE vType);
+		//void getColorBuffer(const void* vertices, u32 vertexCount, E_VERTEX_TYPE vType);
 
 		//! helper function doing the actual rendering.
-		void renderArray(const void* indexList, u32 primitiveCount,
+		void renderArray(const void* vertices, u32 vertexCount, E_VERTEX_TYPE vType,
+                const void* indexList, u32 primitiveCount,
 				scene::E_PRIMITIVE_TYPE pType, E_INDEX_TYPE iType);
+
+        //! upload dynamic vertex and index data to GPU
+        virtual bool uploadVertexData(const void* vertices, u32 vertexCount,
+            const void* indexList, u32 indexCount,
+            E_VERTEX_TYPE vType, E_INDEX_TYPE iType);
 
 		core::stringw Name;
 		core::matrix4 Matrices[ETS_COUNT];
@@ -527,74 +495,13 @@ namespace video
 		bool ResetRenderStates;
 		bool Transformation3DChanged;
 		u8 AntiAlias;
+        u32 mBindedProgram = 0;
+        COpenGLStateCacheManager m_stateCache;
 
 		SMaterial Material, LastMaterial;
 		COpenGLTexture* RenderTargetTexture;
 		core::array<video::IRenderTarget> MRTargets;
-		class STextureStageCache
-		{
-			const ITexture* CurrentTexture[MATERIAL_MAX_TEXTURES];
-		public:
-			STextureStageCache()
-			{
-				for (u32 i=0; i<MATERIAL_MAX_TEXTURES; ++i)
-				{
-					CurrentTexture[i] = 0;
-				}
-			}
-
-			~STextureStageCache()
-			{
-				clear();
-			}
-
-			void set(u32 stage, const ITexture* tex)
-			{
-				if (stage<MATERIAL_MAX_TEXTURES)
-				{
-					const ITexture* oldTexture=CurrentTexture[stage];
-					if (tex)
-						tex->grab();
-					CurrentTexture[stage]=tex;
-					if (oldTexture)
-						oldTexture->drop();
-				}
-			}
-
-			const ITexture* operator[](int stage) const
-			{
-				if ((u32)stage<MATERIAL_MAX_TEXTURES)
-					return CurrentTexture[stage];
-				else
-					return 0;
-			}
-
-			void remove(const ITexture* tex)
-			{
-				for (s32 i = MATERIAL_MAX_TEXTURES-1; i>= 0; --i)
-				{
-					if (CurrentTexture[i] == tex)
-					{
-						tex->drop();
-						CurrentTexture[i] = 0;
-					}
-				}
-			}
-
-			void clear()
-			{
-				// Drop all the CurrentTexture handles
-				for (u32 i=0; i<MATERIAL_MAX_TEXTURES; ++i)
-				{
-					if (CurrentTexture[i])
-					{
-						CurrentTexture[i]->drop();
-						CurrentTexture[i] = 0;
-					}
-				}
-			}
-		};
-		STextureStageCache CurrentTexture;
+        const ITexture* CurrentTexture[MATERIAL_MAX_TEXTURES];
 		core::array<ITexture*> DepthTextures;
 		struct SUserClipPlane
 		{
@@ -604,9 +511,12 @@ namespace video
 		};
 		core::array<SUserClipPlane> UserClipPlanes;
 
-        core::array<OpenGLVERTEXELEMENT> VertexDeclarationMap[EVT_MAX_VERTEX_TYPE];
+        GLSLGpuShader* m_defaultShader;
+        COpenGLHardwareBuffer* DynamicHardwareBuffer; // Use for client side draw (depricated)
+        //core::array<OpenGLVERTEXELEMENT> VertexDeclarationMap[EVT_MAX_VERTEX_TYPE];
 
 		core::dimension2d<u32> CurrentRendertargetSize;
+        std::vector<COpenGLHardwareBuffer*> BindedBuffers;
 
 		core::stringc VendorName;
 
@@ -633,27 +543,19 @@ namespace video
 		};
 		core::array<RequestedLight> RequestedLights;
 
-		#ifdef _IRR_WINDOWS_API_
-			HDC HDc; // Private GDI Device Context
-			HWND Window;
-		#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-			CIrrDeviceWin32 *Win32Device;
-		#endif
-		#endif
-		#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-			GLXDrawable Drawable;
-			Display* X11Display;
-			CIrrDeviceLinux *X11Device;
-		#endif
-		#ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
-			CIrrDeviceMacOSX *OSXDevice;
-		#endif
-		#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
-			CIrrDeviceSDL *SDLDevice;
-		#endif
-		#ifdef _IRR_COMPILE_WITH_CG_
+        //! Built-in 2D quad for 2D rendering.
+        S3DVertex Quad2DVertices[4];
+        static const u16 Quad2DIndices[4];
+
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+        CIrrDeviceSDL *SDLDevice;
+#endif
+
+        IContextManager* ContextManager;
+
+#ifdef _IRR_COMPILE_WITH_CG_
 		CGcontext CgContext;
-		#endif
+#endif
 
 		E_DEVICE_TYPE DeviceType;
 	};

@@ -411,6 +411,17 @@ namespace System
             return (*this);
         }
 
+        bool IsNumberic(std::locale const& loc = std::locale())
+        {
+            for (char c : *this)
+            {
+                if (!std::isdigit(c, loc) && c != '.' && !isspace(c, loc))
+                    return false;
+            }
+
+            return true;
+        }
+
         std::wstring ToWString() const
         {
             //#ifdef WIN32

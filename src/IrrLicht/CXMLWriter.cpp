@@ -57,7 +57,7 @@ void CXMLWriter::writeXMLHeader()
 	}
 
 	const wchar_t* const p = L"<?xml version=\"1.0\"?>";
-	File->write(p, wcslen(p)*sizeof(wchar_t));
+	File->write(p, (irr::u32)(wcslen(p)*sizeof(wchar_t)));
 
 	writeLineBreak();
 	TextWrittenLast = false;
@@ -85,7 +85,7 @@ void CXMLWriter::writeElement(const wchar_t* name, bool empty,
 	// write name
 
 	File->write(L"<", sizeof(wchar_t));
-	File->write(name, wcslen(name)*sizeof(wchar_t));
+	File->write(name, (irr::u32)(wcslen(name)*sizeof(wchar_t)));
 
 	// write attributes
 
@@ -124,7 +124,7 @@ void CXMLWriter::writeElement(const wchar_t* name, bool empty,
 	// write name
 
 	File->write(L"<", sizeof(wchar_t));
-	File->write(name, wcslen(name)*sizeof(wchar_t));
+	File->write(name, (irr::u32)(wcslen(name)*sizeof(wchar_t)));
 
 	// write attributes
 	u32 i=0;
@@ -150,7 +150,7 @@ void CXMLWriter::writeAttribute(const wchar_t* name, const wchar_t* value)
 		return;
 
 	File->write(L" ", sizeof(wchar_t));
-	File->write(name, wcslen(name)*sizeof(wchar_t));
+	File->write(name, (irr::u32)(wcslen(name)*sizeof(wchar_t)));
 	File->write(L"=\"", 2*sizeof(wchar_t));
 	writeText(value);
 	File->write(L"\"", sizeof(wchar_t));
@@ -184,7 +184,7 @@ void CXMLWriter::writeClosingTag(const wchar_t* name)
 	}
 
 	File->write(L"</", 2*sizeof(wchar_t));
-	File->write(name, wcslen(name)*sizeof(wchar_t));
+	File->write(name, (irr::u32)(wcslen(name)*sizeof(wchar_t)));
 	File->write(L">", sizeof(wchar_t));
 	TextWrittenLast = false;
 }
@@ -212,7 +212,7 @@ void CXMLWriter::writeText(const wchar_t* text)
 	// Making a member-variable would work, but a lot of memory would stay around after writing.
 	// So the correct solution is probably using fixed block here and always write when that is full.
 	core::stringw s;
-	s.reserve(wcslen(text)+1);
+	s.reserve((irr::u32)(wcslen(text)+1));
 	const wchar_t* p = text;
 
 	while(*p)
@@ -233,7 +233,7 @@ void CXMLWriter::writeText(const wchar_t* text)
 	}
 
 	// write new string
-	File->write(s.c_str(), s.size()*sizeof(wchar_t));
+	File->write(s.c_str(), (irr::u32)(s.size()*sizeof(wchar_t)));
 	TextWrittenLast = true;
 }
 

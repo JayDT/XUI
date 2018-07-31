@@ -69,7 +69,7 @@ void XUI::Core::Application::InitializeDefaultResoures()
     LoadXamlResource(System::URI("pack://application:,,,/XUI;/Default/DefaultSlider.xaml", true));
     LoadXamlResource(System::URI("pack://application:,,,/XUI;/Default/DefaultToolTip.xaml", true));
     LoadXamlResource(System::URI("pack://application:,,,/XUI;/Default/DefaultDataGrid.xaml", true));
-	LoadXamlResource(System::URI("pack://application:,,,/XUI;/Default/DefaultLayoutDock_Theme.xaml", true));
+	//LoadXamlResource(System::URI("pack://application:,,,/XUI;/Default/DefaultLayoutDock_Theme.xaml", true));
 	LoadXamlResource(System::URI("pack://application:,,,/XUI;/Default/DefaultLayoutDock.xaml", true));
 
 }

@@ -128,7 +128,7 @@ bool CPLYMeshWriter::writeMesh(io::IWriteFile* file, scene::IMesh* mesh, s32 fla
 				tc.X, tc.Y);*/
 
 			// write the line
-			file->write(outLine, strlen(outLine));
+			file->write(outLine, (irr::u32)strlen(outLine));
 		}
 	}
 
@@ -163,7 +163,7 @@ bool CPLYMeshWriter::writeMesh(io::IWriteFile* file, scene::IMesh* mesh, s32 fla
 			// count a b c\n
 			snprintf(outLine, 1024, "3 %u %u %u\n", a, b, c);
 			// write the line
-			file->write(outLine, strlen(outLine));
+			file->write(outLine, (irr::u32)strlen(outLine));
 		}
 
 		// increment offset

@@ -51,23 +51,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-if ( UNIX )
-	include_directories( ${ZLIB_INCLUDE_DIR}/zlib  )
-elseif (WIN32)
-	include_directories( ${ZLIB_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR}/.. )
-endif( UNIX )
-
-CreateLibrary("g3dlite" "${g3dlite_SRCS}" "STATIC" "" "")
-
-add_dependencies(g3dlite zlib)
+CreateLibrary("g3dlite" "${g3dlite_SRCS}" "STATIC" "ZLIB" "")
 
 set_target_properties(g3dlite
     PROPERTIES
       FOLDER
         "dep")
-
-if(WIN32)
-  target_link_libraries(g3dlite
-    zlib
-  )
-endif()

@@ -140,6 +140,12 @@ void ItemVirtualizerSimple::ItemsChanged(System::Collection::Generic::IContainer
                 CreateAndRemoveContainers();
                 panel->ForceInvalidateMeasure();
                 break;
+
+            case System::Collection::NotifyCollectionChangedAction::Init:
+                RecycleContainersOnRemove();
+                CreateAndRemoveContainers();
+                panel->ForceInvalidateMeasure();
+                break;
         }
     }
     else
@@ -215,7 +221,7 @@ Core::Media::Size XUI::UI::Presenters::ItemVirtualizerSimple::MeasureOverride(Co
         }
     }
 
-    Owner->Panel->Measure(availableSize);
+    Owner->Panel->Measure(_availableSize);
     return Owner->Panel->DesiredSize;
 }
 
@@ -350,7 +356,7 @@ void MoveRange(XUI::UI::Controls::Control::LogicalChildrens& _inner, int oldInde
 
     auto remove_itr = std::next(_inner.GetNativeEnumerator().begin(), oldIndex); //(oldIndex, count);
     int modifiedNewIndex = newIndex;
-    for (int i = 0; i != count; ++i)
+    for (int i = oldIndex; i != (oldIndex+count); ++i)
     {
         auto itr = remove_itr;
         ++remove_itr;
@@ -367,10 +373,12 @@ void MoveRange(XUI::UI::Controls::Control::LogicalChildrens& _inner, int oldInde
     int oldid = oldIndex;
     int newid = newIndex;
 
+    // ToDo: insert range and implement to all collection event
     auto insert_itr = std::next(_inner.GetNativeEnumerator().begin(), modifiedNewIndex);
     for (auto const& item : items)
     {
         insert_itr = _inner.GetNativeEnumerator().insert(insert_itr, item);
+        ++insert_itr;
 
         if (_inner.CollectionChanged)
         {
@@ -552,10 +560,12 @@ void XUI::UI::Presenters::ItemVirtualizerSimple::RecycleContainers()
 
 void XUI::UI::Presenters::ItemVirtualizerSimple::RemoveContainers(int count)
 {
-    auto index = VirtualizingPanel->Children.size() - count;
+    auto panel = VirtualizingPanel;
+    int64 index = int64(panel->Children.size() - count);
 
-    for (int i = index; i < count; ++i)
-        VirtualizingPanel->Children.RemoveAt(i);
+    for (int i = index + count - 1; i >= index; --i)
+        panel->Children.RemoveAt(i);
+
     Owner->ItemContainerGenerator->Dematerialize(FirstIndex + index, count);
     NextIndex -= count;
 }

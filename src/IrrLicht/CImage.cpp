@@ -14,7 +14,7 @@ namespace video
 
 //! Constructor of empty image
 CImage::CImage(ECOLOR_FORMAT format, const core::dimension2d<u32>& size)
-:Data(0), Size(size), Format(format), DeleteMemory(true)
+:Data(0), Size(size), Format(format), DeleteMemory(true), Levels(nullptr), LevelCount(0)
 {
 	initData();
 }
@@ -23,7 +23,7 @@ CImage::CImage(ECOLOR_FORMAT format, const core::dimension2d<u32>& size)
 //! Constructor from raw data
 CImage::CImage(ECOLOR_FORMAT format, const core::dimension2d<u32>& size, void* data,
 			bool ownForeignMemory, bool deleteForeignMemory)
-: Data(0), Size(size), Format(format), DeleteMemory(deleteForeignMemory)
+: Data(0), Size(size), Format(format), DeleteMemory(deleteForeignMemory), Levels(nullptr), LevelCount(0)
 {
 	if (ownForeignMemory)
 	{
@@ -63,10 +63,47 @@ void CImage::initData()
 //! destructor
 CImage::~CImage()
 {
-	if ( DeleteMemory )
-		delete [] Data;
+    if (DeleteMemory)
+    {
+        delete[] Data;
+        if (Levels)
+        {
+            for (int i = 0; i < int(LevelCount); ++i)
+                delete[] Levels[i].Data;
+            delete[] Levels;
+        }
+    }
 }
 
+void CImage::initializeMipLevels(u8 levelCount, core::dimension2d<u32>* sizes)
+{
+    if (!sizes)
+        return;
+
+    LevelCount = levelCount;
+    Levels = new MipLevel[levelCount];
+    for (int i = 0; i < levelCount; ++i)
+    {
+        Levels[i].Size = sizes[i];
+        Levels[i].DataSize = BytesPerPixel * sizes[i].Width * sizes[i].Height;
+        Levels[i].Data = new u8[Levels[i].DataSize];
+    }
+}
+
+void CImage::initializeMipLevels(u8 levelCount, core::dimension2d<u32>* sizes, u32 * dataSizes)
+{
+    if (!sizes)
+        return;
+
+    LevelCount = levelCount;
+    Levels = new MipLevel[levelCount];
+    for (int i = 0; i < levelCount; ++i)
+    {
+        Levels[i].Size = sizes[i];
+        Levels[i].DataSize = dataSizes[i];
+        Levels[i].Data = new u8[Levels[i].DataSize];
+    }
+}
 
 //! Returns width and height of image data.
 const core::dimension2d<u32>& CImage::getDimension() const
@@ -90,11 +127,20 @@ f32 CImage::getBytesPerPixel() const
 
 
 //! Returns image data size in bytes
-u32 CImage::getImageDataSizeInBytes() const
+u32 CImage::getImageDataSizeInBytes(u8 miplevel) const
 {
+    if (miplevel > 0)
+        return Levels[miplevel - 1].DataSize;
 	return Pitch * Size.Height;
 }
 
+u32 CImage::getMemorySize() const
+{
+    u32 size = 0;
+    for (int i = 0; i <= int(LevelCount); ++i)
+        size += getImageDataSizeInBytes(i);
+    return size;
+}
 
 //! Returns image data size in pixels
 u32 CImage::getImageDataSizeInPixels() const
@@ -180,36 +226,38 @@ u32 CImage::getAlphaMask() const
 
 
 //! sets a pixel
-void CImage::setPixel(u32 x, u32 y, const SColor &color, bool blend)
+void CImage::setPixel(u32 x, u32 y, const SColor &color, bool blend, u8 miplevel)
 {
 	if (x >= Size.Width || y >= Size.Height)
 		return;
+
+    u8* pData = miplevel ? Levels[miplevel - 1].Data : Data;
 
 	switch(Format)
 	{
 		case ECF_A1R5G5B5:
 		{
-			u16 * dest = (u16*) (Data + ( y * Pitch ) + ( x << 1 ));
+			u16 * dest = (u16*) (pData + ( y * Pitch ) + ( x << 1 ));
 			*dest = video::A8R8G8B8toA1R5G5B5( color.color );
 		} break;
 
 		case ECF_R5G6B5:
 		{
-			u16 * dest = (u16*) (Data + ( y * Pitch ) + ( x << 1 ));
+			u16 * dest = (u16*) (pData + ( y * Pitch ) + ( x << 1 ));
 			*dest = video::A8R8G8B8toR5G6B5( color.color );
 		} break;
 
 		case ECF_R8G8B8:
 		{
-			u8* dest = Data + ( y * Pitch ) + ( x * 3 );
+			u8* dest = pData + ( y * Pitch ) + ( x * 3 );
 			dest[0] = (u8)color.getRed();
 			dest[1] = (u8)color.getGreen();
 			dest[2] = (u8)color.getBlue();
 		} break;
-
+        case ECF_RGBA8:
 		case ECF_A8R8G8B8:
 		{
-			u32 * dest = (u32*) (Data + ( y * Pitch ) + ( x << 2 ));
+			u32 * dest = (u32*) (pData + ( y * Pitch ) + ( x << 2 ));
 			*dest = blend ? PixelBlend32 ( *dest, color.color ) : color.color;
 		} break;
 #ifndef _DEBUG
@@ -221,24 +269,26 @@ void CImage::setPixel(u32 x, u32 y, const SColor &color, bool blend)
 
 
 //! returns a pixel
-SColor CImage::getPixel(u32 x, u32 y) const
+SColor CImage::getPixel(u32 x, u32 y, u8 miplevel) const
 {
 	if (x >= Size.Width || y >= Size.Height)
 		return SColor(0);
 
+    u8* pData = miplevel ? Levels[miplevel - 1].Data : Data;
+
 	switch(Format)
 	{
 	case ECF_A1R5G5B5:
-		return A1R5G5B5toA8R8G8B8(((u16*)Data)[y*Size.Width + x]);
+		return A1R5G5B5toA8R8G8B8(((u16*)pData)[y*Size.Width + x]);
 	case ECF_R5G6B5:
-		return R5G6B5toA8R8G8B8(((u16*)Data)[y*Size.Width + x]);
+		return R5G6B5toA8R8G8B8(((u16*)pData)[y*Size.Width + x]);
     case ECF_ALPHA:
     case ECF_RGBA8:
     case ECF_A8R8G8B8:
-		return ((u32*)Data)[y*Size.Width + x];
+		return ((u32*)pData)[y*Size.Width + x];
     case ECF_R8G8B8:
 		{
-			u8* p = Data+(y*3)*Size.Width + (x*3);
+			u8* p = pData +(y*3)*Size.Width + (x*3);
 			return SColor(255,p[0],p[1],p[2]);
 		}
 #ifndef _DEBUG

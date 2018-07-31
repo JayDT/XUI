@@ -129,9 +129,9 @@ CD3D11Texture::CD3D11Texture(IImage* image, CD3D11Driver* driver,
     switch (image->getColorFormat())
     {
     case ECF_RGBA8:
-    case ECF_RGBA_S3TC_DXT1:
-    case ECF_RGBA_S3TC_DXT3:
-    case ECF_RGBA_S3TC_DXT5:
+    case ECF_DXT1:
+    case ECF_DXT3:
+    case ECF_DXT5:
         ColorFormat = image->getColorFormat();
         Image = image;
         image->grab();
@@ -221,7 +221,7 @@ ID3D11ShaderResourceView* CD3D11Texture::getShaderResourceView() const
 //! lock function
 void* CD3D11Texture::lock(E_TEXTURE_LOCK_MODE mode /*= ETLM_READ_WRITE*/, u32 mipmapLevel /*= 0*/, u32 arraySlice /*= 0*/) //bool readOnly, u32 mipmapLevel, u32 arraySlice)
 {
-    if(!Texture || !createTextureBuffer())
+    if(!Texture)
         return 0;
 
     if (!STATHREADiD)
@@ -232,24 +232,31 @@ void* CD3D11Texture::lock(E_TEXTURE_LOCK_MODE mode /*= ETLM_READ_WRITE*/, u32 mi
 
     switch ( mode )
     {
-        case ETLM_READ_WRITE:
         case ETLM_WRITE_ONLY:
-        {
-            //if (!dynamic)
-            //    break;
-
-            if ( !Image )
-                Image = Driver->createImage(ColorFormat, TextureSize);
-            return Image->GetData();
-        }
+        //{
+        //    // Record mip level locked to use in unlock
+        //    MipLevelLocked = mipmapLevel;
+        //    ArraySliceLocked = arraySlice;
+        //    LastMapDirection = (D3D11_MAP)(D3D11_MAP_WRITE);
+        //
+        //    if ( !Image )
+        //        Image = Driver->createImage(ColorFormat, TextureSize);
+        //    return Image->GetData();
+        //}
+        case ETLM_READ_WRITE:
         case ETLM_READ_ONLY:
         {
+            if (!createTextureBuffer())
+                break;
+
             // Record mip level locked to use in unlock
             MipLevelLocked = mipmapLevel;
             ArraySliceLocked = arraySlice;
 
             // set map direction
-            if ( mode == ETLM_READ_ONLY )
+            if ( mode == ETLM_WRITE_ONLY)
+                LastMapDirection = D3D11_MAP_WRITE;
+            else if ( mode == ETLM_READ_ONLY )
                 LastMapDirection = D3D11_MAP_READ;
             else
                 LastMapDirection = (D3D11_MAP)(D3D11_MAP_READ | D3D11_MAP_WRITE);
@@ -297,20 +304,20 @@ void CD3D11Texture::unlock()
 
     switch ( LastMapDirection )
     {
-        case ETLM_READ_WRITE:
         case ETLM_WRITE_ONLY:
-        {
-            if ( Image )
-            {
-                size_t numBytes, RowBytes, numRows;
-                GetSurfaceInfo(Driver, Image->getDimension().Width, Image->getDimension().Height, Driver->getD3DFormatFromColorFormat(ColorFormat), &numBytes, &RowBytes, &numRows);
-
-                ArraySliceLocked = 0;
-                UINT res = D3D11CalcSubresource(0, ArraySliceLocked, NumberOfMipLevels);
-                ImmediateContext->UpdateSubresource(Texture, res, nullptr, Image->GetData(), static_cast<UINT>(RowBytes), static_cast<UINT>(numBytes));
-            }
-            break;
-        }
+        //{
+        //    if ( Image )
+        //    {
+        //        size_t numBytes, RowBytes, numRows;
+        //        GetSurfaceInfo(Driver, Image->getDimension().Width, Image->getDimension().Height, Driver->getD3DFormatFromColorFormat(ColorFormat), &numBytes, &RowBytes, &numRows);
+        //
+        //        ArraySliceLocked = 0;
+        //        UINT res = D3D11CalcSubresource(0, ArraySliceLocked, NumberOfMipLevels);
+        //        ImmediateContext->UpdateSubresource(Texture, res, nullptr, Image->GetData(), static_cast<UINT>(RowBytes), static_cast<UINT>(numBytes));
+        //    }
+        //    break;
+        //}
+        case ETLM_READ_WRITE:
         case ETLM_READ_ONLY:
         {
             // unlock texture buffer
@@ -840,13 +847,13 @@ bool CD3D11Texture::InitializeColorFormat(u32 flags, ECOLOR_FORMAT colorFormat)
     // - Irrlicht color format follows DX 9 (alpha first), and DX 10 is alpha last
     switch ( colorFormat )
     {
-        case ECF_RGBA_S3TC_DXT1:
+        case ECF_DXT1:
             format = DXGI_FORMAT_BC1_UNORM;
             break;
-        case ECF_RGBA_S3TC_DXT3:
+        case ECF_DXT3:
             format = DXGI_FORMAT_BC2_UNORM;
             break;
-        case ECF_RGBA_S3TC_DXT5:
+        case ECF_DXT5:
             format = DXGI_FORMAT_BC3_UNORM;
             break;
         default:

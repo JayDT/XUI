@@ -24,6 +24,7 @@ public:
 
 	//! sets the text string
 	virtual void setText(const wchar_t* text) = 0;
+    virtual const wchar_t* getText() const = 0;
 
 	//! sets the color of the text
 	virtual void setTextColor(video::SColor color) = 0;

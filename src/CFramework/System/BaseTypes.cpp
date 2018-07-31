@@ -56,9 +56,25 @@ int System::Int32::Parse(const std::string & value, std::locale const& loc)
 bool System::Int32::TryParse(const std::string & value, int & result, std::locale const& loc)
 {
     if (!value.empty() && std::find_if(value.begin(),
-        value.end(), [&loc](char c) { return !std::isdigit(c, loc); }) == value.end())
+        value.end(), [&loc](char c) { return !std::isdigit(c, loc) && !isspace(c, loc); }) == value.end())
     {
         result = Int32::Parse(value);
+        return true;
+    }
+    return false;
+}
+
+uint System::UInt32::Parse(const std::string & value, std::locale const & loc)
+{
+    return uint32(std::stoi(value));
+}
+
+bool System::UInt32::TryParse(const std::string& value, uint& result, std::locale const& loc)
+{
+    if (!value.empty() && std::find_if(value.begin(),
+        value.end(), [&loc](char c) { return !std::isdigit(c, loc) && !isspace(c, loc); }) == value.end())
+    {
+        result = UInt32::Parse(value);
         return true;
     }
     return false;
@@ -77,7 +93,7 @@ long long System::Int64::Parse(const std::string & value, std::locale const & lo
 bool System::Int64::TryParse(const std::string & value, long long & result, std::locale const & loc)
 {
     if (!value.empty() && std::find_if(value.begin(),
-        value.end(), [&loc](char c) { return !std::isdigit(c, loc); }) == value.end())
+        value.end(), [&loc](char c) { return !std::isdigit(c, loc) && !isspace(c, loc); }) == value.end())
     {
         result = Int32::Parse(value);
         return true;

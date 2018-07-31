@@ -74,6 +74,7 @@
 #   (this is compatible with the same CMake variables in zlib's CMake
 #   support).
 
+MESSAGE(FATAL_ERROR "not use build in freetype")
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -377,7 +378,7 @@ else ()
 endif ()
 
 if (ZLIB_FOUND)
-  target_link_libraries(freetype ${MAYBE_PRIVATE} ${ZLIB_LIBRARIES})
+  target_link_libraries(freetype ${MAYBE_PRIVATE} ZLIB)
   include_directories(${ZLIB_INCLUDE_DIRS})
 endif ()
 if (BZIP2_FOUND)

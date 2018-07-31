@@ -21,7 +21,7 @@ struct SSkinMeshBuffer : public IMeshBuffer
 	//! Default constructor
 	SSkinMeshBuffer(video::E_VERTEX_TYPE vt=video::EVT_STANDARD) :
 		ChangedID_Vertex(1), ChangedID_Index(1), VertexType(vt),
-		MappingHint_Vertex(EHM_NEVER), MappingHint_Index(EHM_NEVER),
+		MappingHint_Vertex(EHM_NEVER), MappingHint_Index(EHM_NEVER), MappingHint_Instance(EHM_NEVER),
 		BoundingBoxNeedsRecalculated(true)
 	{
 		#ifdef _DEBUG
@@ -356,6 +356,11 @@ struct SSkinMeshBuffer : public IMeshBuffer
 		return MappingHint_Index;
 	}
 
+    virtual E_HARDWARE_MAPPING getHardwareMappingHint_Instance() const
+    {
+        return MappingHint_Instance;
+    }
+
 	//! set the hardware mapping hint, for driver
 	virtual void setHardwareMappingHint( E_HARDWARE_MAPPING NewMappingHint, E_BUFFER_TYPE Buffer=EBT_VERTEX_AND_INDEX )
 	{
@@ -368,7 +373,9 @@ struct SSkinMeshBuffer : public IMeshBuffer
 			MappingHint_Vertex=NewMappingHint;
 			MappingHint_Index=NewMappingHint;
 		}
-	}
+        if (Buffer == EBT_INSTANCE)
+            MappingHint_Instance = NewMappingHint;
+    }
 
 	//! flags the mesh as changed, reloads hardware buffers
 	virtual void setDirty(E_BUFFER_TYPE Buffer=EBT_VERTEX_AND_INDEX)
@@ -403,9 +410,9 @@ struct SSkinMeshBuffer : public IMeshBuffer
 	core::aabbox3d<f32> BoundingBox;
 
 	// hardware mapping hint
-	E_HARDWARE_MAPPING MappingHint_Vertex:3;
-	E_HARDWARE_MAPPING MappingHint_Index:3;
-
+	E_HARDWARE_MAPPING MappingHint_Vertex:4;
+	E_HARDWARE_MAPPING MappingHint_Index:4;
+    E_HARDWARE_MAPPING MappingHint_Instance:4;
 	bool BoundingBoxNeedsRecalculated:1;
 };
 

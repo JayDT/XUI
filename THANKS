@@ -1,4 +1,4 @@
-XUI Thanks/credits file =https://github.com/OmniGUI/OmniXAML
+XUI Thanks/credits file =
 
 XUI is a derivation/rewrite/c++ port of Avalonia, OmniXAML and Austin Brunkhorst's C++ Reflection.
 
@@ -10,17 +10,5 @@ Thanks to Austin Brunkhorst for C++ Reflection.
 
 Thanks to Microsoft for DataGrid and LayoutDock.
 
-
-Thanks to the following projects:
-- OmniXAML https://github.com/OmniGUI/OmniXAML
-- AvaloniaUI https://github.com/AvaloniaUI
-- Microsoft for WPF and DataGrid
-- Austin Brunkhorst for C++ Reflection.
-- MaNGOS
-- TrinityCore
-- IrrLicht
-- GLM
-
 Thanks to the following people:
 
-I'll updating if missing anyone

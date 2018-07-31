@@ -851,6 +851,20 @@ namespace scene
         bool IsHighLighted() const { return isHighLighted; }
         void SetHighLighted(bool on) { isHighLighted = on; }
 
+        u32 GetRenderChangedID() const { return RenderChangedID; }
+        void SetRenderChangedID(u32 nr) { RenderChangedID = nr; }
+
+        //! Sets the new scene manager for this node and all children.
+        //! Called by addChild when moving nodes between scene managers
+        void setSceneManager(ISceneManager* newManager)
+        {
+            SceneManager = newManager;
+
+            ISceneNodeList::iterator it = Children.begin();
+            for (; it != Children.end(); ++it)
+                (*it)->setSceneManager(newManager);
+        }
+
     protected:
 
         //! A clone function for the ISceneNode members.
@@ -897,17 +911,6 @@ namespace scene
             //}
         }
 
-        //! Sets the new scene manager for this node and all children.
-        //! Called by addChild when moving nodes between scene managers
-        void setSceneManager(ISceneManager* newManager)
-        {
-            SceneManager = newManager;
-
-            ISceneNodeList::iterator it = Children.begin();
-            for (; it != Children.end(); ++it)
-                (*it)->setSceneManager(newManager);
-        }
-
         //! Name of the scene node.
         //core::stringc Name;
 
@@ -949,17 +952,14 @@ namespace scene
         //! Flag if debug data should be drawn, such as Bounding Boxes.
         u32 DebugDataVisible;
 
-        // Custom Ref count
-        //u32 CustomRefCount;
-
+        // ID for rendern culling (fast singular)
+        u32 RenderChangedID;
 
         //! Is the node visible?
         bool IsVisible : 1;
         bool IsInConstruct : 1;
-        bool isHighLighted : 1;
-
-        //! Is debug object?
         bool IsDebugObject : 1;
+        bool isHighLighted : 1;
     };
 
 

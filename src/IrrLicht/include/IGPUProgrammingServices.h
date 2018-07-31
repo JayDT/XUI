@@ -38,34 +38,6 @@ enum E_GPU_SHADING_LANGUAGE
     EGSL_HLSL
 };
 
-enum E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE
-{
-    EGVAT_NONE,
-    EGVAT_POSITION,
-    EGVAT_NORMAL,
-    EGVAT_COLOR,
-    EGVAT_COLOR2,
-    EGVAT_TCoord,
-    EGVAT_TCoord2,
-    EGVAT_Tangent,
-    EGVAT_Binormal,
-    EGVAT_TEXTURE_COORD_MOD,
-    EGVAT_TEXTURE_COORD_MOD2,
-    EGVAT_VIEW_MATRIX,
-    EGVAT_FUSTRUM_MATRIX,
-    EGVAT_BONE_IDS,
-    EGVAT_WEIGHT,
-    EGVAT_TEXTURE_UNIT_FIRST,
-    EGVAT_TEXTURE_UNIT_LAST = (EGVAT_TEXTURE_UNIT_FIRST + MATERIAL_MAX_TEXTURES) - 1,
-    EGVAT_MAX_VALUE
-};
-
-struct S_GPU_SHADER_VARIABLE_DEFAULT_LINK
-{
-    const char* name;
-    E_GPU_PROGRAM_VERTEX_ATTRIB_TYPE id;
-};
-
 //! Interface making it possible to create and use programs running on the GPU.
 class IRRLICHT_API IGPUProgrammingServices
 {

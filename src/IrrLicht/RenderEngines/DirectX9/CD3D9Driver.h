@@ -126,7 +126,7 @@ namespace video
 		//! gets the area of the current viewport
 		virtual const core::rect<s32>& getViewPort() const;
 
-        virtual IShader* createShader(const char* vertexShader, const char* fragmentShader, const char* geometryShader, const char* tesselationShader);
+        virtual IShader* createShader(System::IO::IFileReader* vertexShader, System::IO::IFileReader* fragmentShader, System::IO::IFileReader* geometryShader, System::IO::IFileReader* tesselationShader);
         virtual void useShader(IShader* gpuProgram);
         virtual bool setShaderConstant(ShaderVariableDescriptor const* desc, const void* values, int count, IHardwareBuffer* buffer /*= nullptr*/);
         void buildShaderVariableDescriptor(IShader* gpuProgram);
@@ -376,7 +376,7 @@ namespace video
 		void setVertexShader(video::E_VERTEX_TYPE newType);
 
 		//! sets the needed renderstates
-		bool setRenderStates3DMode(video::E_VERTEX_TYPE newType);
+		bool setRenderStates3DMode() override;
 
 		//! sets the needed renderstates
 		void setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel);

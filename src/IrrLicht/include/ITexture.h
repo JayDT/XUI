@@ -65,6 +65,19 @@ enum E_TEXTURE_CREATION_FLAG
 	/** BurningVideo can handle Non-Power-2 Textures in 2D (GUI), but not in 3D. */
 	ETCF_ALLOW_NON_POWER_2 = 0x00000040,
 
+    /** Texture used as a depth/stencil buffer by the GPU. */
+    ETCF_USAGE_DEPTHSTENCIL = 0x00000080,
+    /** Texture that can be rendered to by the GPU. */
+    ETCF_USAGE_RENDERTARGET = 0x00000100,
+    /** A regular texture that is often updated by the CPU. */
+    ETCF_USAGE_DYNAMIC = 0x00000200,
+    /** All mesh data will also be cached in CPU memory, making it available for fast read access from the CPU. */
+    ETCF_USAGE_CPUCACHED = 0x00000400,
+    /** Texture that allows load/store operations from the GPU program. */
+    ETCF_USAGE_LOADSTORE = 0x00000800,
+    /** Allows the CPU to directly read the texture data buffers from the GPU. */
+    ETCF_USAGE_CPUREADABLE = 0x00001000,
+
 	/** This flag is never used, it only forces the compiler to compile
 	these enumeration values to 32 bit. */
 	ETCF_FORCE_32_BIT_DO_NOT_USE = 0x7fffffff
@@ -84,6 +97,48 @@ enum E_TEXTURE_LOCK_MODE
 	/** The updated texture is uploaded to the GPU.
 	Used for initialising the shader from the CPU. */
 	ETLM_WRITE_ONLY
+};
+
+// Texture types.
+enum class TextureType
+{
+    e1D,
+    e2D,
+    eCube,
+    e3D,
+    eArray,
+};
+
+/**	Types of frame buffers. */
+enum FrameBufferType
+{
+    FBT_COLOR = 0x1, /**< Clear the color surface. */
+    FBT_DEPTH = 0x2, /**< Clear the depth surface. */
+    FBT_STENCIL = 0x4 /**< Clear the stencil surface. */
+};
+
+/**	References a subset of surfaces within a texture. */
+struct TextureSurface
+{
+    TextureSurface(uint32_t mipLevel = 0, uint32_t numMipLevels = 1, uint32_t face = 0, uint32_t numFaces = 1)
+        :mipLevel(mipLevel), numMipLevels(numMipLevels), face(face), numFaces(numFaces)
+    { }
+
+    /** First mip level to reference. */
+    u32 mipLevel;
+
+    /** Number of mip levels to reference. Must be greater than zero. */
+    u32 numMipLevels;
+
+    /**
+    * First face to reference. Face can represent a single cubemap face, or a single array entry in a
+    * texture array. If cubemaps are laid out in a texture array then every six sequential faces represent a single
+    * array entry.
+    */
+    u32 face;
+
+    /** Number of faces to reference, if the texture has more than one. */
+    u32 numFaces;
 };
 
 //! Interface of a Video Driver dependent Texture.
@@ -192,6 +247,88 @@ public:
 	const io::SNamedPath& getName() const { return NamedPath; }
 
     virtual void clearImage() {}
+
+    static bool checkFormat(ECOLOR_FORMAT& format, TextureType texType, int usage)
+    {
+        // First check just the usage since it's the most limiting factor
+
+        //// Depth-stencil only supports depth formats
+        if ((usage & ETCF_USAGE_DEPTHSTENCIL) != 0)
+        {
+            if (IImage::isDepthOnlyFormat(format))
+                return true;
+
+            format = ECOLOR_FORMAT::ECF_D32_S8X24;
+            return false;
+        }
+
+        //// Render targets support everything but compressed & depth-stencil formats
+        if ((usage & ETCF_USAGE_RENDERTARGET) != 0)
+        {
+            if (IImage::isRenderTargetOnlyFormat(format) && !IImage::isCompressedFormat(format))
+                return true;
+
+            format = ECOLOR_FORMAT::ECF_RGBA8;
+            return false;
+        }
+
+        //// Load-store textures support everything but compressed & depth-stencil formats
+        if ((usage & ETCF_USAGE_LOADSTORE) != 0)
+        {
+            if (!IImage::isDepthOnlyFormat(format) && !IImage::isCompressedFormat(format))
+                return true;
+
+            format = ECOLOR_FORMAT::ECF_RGBA8;
+            return false;
+        }
+
+        //// Sampled texture support depends on texture type
+        switch (texType)
+        {
+            case TextureType::e1D:
+            {
+                // 1D textures support anything but depth & compressed formats
+                if (!IImage::isDepthOnlyFormat(format) && !IImage::isCompressedFormat(format))
+                    return true;
+
+                format = ECOLOR_FORMAT::ECF_RGBA8;
+                return false;
+            }
+            case TextureType::e3D:
+            {
+                // 3D textures support anything but depth & compressed formats
+                if (!IImage::isDepthOnlyFormat(format))
+                    return true;
+
+                format = ECOLOR_FORMAT::ECF_RGBA8;
+                return false;
+            }
+            default: // 2D & cube
+            {
+                // 2D/cube textures support anything but depth formats
+                if (!IImage::isDepthOnlyFormat(format))
+                    return true;
+
+                format = ECOLOR_FORMAT::ECF_RGBA8;
+                return false;
+            }
+        }
+    }
+
+    static void getSizeForMipLevel(u32 width, u32 height, u32 depth, u32 mipLevel, u32& mipWidth, u32& mipHeight, u32& mipDepth)
+    {
+        mipWidth = width;
+        mipHeight = height;
+        mipDepth = depth;
+
+        for (u32 i = 0; i < mipLevel; i++)
+        {
+            if (mipWidth != 1) mipWidth /= 2;
+            if (mipHeight != 1) mipHeight /= 2;
+            if (mipDepth != 1) mipDepth /= 2;
+        }
+    }
+
 protected:
 
 	//! Helper function, helps to get the desired texture creation format from the flags.

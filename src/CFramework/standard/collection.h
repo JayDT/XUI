@@ -54,8 +54,13 @@ namespace System
             // Summary:
             //     The content of the collection changed dramatically.
             Reset = 4,
+            //
+            // Summary:
+            //     The content of the collection first initalization.
+            Init = 5,
 
-            AfterRemove = 5
+
+            AfterRemove = 6
         };
 
         struct NotifyCollectionChangedEventArgs : System::Events::EventArg

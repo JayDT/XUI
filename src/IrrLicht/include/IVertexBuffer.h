@@ -8,6 +8,7 @@
 #include "IReferenceCounted.h"
 #include "irrArray.h"
 #include "S3DVertex.h"
+#include "EHardwareBufferFlags.h"
 
 namespace irr
 {

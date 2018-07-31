@@ -14,6 +14,12 @@ struct IDirect3DDevice9;
 struct IDirect3D8;
 struct IDirect3DDevice8;
 
+namespace vk
+{
+    class Device;
+    class SwapchainKHR;
+}
+
 namespace irr
 {
 namespace video
@@ -95,6 +101,13 @@ struct SExposedVideoData
 			/** Get with for example HWND h = reinterpret_cast<HWND>(exposedData.D3D9.HWnd) */
 			void* HWnd;
 		} D3D11;
+
+        struct
+        {
+            vk::SwapchainKHR* SwapChain;
+            vk::Device* Device;
+            intptr_t WnHnd;
+        } Vulkan;
 	};
 };
 

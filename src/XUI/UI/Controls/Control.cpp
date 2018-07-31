@@ -366,13 +366,18 @@ void XUI::UI::Controls::Control::SetParent(Control * parent)
             Interfaces::IRenderRoot* renderRootParent = Dynamic_As<Interfaces::IRenderRoot>();
             auto oldRoot = renderRootParent && renderRootParent->IsRootMode() ? this : FindRenderRoot(old);
 
+#ifdef _DEBUG
             if (oldRoot == nullptr)
             {
                 throw System::InvalidOperationException("Was attached to logical tree but cannot find root.");
             }
+#endif
 
-            auto e = LogicalTreeAttachmentEventArgs(static_cast<Control*>(oldRoot));
-            OnDetachedFromLogicalTreeCore(e);
+            if (oldRoot)
+            {
+                auto e = LogicalTreeAttachmentEventArgs(static_cast<Control*>(oldRoot));
+                OnDetachedFromLogicalTreeCore(e);
+            }
         }
 
         if (!_isMovingInLogicalTemplate && (_inheritanceParent == nullptr || parent == nullptr))

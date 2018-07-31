@@ -613,9 +613,9 @@ void CColorConverter::convert_viaFormat(const void* sP, ECOLOR_FORMAT sF, s32 sN
 {
 	switch (sF)
 	{
-        case ECF_RGBA_S3TC_DXT1:
-        case ECF_RGBA_S3TC_DXT3:
-        case ECF_RGBA_S3TC_DXT5:
+        case ECF_DXT1:
+        case ECF_DXT3:
+        case ECF_DXT5:
             if ( dF == sF )
                 memcpy(dP, sP, sN);
             break;

@@ -45,7 +45,7 @@ ItemVirtualizer::ItemVirtualizer(ItemsPresenter *owner)
 
 UI::VirtualizingStackPanel* ItemVirtualizer::GetVirtualizingPanel() const
 {
-    return Owner->Panel->Dynamic_As<UI::VirtualizingStackPanel>();
+    return Owner->Panel->Static_As<UI::VirtualizingStackPanel>();
 }
 
 System::Collection::Generic::IContainer *ItemVirtualizer::GetItems() const

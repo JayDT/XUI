@@ -139,6 +139,14 @@ namespace video
 				return core::IdentityMatrix;
 		}
 
+        const core::matrix4& getTextureMatrixConst() const
+        {
+            if (TextureMatrix)
+                return *TextureMatrix;
+            else
+                return core::IdentityMatrix;
+        }
+
 		//! Sets the texture transformation matrix to mat
 		/** \param mat New texture matrix for this layer. */
 		void setTextureMatrix(const core::matrix4& mat)

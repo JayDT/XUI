@@ -334,6 +334,15 @@ void COpenGLExtensionHandler::dumpFramebufferFormats() const
 
 void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
 {
+    static bool __glewInitialized = false;
+
+    // Get extension function pointers
+    if (!__glewInitialized)
+    {
+        glewInit();
+        __glewInitialized = true;
+    }
+
 	const f32 ogl_ver = core::fast_atof(reinterpret_cast<const c8*>(glGetString(GL_VERSION)));
 	Version = static_cast<u16>(core::floor32(ogl_ver)*100+core::round32(core::fract(ogl_ver)*10.0f));
 	if ( Version >= 102)
@@ -572,6 +581,32 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
     pGLGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
     pGLGetActiveAttrib = (PFNGLGETACTIVEATTRIBPROC)IRR_OGL_LOAD_EXTENSION("glGetActiveAttrib");
     pGLGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformLocation");
+    __glewGetProgramResourceIndex = (PFNGLGETPROGRAMRESOURCEINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramResourceIndex");
+    __glewGetInteger64i_v = (PFNGLGETINTEGER64I_VPROC)IRR_OGL_LOAD_EXTENSION("glGetInteger64i_v");
+    __glewGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramResourceName");
+    __glewGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramResourceiv");
+    __glewGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInterfaceiv");
+    __glewGetActiveUniformName = (PFNGLGETACTIVEUNIFORMNAMEPROC)IRR_OGL_LOAD_EXTENSION("glGetActiveUniformName");
+    __glewBufferData = (PFNGLBUFFERDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferData");
+    __glewMapBuffer = (PFNGLMAPBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glMapBuffer");
+    __glewUnmapBuffer = (PFNGLUNMAPBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glUnmapBuffer");
+    __glewBindBuffer = (PFNGLBINDBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindBuffer");
+    __glewDebugMessageControl = (PFNGLDEBUGMESSAGECONTROLPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageControl");
+    __glewDebugMessageInsert = (PFNGLDEBUGMESSAGEINSERTPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageInsert");
+    __glewDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallback");
+    __glewBindBufferBase = (PFNGLBINDBUFFERBASEPROC)IRR_OGL_LOAD_EXTENSION("glBindBufferBase");
+    __glewBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
+    __glewBindTextureUnit = (PFNGLBINDTEXTUREUNITPROC)IRR_OGL_LOAD_EXTENSION("glBindTextureUnit");
+    __glewBindTextureUnitParameterEXT = (PFNGLBINDTEXTUREUNITPARAMETEREXTPROC)IRR_OGL_LOAD_EXTENSION("glBindTextureUnitParameterEXT");
+    __glewSamplerParameterIiv   = (PFNGLSAMPLERPARAMETERIIVPROC )IRR_OGL_LOAD_EXTENSION("glSamplerParameterIiv");
+    __glewSamplerParameterIuiv  = (PFNGLSAMPLERPARAMETERIUIVPROC)IRR_OGL_LOAD_EXTENSION("glSamplerParameterIuiv");
+    __glewSamplerParameterf     = (PFNGLSAMPLERPARAMETERFPROC   )IRR_OGL_LOAD_EXTENSION("glSamplerParameterf");
+    __glewSamplerParameterfv    = (PFNGLSAMPLERPARAMETERFVPROC  )IRR_OGL_LOAD_EXTENSION("glSamplerParameterfv");
+    __glewSamplerParameteri     = (PFNGLSAMPLERPARAMETERIPROC   )IRR_OGL_LOAD_EXTENSION("glSamplerParameteri");
+    __glewSamplerParameteriv    = (PFNGLSAMPLERPARAMETERIVPROC  )IRR_OGL_LOAD_EXTENSION("glSamplerParameteriv");
+    __glewBindSampler = (PFNGLBINDSAMPLERPROC)IRR_OGL_LOAD_EXTENSION("glBindSampler");
+    __glewDeleteSamplers = (PFNGLDELETESAMPLERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteSamplers");
+    __glewGenSamplers = (PFNGLGENSAMPLERSPROC)IRR_OGL_LOAD_EXTENSION("glGenSamplers");
 
     // get vsync extension
 	#if defined(WGL_EXT_swap_control) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
